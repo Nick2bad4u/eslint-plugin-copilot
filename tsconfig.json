@@ -117,7 +117,8 @@
         "src/**/*.ts",
         "test/**/*.d.ts",
         "test/**/*.ts",
-        "vite.config.ts"
+        "vite.config.ts",
+        "require-repository-instructions-file.ts"
     ],
     "typeAcquisition": {
         "enable": true,
