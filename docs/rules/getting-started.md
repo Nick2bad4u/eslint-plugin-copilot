@@ -7,7 +7,8 @@
 - repository-wide instructions: `.github/copilot-instructions.md`
 - path-specific instructions: `.github/instructions/**/*.instructions.md`
 - reusable prompts: `.github/prompts/**/*.prompt.md`
-- custom chat modes: `.github/chatmodes/**/*.chatmode.md`
+- custom agents: `.github/agents/**/*.agent.md`
+- legacy chat modes: `.github/chatmodes/**/*.chatmode.md`
 - agent instruction files: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`
 
 ## Basic setup

@@ -6,7 +6,7 @@ import styles from "./index.module.css";
 const featureCards = [
     {
         description:
-            "Lint repository instructions, path-specific instructions, prompt files, custom chat modes, and agent instructions.",
+            "Lint repository instructions, path-specific instructions, prompt files, custom agents, legacy chat modes, and agent instructions.",
         title: "Repository customization focus",
         to: "/docs/rules/overview",
     },
@@ -26,10 +26,7 @@ const featureCards = [
 
 export default function Home(): React.JSX.Element {
     return (
-        <Layout
-            title="eslint-plugin-copilot docs"
-            description="Documentation for eslint-plugin-copilot"
-        >
+        <Layout>
             <main className={styles.page}>
                 <section className={styles.hero}>
                     <div className="container">
@@ -39,8 +36,8 @@ export default function Home(): React.JSX.Element {
                         <h1 className={styles.title}>eslint-plugin-copilot</h1>
                         <p className={styles.subtitle}>
                             Lint GitHub Copilot repository instructions, prompt
-                            files, chat modes, and related markdown-first
-                            customization surfaces.
+                            files, custom agents, legacy chat modes, and related
+                            markdown-first customization surfaces.
                         </p>
                         <div className={styles.actions}>
                             <Link

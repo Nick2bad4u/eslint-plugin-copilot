@@ -76,7 +76,12 @@ const parseBlockList = (lines: readonly string[]): readonly string[] =>
                 return "";
             }
 
-            const [, rawValue] = listItemMatch;
+            const rawValue = listItemMatch[1];
+
+            if (rawValue === undefined) {
+                return "";
+            }
+
             return normalizeScalarValue(rawValue);
         })
         .filter((value) => value.length > 0);
@@ -103,11 +108,13 @@ const parseFrontmatterFields = (
             continue;
         }
 
-        const [
-            ,
-            key,
-            rawValue,
-        ] = fieldMatch;
+        const key = fieldMatch[1];
+        const rawValue = fieldMatch[2];
+
+        if (key === undefined || rawValue === undefined) {
+            continue;
+        }
+
         const normalizedValue = rawValue.trim();
 
         if (normalizedValue.length > 0) {
@@ -181,7 +188,12 @@ export const extractFrontmatter = (
         return null;
     }
 
-    const [rawFrontmatter, content] = frontmatterMatch;
+    const rawFrontmatter = frontmatterMatch[0];
+    const content = frontmatterMatch[1];
+
+    if (rawFrontmatter === undefined || content === undefined) {
+        return null;
+    }
 
     return {
         body: text.slice(rawFrontmatter.length),

@@ -1,10 +1,8 @@
----
 name: discover-unique-eslint-plugin-rules
 description: "🤖🤖 Use this prompt to discover net-new ESLint rules that fit the repository's niche and then IMPLEMENT the best candidates in the repo. This prompt is not just for brainstorming; it must end in real rule implementation work."
 agent: BeastMode-[3.1]
 argument-hint: Provide any rule themes, ecosystems, or rule families to target first, if applicable. Optionally specify number of rules to implement.
----
-
+agent: BeastMode-[3.1]
 # Task: Discover and Implement Net-New Rule Opportunities for This ESLint Plugin Repository
 
 Research and identify rule ideas that are relevant to this repository's domain and goals but are not already well-covered by other major ESLint plugins.

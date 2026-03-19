@@ -89,11 +89,11 @@ import * as yamlEslintParser from "yaml-eslint-parser";
  * @remarks
  * When bootstrapping a new ESLint plugin, do the following:
  *
- * 1. Import `typefest` from the npm package and add it above
- * 2. Change the `typefest` local import below to be the new plugin's name and path
+ * 1. Import your local plugin entrypoint below
+ * 2. Change the `copilot` local import below to be the new plugin's name and path
  * 3. Setup the `🚢 Local Plugin Import` section below for new plugin
  */
-import typefest from "./plugin.mjs";
+import copilot from "./plugin.mjs";
 
 // NOTE: eslint-plugin-json-schema-validator may attempt to fetch remote schemas
 // at lint time. That makes linting flaky/offline-hostile.
@@ -348,8 +348,6 @@ export default defineConfig([
         // Add patterns here to ignore files and directories globally
         // ═══════════════════════════════════════════════════════════════════════════════
         ignores: [
-            "**/**-instructions.md",
-            "**/**.instructions.md",
             "**/**dist**/**",
             "**/.agentic-tools*",
             "**/.cache/**",
@@ -369,9 +367,6 @@ export default defineConfig([
             ".devskim.json",
             ".github/ISSUE_TEMPLATE/**",
             ".github/PULL_REQUEST_TEMPLATE/**",
-            ".github/chatmodes/**",
-            ".github/instructions/**",
-            ".github/prompts/**",
             ".stryker-tmp/**",
             "**/CHANGELOG.md",
             "coverage-report.json",
@@ -696,28 +691,25 @@ export default defineConfig([
     //     ],
     //     name: "Local Plugin Rules from Source",
     //     plugins: {
-    //         typefest: typefest,
+    //         copilot: copilot,
     //     },
     //     rules: {
-    //         ...typefest.configs.all.rules,
+    //         ...copilot.configs.all.rules,
     //     },
     // },
     // #endregion
-    // #region ⌨️ Typefest
+    // #region 🤖 Copilot Customization Rules
     // ═══════════════════════════════════════════════════════════════════════════════
-    // SECTION: ⌨️ Typefest (typefest/*)
+    // SECTION: 🤖 Copilot Customization Rules (copilot/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     {
-        files: [
-            "src/**/*.{ts,tsx,mts,cts}",
-            //    "test/**/*.{ts,tsx,mts,cts}"
-        ],
-        name: "Typefest Rules for Source",
+        ...copilot.configs.all,
+        name: "Copilot Customization Rules",
         plugins: {
-            typefest: typefest,
+            ...copilot.configs.all.plugins,
         },
         rules: {
-            ...typefest.configs.all.rules,
+            ...copilot.configs.all.rules,
         },
     },
     // #endregion

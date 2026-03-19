@@ -121,57 +121,33 @@ applyTo: "**/*.ts, **/*.tsx"
 
 - Use built-in utility types to express intent:
   - `Readonly<T>`, `Required<T>`, `Partial<T>`, `Pick<T, K>`, `Omit<T, K>`, `Record<K, T>`, `NonNullable<T>`, `ReturnType<F>`, `Parameters<F>`, etc.
-- Prefer built-in TypeScript utility types first. If the repository already includes a utility-type library such as **Type-Fest**, use it when it better expresses intent than the built-ins.
+- Prefer built-in TypeScript utility types first. Reach for third-party utility-type libraries only when the repository already depends on them and the intent is meaningfully clearer than the built-ins.
 
 ### Optional Utility Library Guidelines
 
-- If the repository includes Type-Fest, import its helpers from `"type-fest"` and keep imports **narrow and explicit**:
+- If the repository already ships a utility-type library, keep imports **narrow and explicit** and prefer `import type` when you only need types.
+- Avoid adding a new dependency solely for a single helper type when a small local alias would be clearer.
+- Keep advanced type helpers:
+  - **Local to domain-focused modules** (for example, `ids.ts`, `api-types.ts`, or `json.ts`) instead of scattering them across the codebase.
+  - **Documented** at the declaration site when the helper encodes a non-obvious invariant.
+
+- For JSON-safe data, prefer a small local contract when the repository does not already expose one:
 
   ```ts
-  import type { JsonValue, SetRequired, Simplify } from "type-fest";
+  type JsonPrimitive = string | number | boolean | null;
+  type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
   ```
 
-- If Type-Fest is available, use it for:
-  - **JSON-safe types**: `JsonObject`, `JsonValue`, `Jsonify<T>` when modeling data that must be serializable.
+- For branded identifiers, prefer a readable local pattern that makes the invariant obvious:
 
-    ```ts
-    import type { JsonValue } from "type-fest";
+  ```ts
+  type Brand<TValue, TBrand extends string> = TValue & {
+    readonly __brand: TBrand;
+  };
 
-    type ApiPayload = JsonValue;
-    ```
-
-  - **Tagged and branded types**: prefer `Tagged<Type, TagName>` for IDs and other primitives that share a representation but differ semantically. Treat legacy `Opaque`/`Branded` usage as migration territory, not the preferred new pattern.
-
-    ```ts
-    import type { Tagged } from "type-fest";
-
-    type UserId = Tagged<string, "UserId">;
-    type OrderId = Tagged<string, "OrderId">;
-    ```
-
-  - **Object refinement**:
-    - `SetRequired<T, K>` / `SetOptional<T, K>` for partial/required subsets.
-    - `Merge<T, U>` for producing a single flattened type from overlapping sources.
-    - `Simplify<T>` to clean up deeply composed types for better tooling display.
-
-    ```ts
-    import type { SetRequired, Simplify } from "type-fest";
-
-    type User = {
-      id?: string;
-      name: string;
-      email?: string;
-    };
-
-    type PersistedUser = Simplify<SetRequired<User, "id" | "email">>;
-    ```
-
-  - **String manipulation**:
-    - `CamelCase`, `KebabCase`, etc., when type-level string formats matter (e.g., mapping API keys to internal names).
-
-- Keep advanced utility-library usage:
-  - **Local to domain-focused modules** (e.g., `ids.ts`, `api-types.ts`) instead of scattering across the codebase.
-  - **Documented** at the type alias site when you use more advanced utilities, so future maintainers understand the intent.
+  type UserId = Brand<string, "UserId">;
+  type OrderId = Brand<string, "OrderId">;
+  ```
 
 ---
 
@@ -205,7 +181,7 @@ applyTo: "**/*.ts, **/*.tsx"
   - Type your helpers, mocks, and fixtures.
   - Avoid `as any`; prefer helpers that create correctly typed objects.
 - Ensure test code compiles under the same strict settings as production code.
-- For test fixtures that must match JSON structures, prefer repository-approved JSON-compatible types. If Type-Fest is installed, `JsonValue`/`JsonObject` are good options; otherwise define a small local type that documents the same constraint.
+- For test fixtures that must match JSON structures, prefer repository-approved JSON-compatible types. If the repository does not already expose one, define a small local type that documents the constraint instead of reaching for `any`.
 
 ---
 

@@ -4,10 +4,10 @@
 
 ## What the rules cover
 
-- frontmatter metadata required by prompt, instructions, and chat mode files
+- frontmatter metadata required by prompt, instructions, custom agent, and legacy chat mode files
 - repository-wide instruction hygiene
-- baseline repository setup when you opt into prompts, chat modes, agent files, or path-specific instructions
-- modern fully-qualified `tools` metadata in prompt and chat mode files
+- baseline repository setup when you opt into prompts, custom agents, legacy chat modes, agent instruction files, or path-specific instructions
+- modern fully-qualified `tools` metadata in prompt, custom agent, and legacy chat mode files
 
 ## Design goals
 

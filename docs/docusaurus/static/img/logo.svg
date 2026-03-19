@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
-  <title id="title">eslint-plugin-typefest logo</title>
-  <desc id="desc">Stylized hexagon containing TF initials.</desc>
+  <title id="title">eslint-plugin-copilot logo</title>
+  <desc id="desc">Stylized chat bubble with spark accents for GitHub Copilot customization tooling.</desc>
   <defs>
     <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4f46e5" />
@@ -8,6 +8,10 @@
     </linearGradient>
   </defs>
   <rect width="128" height="128" rx="20" fill="url(#g)" />
-  <path d="M23 30h82v14H70v54H56V44H23V30Z" fill="#fff" />
-  <path d="M70 52h35v12H82v34H70V52Z" fill="#fff" opacity="0.92" />
+  <path d="M27 34c0-4.418 3.582-8 8-8h58c4.418 0 8 3.582 8 8v36c0 4.418-3.582 8-8 8H62l-16 16v-16H35c-4.418 0-8-3.582-8-8V34Z" fill="#fff" />
+  <circle cx="50" cy="53" r="5" fill="#4f46e5" />
+  <circle cx="64" cy="53" r="5" fill="#4f46e5" />
+  <circle cx="78" cy="53" r="5" fill="#4f46e5" />
+  <path d="M93 26l2.8 6.2L102 35l-6.2 2.8L93 44l-2.8-6.2L84 35l6.2-2.8L93 26Z" fill="#bfdbfe" />
+  <path d="M102 82l1.9 4.1 4.1 1.9-4.1 1.9-1.9 4.1-1.9-4.1-4.1-1.9 4.1-1.9 1.9-4.1Z" fill="#bfdbfe" opacity="0.95" />
 </svg>

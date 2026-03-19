@@ -11,6 +11,7 @@ import {
     copilotConfigMetadataByName,
     type CopilotConfigName,
 } from "./_internal/copilot-config-references.js";
+import type { CopilotRuleDocs } from "./_internal/create-copilot-rule.js";
 import { copilotRules } from "./_internal/rules-registry.js";
 
 /** ESLint severity used by generated preset rule maps. */
@@ -21,6 +22,7 @@ const COPILOT_MARKDOWN_FILES = [
     ".github/copilot-instructions.md",
     ".github/instructions/**/*.instructions.md",
     ".github/prompts/**/*.prompt.md",
+    ".github/agents/**/*.agent.md",
     ".github/chatmodes/**/*.chatmode.md",
     "**/AGENTS.md",
     "**/CLAUDE.md",
@@ -67,6 +69,7 @@ const getPackageVersion = (pkg: unknown): string => {
 /** Strongly typed ESLint rule map view of the runtime registry. */
 const eslintRules: NonNullable<ESLint.Plugin["rules"]> & typeof copilotRules =
     copilotRules as NonNullable<ESLint.Plugin["rules"]> & typeof copilotRules;
+const markdownPlugin = markdown as unknown as ESLint.Plugin;
 
 /** Stable ordered entries used to derive preset membership. */
 const copilotRuleEntries = Object.entries(copilotRules).toSorted(
@@ -99,7 +102,8 @@ const derivePresetRuleNamesByConfig = (): Readonly<
     const presetRuleMap = createEmptyPresetRuleMap();
 
     for (const [ruleName, ruleModule] of copilotRuleEntries) {
-        const configNames = ruleModule.meta.docs.copilotConfigNames;
+        const docs = ruleModule.meta.docs as CopilotRuleDocs;
+        const configNames = docs.copilotConfigNames;
 
         for (const configName of configNames) {
             presetRuleMap[configName].push(ruleName);
@@ -139,12 +143,12 @@ const createPresetConfig = (
     name: copilotConfigMetadataByName[configName].presetName,
     plugins: {
         copilot: plugin,
-        markdown,
+        markdown: markdownPlugin,
     },
     rules: errorRulesFor(presetRuleNamesByConfig[configName]),
 });
 
-const plugin = {
+const plugin: CopilotPluginContract = {
     configs: {} as CopilotConfigsContract,
     meta: {
         name: "eslint-plugin-copilot",
@@ -153,7 +157,7 @@ const plugin = {
     },
     processors: {},
     rules: eslintRules,
-} satisfies CopilotPluginContract;
+};
 
 plugin.configs = {
     all: createPresetConfig("all", plugin),

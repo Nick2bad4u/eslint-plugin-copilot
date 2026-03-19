@@ -64,7 +64,7 @@ const config: Config = {
     ],
     projectName,
     tagline:
-        "Lint GitHub Copilot repository instructions, prompt files, chat modes, and related customization assets.",
+        "Lint GitHub Copilot repository instructions, prompt files, custom agents, legacy chat modes, and related customization assets.",
     themeConfig: {
         colorMode: {
             respectPrefersColorScheme: true,

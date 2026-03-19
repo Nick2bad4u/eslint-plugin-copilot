@@ -7,7 +7,7 @@ describe("prefer-qualified-tools", () => {
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "prefer-qualified-tools",
-            text: "---\ndescription: Review the repository\nmode: agent\ntools: [search/file_search, search/read_file]\n---\nReview the repository for configuration drift.\n",
+            text: "---\ndescription: Review the repository\nagent: agent\ntools: [search/file_search, search/read_file]\n---\nReview the repository for configuration drift.\n",
         });
 
         expect(messages).toHaveLength(0);
@@ -17,7 +17,7 @@ describe("prefer-qualified-tools", () => {
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "prefer-qualified-tools",
-            text: "---\ndescription: Review the repository\nmode: agent\ntools: [file_search, search/read_file]\n---\nReview the repository for configuration drift.\n",
+            text: "---\ndescription: Review the repository\nagent: agent\ntools: [file_search, search/read_file]\n---\nReview the repository for configuration drift.\n",
         });
 
         expect(messages.map((message) => message.messageId)).toEqual([

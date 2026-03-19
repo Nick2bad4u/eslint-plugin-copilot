@@ -5,6 +5,7 @@
 import * as fs from "node:fs";
 
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 import {
     getCopilotFileKind,
     getRepositoryInstructionsPath,
@@ -14,52 +15,55 @@ import {
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
 
-const requireRepositoryInstructionsFileRule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
-            const fileKind = getCopilotFileKind(context.filename);
+const requireRepositoryInstructionsFileRule: CopilotRuleModule =
+    createCopilotRule({
+        create(context) {
+            return createMarkdownDocumentListener(() => {
+                const fileKind = getCopilotFileKind(context.filename);
 
-            if (
-                fileKind !== "agent-instructions" &&
-                fileKind !== "chatmode" &&
-                fileKind !== "instructions" &&
-                fileKind !== "prompt"
-            ) {
-                return;
-            }
+                if (
+                    fileKind !== "agent-instructions" &&
+                    fileKind !== "chatmode" &&
+                    fileKind !== "instructions" &&
+                    fileKind !== "prompt"
+                ) {
+                    return;
+                }
 
-            const repositoryInstructionsPath = getRepositoryInstructionsPath(
-                context.filename
-            );
+                const repositoryInstructionsPath =
+                    getRepositoryInstructionsPath(context.filename);
 
-            if (fs.existsSync(repositoryInstructionsPath)) {
-                return;
-            }
+                if (fs.existsSync(repositoryInstructionsPath)) {
+                    return;
+                }
 
-            reportAtDocumentStart(context, {
-                messageId: "missingRepositoryInstructions",
+                reportAtDocumentStart(context, {
+                    messageId: "missingRepositoryInstructions",
+                });
             });
-        });
-    },
-    defaultOptions: [],
-    meta: {
-        deprecated: false,
-        docs: {
-            copilotConfigs: ["copilot.configs.strict", "copilot.configs.all"],
-            description:
-                "require repositories that define Copilot customization assets to also provide `.github/copilot-instructions.md`.",
-            frozen: false,
-            recommended: false,
-            requiresTypeChecking: false,
         },
-        messages: {
-            missingRepositoryInstructions:
-                "Repositories that define Copilot prompts, chat modes, agent instructions, or path-specific instructions should also provide `.github/copilot-instructions.md` for baseline repository guidance.",
+        defaultOptions: [],
+        meta: {
+            deprecated: false,
+            docs: {
+                copilotConfigs: [
+                    "copilot.configs.strict",
+                    "copilot.configs.all",
+                ],
+                description:
+                    "require repositories that define Copilot customization assets to also provide `.github/copilot-instructions.md`.",
+                frozen: false,
+                recommended: false,
+                requiresTypeChecking: false,
+            },
+            messages: {
+                missingRepositoryInstructions:
+                    "Repositories that define Copilot prompts, custom agents, legacy chat modes, agent instructions, or path-specific instructions should also provide `.github/copilot-instructions.md` for baseline repository guidance.",
+            },
+            schema: [],
+            type: "suggestion",
         },
-        schema: [],
-        type: "suggestion",
-    },
-    name: "require-repository-instructions-file",
-});
+        name: "require-repository-instructions-file",
+    });
 
 export default requireRepositoryInstructionsFileRule;

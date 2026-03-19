@@ -1,10 +1,8 @@
----
 name: review-hacky-brittle-fixes
 description: "🤖🤖 Use this prompt to perform a comprehensive audit of the repository, focusing on fragile, brittle, hacky, or legacy code paths."
 agent: BeastMode-[3.1]
 argument-hint: Provide any trouble spots, files, or rule families to focus on, if applicable.
----
-
+agent: BeastMode-[3.1]
 # Task: Looping Audit for Hacky, Brittle, and Legacy Fixes
 
 Audit this eslint-plugin repository autonomously. Use any user-provided focus areas first; otherwise inspect the full repo.

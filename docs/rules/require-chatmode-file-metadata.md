@@ -1,20 +1,21 @@
 # require-chatmode-file-metadata
 
-Require custom Copilot chat mode files to define a non-empty `description` in frontmatter.
+Require custom Copilot agent files and legacy chat mode files to define a non-empty `description` in frontmatter.
 
 > **Rule catalog ID:** R003
 
 ## Targeted pattern scope
 
 - `.github/chatmodes/**/*.chatmode.md`
+- `.github/agents/**/*.agent.md`
 
 ## What this rule reports
 
-- chat mode files with missing or blank `description` frontmatter
+- custom agent or legacy chat mode files with missing or blank `description` frontmatter
 
 ## Why this rule exists
 
-Chat modes are reusable, user-facing workflows. A short description improves discoverability and keeps the mode contract explicit.
+The stable rule name is historical, but the rule now covers both modern custom agent files and legacy chat mode files. A short description improves discoverability and keeps the workflow contract explicit.
 
 ## ❌ Incorrect
 
@@ -37,4 +38,4 @@ Plan the next implementation step.
 
 ## Further reading
 
-- [VS Code Docs: Custom chat modes](https://code.visualstudio.com/docs/copilot/copilot-customization#_custom-chat-modes)
+- [VS Code Docs: Custom agents](https://code.visualstudio.com/docs/copilot/customization/custom-agents)

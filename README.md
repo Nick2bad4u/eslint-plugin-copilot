@@ -7,6 +7,7 @@ ESLint plugin for linting GitHub Copilot repository customization files such as:
 - `.github/copilot-instructions.md`
 - `.github/instructions/**/*.instructions.md`
 - `.github/prompts/**/*.prompt.md`
+- `.github/agents/**/*.agent.md`
 - `.github/chatmodes/**/*.chatmode.md`
 - `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md`
 
@@ -45,7 +46,7 @@ The shipped presets already configure:
 
 - `plugins.markdown` via `@eslint/markdown`
 - `language: "markdown/gfm"`
-- Copilot customization file globs for repository instructions, path-specific instructions, prompt files, chat modes, and agent-instructions files
+- Copilot customization file globs for repository instructions, path-specific instructions, prompt files, custom agents, legacy chat modes, and agent-instructions files
 
 ## What the presets lint
 
@@ -54,6 +55,7 @@ The built-in presets target these markdown file patterns:
 - `.github/copilot-instructions.md`
 - `.github/instructions/**/*.instructions.md`
 - `.github/prompts/**/*.prompt.md`
+- `.github/agents/**/*.agent.md`
 - `.github/chatmodes/**/*.chatmode.md`
 - `**/AGENTS.md`
 - `**/CLAUDE.md`

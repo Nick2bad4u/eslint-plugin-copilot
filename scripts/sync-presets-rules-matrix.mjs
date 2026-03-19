@@ -54,8 +54,10 @@ const collectPresetRuleNames = (presetConfigName) => {
     return sortStrings(names);
 };
 
-/** @param {Readonly<Record<string, unknown>>} ruleModule @returns {"—" | "💡" |
-  "🔧" | "🔧 💡"} */
+/**
+ * @param {Readonly<Record<string, unknown>>} ruleModule @returns {"—" | "💡" |
+ *   "🔧" | "🔧 💡"}
+ */
 const getRuleFixIndicator = (ruleModule) => {
     const meta = ruleModule["meta"];
 
@@ -141,8 +143,10 @@ const generatePresetRulesSection = (presetConfigName) => {
     ].join("\n");
 };
 
-/** @param {string} markdown @returns {{ headingOffset: number; sectionEndOffset:
-  number }} */
+/**
+ * @param {string} markdown @returns {{ headingOffset: number; sectionEndOffset:
+ *   number }}
+ */
 const findMatrixSectionBounds = (markdown) => {
     const headingOffset = markdown.indexOf(matrixSectionHeading);
 
@@ -192,7 +196,9 @@ const normalizeMarkdownTableSpacing = (markdown) =>
  * @returns {string}
  */
 export const generatePresetsRulesMatrixSectionFromRules = (
-    rules = builtPlugin.rules
+    rules = /** @type {Readonly<Record<string, Readonly<Record<string, unknown>>>>} */ (
+        /** @type {unknown} */ (builtPlugin.rules)
+    )
 ) => {
     const orderedRuleNames = Object.keys(rules).toSorted((left, right) =>
         left.localeCompare(right)
@@ -203,7 +209,10 @@ export const generatePresetsRulesMatrixSectionFromRules = (
     );
 
     const matrixRows = orderedRuleNames.map((ruleName) => {
-        const meta = rules[ruleName]?.meta;
+        const ruleModule = rules[ruleName];
+        const meta = isUnknownRecord(ruleModule)
+            ? ruleModule["meta"]
+            : undefined;
         const docs = isUnknownRecord(meta) ? meta["docs"] : undefined;
         const docsUrl = isUnknownRecord(docs) ? docs["url"] : undefined;
         const configNames =

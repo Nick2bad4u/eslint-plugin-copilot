@@ -49,8 +49,10 @@ export const getCopilotFileKind = (
     }
 
     if (
-        normalizedFilePath.includes("/.github/chatmodes/") &&
-        basename.endsWith(".chatmode.md")
+        (normalizedFilePath.includes("/.github/chatmodes/") &&
+            basename.endsWith(".chatmode.md")) ||
+        (normalizedFilePath.includes("/.github/agents/") &&
+            basename.endsWith(".agent.md"))
     ) {
         return "chatmode";
     }

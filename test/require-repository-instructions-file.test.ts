@@ -11,7 +11,7 @@ describe("require-repository-instructions-file", () => {
             },
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-repository-instructions-file",
-            text: "---\ndescription: Review the repository\nmode: ask\n---\nReview the repository for configuration drift.\n",
+            text: "---\ndescription: Review the repository\nagent: ask\n---\nReview the repository for configuration drift.\n",
         });
 
         expect(messages).toHaveLength(0);
@@ -21,7 +21,7 @@ describe("require-repository-instructions-file", () => {
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-repository-instructions-file",
-            text: "---\ndescription: Review the repository\nmode: ask\n---\nReview the repository for configuration drift.\n",
+            text: "---\ndescription: Review the repository\nagent: ask\n---\nReview the repository for configuration drift.\n",
         });
 
         expect(messages.map((message) => message.messageId)).toEqual([

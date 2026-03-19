@@ -8,6 +8,7 @@ Require repositories that define Copilot customization assets to also provide `.
 
 - `.github/instructions/**/*.instructions.md`
 - `.github/prompts/**/*.prompt.md`
+- `.github/agents/**/*.agent.md`
 - `.github/chatmodes/**/*.chatmode.md`
 - `AGENTS.md`
 - `CLAUDE.md`
@@ -19,7 +20,7 @@ Require repositories that define Copilot customization assets to also provide `.
 
 ## Why this rule exists
 
-Repository-wide instructions provide the broadest Copilot customization surface and are widely supported. When a repository already defines prompts, chat modes, agent instructions, or path-specific instructions, a baseline repository instructions file keeps the overall guidance coherent.
+Repository-wide instructions provide the broadest Copilot customization surface and are widely supported. When a repository already defines prompts, custom agents, legacy chat modes, agent instructions, or path-specific instructions, a baseline repository instructions file keeps the overall guidance coherent.
 
 ## ❌ Incorrect
 

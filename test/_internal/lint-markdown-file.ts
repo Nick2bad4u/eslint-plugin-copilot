@@ -14,6 +14,8 @@ type LintMarkdownRuleInput = Readonly<{
     text: string;
 }>;
 
+const markdownPlugin = markdown as unknown as ESLint.Plugin;
+
 const writeFixtureFile = async (
     rootDirectoryPath: string,
     relativeFilePath: string,
@@ -25,13 +27,13 @@ const writeFixtureFile = async (
     await fs.writeFile(absoluteFilePath, content, "utf8");
 };
 
-const createLintConfig = (ruleId: string): readonly Linter.Config[] => [
+const createLintConfig = (ruleId: string): Linter.Config[] => [
     {
         files: ["**/*.md"],
         language: "markdown/gfm",
         plugins: {
             copilot: copilotPlugin,
-            markdown,
+            markdown: markdownPlugin,
         },
         rules: {
             [`copilot/${ruleId}`]: "error",
@@ -70,7 +72,11 @@ export const lintMarkdownRule = async (
             path.join(temporaryRoot, input.filePath),
         ]);
 
-        return result?.messages ?? [];
+        if (result === undefined) {
+            return [];
+        }
+
+        return result.messages;
     } finally {
         await fs.rm(temporaryRoot, { force: true, recursive: true });
     }

@@ -1,10 +1,8 @@
----
 name: audit-rule-docs-tests-preset-sync
 description: "🤖🤖 Use this prompt to audit the full rule surface for drift between implementation, docs, tests, presets, and public plugin metadata."
 agent: BeastMode-[3.1]
 argument-hint: Provide any rule families, preset names, docs areas, or generated surfaces to prioritize, if applicable.
----
-
+agent: BeastMode-[3.1]
 # Task: Looping Rule Surface Sync Audit
 
 Audit the entire plugin surface so that rule implementations, docs, tests, presets, README tables, site docs, and public metadata remain synchronized.

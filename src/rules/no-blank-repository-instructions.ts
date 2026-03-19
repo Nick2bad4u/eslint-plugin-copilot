@@ -3,6 +3,7 @@
  * ESLint rule implementation for `no-blank-repository-instructions`.
  */
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
 import {
     extractFrontmatter,
@@ -13,7 +14,7 @@ import {
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
 
-const noBlankRepositoryInstructionsRule = createCopilotRule({
+const noBlankRepositoryInstructionsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
             if (

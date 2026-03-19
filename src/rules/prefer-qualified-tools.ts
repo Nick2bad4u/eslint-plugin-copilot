@@ -3,6 +3,7 @@
  * ESLint rule implementation for `prefer-qualified-tools`.
  */
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
 import {
     extractFrontmatter,
@@ -16,7 +17,7 @@ import {
 const isQualifiedToolName = (toolName: string): boolean =>
     toolName.includes("/");
 
-const preferQualifiedToolsRule = createCopilotRule({
+const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
             const fileKind = getCopilotFileKind(context.filename);
@@ -57,7 +58,7 @@ const preferQualifiedToolsRule = createCopilotRule({
         docs: {
             copilotConfigs: ["copilot.configs.all"],
             description:
-                "prefer fully-qualified tool names in Copilot prompt files and custom chat modes.",
+                "prefer fully-qualified tool names in Copilot prompt files, custom agents, and legacy chat modes.",
             frozen: false,
             recommended: false,
             requiresTypeChecking: false,

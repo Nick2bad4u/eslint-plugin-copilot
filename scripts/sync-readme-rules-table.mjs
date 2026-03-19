@@ -21,6 +21,10 @@ const PRESET_DOCS_URL_BASE =
 
 const presetOrder = [...copilotConfigNamesByReadmeOrder];
 
+/** @param {unknown} value @returns {value is Readonly<Record<string, unknown>>} */
+const isUnknownRecord = (value) =>
+    typeof value === "object" && value !== null && !Array.isArray(value);
+
 /**
  * @param {string} markdown
  *
@@ -104,7 +108,7 @@ const createPresetLegendLines = () =>
 const getRuleFixIndicator = (ruleModule) => {
     const meta = ruleModule["meta"];
 
-    if (typeof meta !== "object" || meta === null) {
+    if (!isUnknownRecord(meta)) {
         return "—";
     }
 
@@ -130,13 +134,13 @@ const getRuleFixIndicator = (ruleModule) => {
 const getPresetNamesForRule = (ruleModule) => {
     const meta = ruleModule["meta"];
 
-    if (typeof meta !== "object" || meta === null) {
+    if (!isUnknownRecord(meta)) {
         return [];
     }
 
     const docs = meta["docs"];
 
-    if (typeof docs !== "object" || docs === null) {
+    if (!isUnknownRecord(docs)) {
         return [];
     }
 
@@ -177,10 +181,8 @@ const getPresetIndicator = (ruleModule) => {
  */
 const toRuleTableRow = ([ruleName, ruleModule]) => {
     const meta = ruleModule["meta"];
-    const docs =
-        typeof meta === "object" && meta !== null ? meta["docs"] : undefined;
-    const docsUrl =
-        typeof docs === "object" && docs !== null ? docs["url"] : undefined;
+    const docs = isUnknownRecord(meta) ? meta["docs"] : undefined;
+    const docsUrl = isUnknownRecord(docs) ? docs["url"] : undefined;
 
     if (typeof docsUrl !== "string" || docsUrl.trim().length === 0) {
         throw new TypeError(`Rule '${ruleName}' is missing meta.docs.url.`);
@@ -225,9 +227,11 @@ export const syncReadmeRulesTable = async (options = {}) => {
     const readmePath = resolve(process.cwd(), "README.md");
     const currentMarkdown = await readFile(readmePath, "utf8");
     const generatedSection = generateReadmeRulesSectionFromRules(
-        /** @type {Readonly<
-    Record<string, Readonly<Record<string, unknown>>>
->} */ (builtPlugin.rules)
+        /**
+         * @type {Readonly<
+         *     Record<string, Readonly<Record<string, unknown>>>
+         * >}
+         */ (/** @type {unknown} */ (builtPlugin.rules))
     );
     const { endOffset, startOffset } =
         getReadmeRulesSectionBounds(currentMarkdown);

@@ -3,6 +3,7 @@
  * ESLint rule implementation for `require-prompt-file-metadata`.
  */
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
 import {
     extractFrontmatter,
@@ -15,13 +16,13 @@ import {
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
 
-const VALID_PROMPT_MODES = new Set([
+const VALID_BUILT_IN_PROMPT_AGENTS = new Set([
     "agent",
     "ask",
-    "edit",
+    "plan",
 ]);
 
-const requirePromptFileMetadataRule = createCopilotRule({
+const requirePromptFileMetadataRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
             if (getCopilotFileKind(context.filename) !== "prompt") {
@@ -51,28 +52,27 @@ const requirePromptFileMetadataRule = createCopilotRule({
                 return;
             }
 
-            const mode = getFrontmatterScalar(frontmatter, "mode");
-
-            if (mode === undefined) {
+            if (hasFrontmatterField(frontmatter, "mode")) {
                 reportAtDocumentStart(context, {
-                    messageId: hasFrontmatterField(frontmatter, "mode")
-                        ? "emptyMode"
-                        : "missingMode",
+                    messageId: "deprecatedMode",
                 });
                 return;
             }
 
-            if (!VALID_PROMPT_MODES.has(mode)) {
+            const agent = getFrontmatterScalar(frontmatter, "agent");
+
+            if (agent === undefined) {
                 reportAtDocumentStart(context, {
-                    data: { mode },
-                    messageId: "invalidMode",
+                    messageId: hasFrontmatterField(frontmatter, "agent")
+                        ? "emptyAgent"
+                        : "missingAgent",
                 });
                 return;
             }
 
             const tools = getFrontmatterList(frontmatter, "tools");
 
-            if (mode === "agent") {
+            if (agent === "agent") {
                 if (tools !== undefined) {
                     return;
                 }
@@ -85,9 +85,12 @@ const requirePromptFileMetadataRule = createCopilotRule({
                 return;
             }
 
-            if (hasFrontmatterField(frontmatter, "tools")) {
+            if (
+                VALID_BUILT_IN_PROMPT_AGENTS.has(agent) &&
+                hasFrontmatterField(frontmatter, "tools")
+            ) {
                 reportAtDocumentStart(context, {
-                    data: { mode },
+                    data: { agent },
                     messageId: "unexpectedTools",
                 });
             }
@@ -104,30 +107,30 @@ const requirePromptFileMetadataRule = createCopilotRule({
                 "copilot.configs.all",
             ],
             description:
-                "require reusable Copilot prompt files to declare description, mode, and agent-mode tools metadata.",
+                "require reusable Copilot prompt files to declare description, agent, and built-in agent-mode tools metadata.",
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
         },
         messages: {
+            deprecatedMode:
+                "Copilot prompt files should use `agent` instead of the deprecated `mode` frontmatter key.",
             emptyDescription:
                 "Copilot prompt files must define a non-empty `description` frontmatter value.",
-            emptyMode:
-                "Copilot prompt files must define a non-empty `mode` frontmatter value.",
+            emptyAgent:
+                "Copilot prompt files must define a non-empty `agent` frontmatter value.",
             emptyTools:
-                "Agent-mode Copilot prompt files must define a non-empty `tools` frontmatter list.",
-            invalidMode:
-                "Copilot prompt file mode `{{mode}}` is invalid. Use `ask`, `edit`, or `agent`.",
+                "Built-in `agent` Copilot prompt files must define a non-empty `tools` frontmatter list.",
             missingDescription:
                 "Copilot prompt files must define a `description` frontmatter value.",
             missingFrontmatter:
-                "Copilot prompt files must start with YAML frontmatter that declares at least `description` and `mode`.",
-            missingMode:
-                "Copilot prompt files must define a `mode` frontmatter value.",
+                "Copilot prompt files must start with YAML frontmatter that declares at least `description` and `agent`.",
+            missingAgent:
+                "Copilot prompt files must define an `agent` frontmatter value.",
             missingTools:
-                "Agent-mode Copilot prompt files must define a `tools` frontmatter list.",
+                "Built-in `agent` Copilot prompt files must define a `tools` frontmatter list.",
             unexpectedTools:
-                "Copilot prompt files should only declare `tools` when `mode` is `agent` (current mode: `{{mode}}`).",
+                "Copilot prompt files should only declare `tools` when `agent` is the built-in `agent` mode (current agent: `{{agent}}`).",
         },
         schema: [],
         type: "problem",

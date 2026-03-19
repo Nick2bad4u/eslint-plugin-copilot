@@ -20,7 +20,7 @@ assignees: []
 
 - Type: New rule / Rule enhancement / Config preset / Docs / Tooling
 - Affected rule IDs (if any):
-- Targeted Copilot surface: repository instructions / path-specific instructions / prompt files / chat modes / agent instructions / other
+- Targeted Copilot surface: repository instructions / path-specific instructions / prompt files / custom agents / legacy chat modes / agent instructions / other
 
 ## Alternatives considered
 

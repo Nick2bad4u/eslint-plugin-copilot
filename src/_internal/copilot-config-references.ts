@@ -14,6 +14,14 @@ export const copilotConfigNames = [
 /** Canonical flat-config preset key type exposed through `plugin.configs`. */
 export type CopilotConfigName = (typeof copilotConfigNames)[number];
 
+/** Fully-qualified preset reference lookup object shape. */
+type CopilotConfigReferenceMap = Readonly<{
+    "copilot.configs.all": "all";
+    "copilot.configs.minimal": "minimal";
+    "copilot.configs.recommended": "recommended";
+    "copilot.configs.strict": "strict";
+}>;
+
 /** Metadata contract shared across preset wiring, docs, and README rendering. */
 export type CopilotConfigMetadata = Readonly<{
     icon: string;
@@ -61,18 +69,20 @@ export const copilotConfigNamesByReadmeOrder: readonly CopilotConfigName[] = [
 ];
 
 /** Fully-qualified preset reference lookup used by rule docs metadata. */
-export const copilotConfigReferenceToName = {
+export const copilotConfigReferenceToName: CopilotConfigReferenceMap = {
     "copilot.configs.all": "all",
     "copilot.configs.minimal": "minimal",
     "copilot.configs.recommended": "recommended",
     "copilot.configs.strict": "strict",
-} as const satisfies Readonly<Record<string, CopilotConfigName>>;
+};
 
 /** Fully-qualified preset reference type accepted in docs metadata. */
 export type CopilotConfigReference = keyof typeof copilotConfigReferenceToName;
 
 /** Check whether a string is a supported docs preset reference. */
-export const isCopilotConfigReference = (
+export const isCopilotConfigReference: (
     value: string
+) => value is CopilotConfigReference = (
+    value
 ): value is CopilotConfigReference =>
     Object.prototype.hasOwnProperty.call(copilotConfigReferenceToName, value);

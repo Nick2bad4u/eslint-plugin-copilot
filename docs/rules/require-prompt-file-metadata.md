@@ -1,6 +1,6 @@
 # require-prompt-file-metadata
 
-Require reusable Copilot prompt files to declare `description`, `mode`, and agent-mode `tools` metadata.
+Require reusable Copilot prompt files to declare `description`, `agent`, and built-in agent-mode `tools` metadata.
 
 > **Rule catalog ID:** R002
 
@@ -11,19 +11,20 @@ Require reusable Copilot prompt files to declare `description`, `mode`, and agen
 ## What this rule reports
 
 - prompt files with missing or blank `description`
-- prompt files with missing or blank `mode`
-- agent-mode prompt files without `tools`
+- prompt files with missing or blank `agent`
+- prompt files that still use deprecated `mode`
+- built-in `agent` prompt files without `tools`
 
 ## Why this rule exists
 
-Prompt files are reusable requests. Explicit metadata makes them easier to understand, safer to run, and more consistent across repositories.
+Prompt files are reusable requests. Explicit metadata makes them easier to understand, safer to run, and more consistent across repositories. Current VS Code prompt files use `agent` instead of the older `mode` key.
 
 ## ❌ Incorrect
 
 ```md
 ---
 description: Review this repository
-mode: agent
+agent: agent
 ---
 Audit the repository for stale branding and broken docs links.
 ```
@@ -33,7 +34,7 @@ Audit the repository for stale branding and broken docs links.
 ```md
 ---
 description: Review this repository
-mode: agent
+agent: agent
 tools: [search/file_search, search/read_file]
 ---
 Audit the repository for stale branding and broken docs links.
@@ -41,4 +42,4 @@ Audit the repository for stale branding and broken docs links.
 
 ## Further reading
 
-- [VS Code Docs: Reusable prompt files](https://code.visualstudio.com/docs/copilot/copilot-customization#_prompt-files-experimental)
+- [VS Code Docs: Reusable prompt files](https://code.visualstudio.com/docs/copilot/customization/prompt-files)
