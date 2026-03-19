@@ -1,7 +1,7 @@
 ---
 name: review-repo-consistency-dedupe
 description: "🤖🤖 Use this prompt to audit the repository for consistency drift, duplicate logic, and normalization opportunities."
-mode: ask
+agent: BeastMode-[3.1]
 argument-hint: Provide any subsystems, rule families, files, or patterns to prioritize, if applicable.
 ---
 
