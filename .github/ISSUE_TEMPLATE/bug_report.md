@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a reproducible bug in eslint-plugin-typefest
+about: Report a reproducible bug in eslint-plugin-copilot
 title: "Bug: "
 labels:
     - bug
@@ -14,7 +14,7 @@ assignees: []
 
 ## Rule / Area
 
-<!-- Example: prefer-ts-extras-array-find, docs/docusaurus, presets, runtime API docs -->
+<!-- Example: require-prompt-file-metadata, docs/rules, presets, runtime plugin export -->
 
 ## Reproduction
 
@@ -24,16 +24,16 @@ assignees: []
 // Minimal eslint.config.mjs (or relevant excerpt)
 ```
 
-### Minimal code sample
+### Minimal markdown sample
 
-```ts
-// Minimal reproducible input
+```md
+<!-- Minimal reproducible Copilot file input -->
 ```
 
 ### Command and output
 
 ```bash
-# Example: npm run test -- test/prefer-ts-extras-array-find.test.ts
+# Example: npm run test -- test/require-prompt-file-metadata.test.ts
 ```
 
 ## Steps to reproduce
@@ -51,11 +51,10 @@ assignees: []
 - Node.js version:
 - npm version:
 - ESLint version:
-- TypeScript version:
-- `@typescript-eslint/*` version:
-- `eslint-plugin-typefest` version/commit:
+- `@eslint/markdown` version:
+- `eslint-plugin-copilot` version/commit:
 - OS:
 
 ## Additional context
 
-<!-- Add logs, screenshots, benchmark numbers, or related issues/PRs if helpful. -->
+<!-- Add logs, screenshots, or related issues/PRs if helpful. -->

@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest a new rule or improvement for eslint-plugin-typefest
+about: Suggest a new rule or improvement for eslint-plugin-copilot
 title: "Feature: "
 labels:
     - enhancement
@@ -10,7 +10,7 @@ assignees: []
 
 ## Problem statement
 
-<!-- What developer pain does this solve? -->
+<!-- What repository or Copilot customization problem does this solve? -->
 
 ## Proposed solution
 
@@ -20,7 +20,7 @@ assignees: []
 
 - Type: New rule / Rule enhancement / Config preset / Docs / Tooling
 - Affected rule IDs (if any):
-- Requires type checking?: Yes / No / Unsure
+- Targeted Copilot surface: repository instructions / path-specific instructions / prompt files / chat modes / agent instructions / other
 
 ## Alternatives considered
 
@@ -28,19 +28,19 @@ assignees: []
 
 ### Before
 
-```ts
-// Code that should be reported (if applicable)
+```md
+<!-- Input that should be reported (if applicable) -->
 ```
 
 ### After
 
-```ts
-// Desired code after fix/suggestion
+```md
+<!-- Desired content after a fix or suggestion -->
 ```
 
 ## Acceptance criteria
 
 - [ ] Clear, actionable diagnostic message(s)
 - [ ] Safe autofix or suggestion behavior defined
-- [ ] Test coverage plan (valid/invalid/edge/fixer)
+- [ ] Test coverage plan (valid/invalid/edge cases)
 - [ ] Documentation impact identified (`docs/rules/<rule-id>.md` if rule-related)

@@ -1,25 +1,25 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
-    "name": "eslint-plugin-typefest",
+    "name": "eslint-plugin-copilot",
     "version": "1.0.4",
     "private": false,
-    "description": "ESLint rules for adopting type-fest and ts-extras conventions.",
+    "description": "ESLint rules for GitHub Copilot repository customization files.",
     "keywords": [
+        "copilot",
         "eslint",
         "eslint-plugin",
         "eslintplugin",
-        "type-fest",
-        "ts-extras",
-        "typescript"
+        "github-copilot",
+        "markdown"
     ],
-    "homepage": "https://github.com/Nick2bad4u/eslint-plugin-typefest",
+    "homepage": "https://github.com/Nick2bad4u/eslint-plugin-copilot",
     "bugs": {
-        "url": "https://github.com/Nick2bad4u/eslint-plugin-typefest/issues",
+        "url": "https://github.com/Nick2bad4u/eslint-plugin-copilot/issues",
         "email": "20943337+Nick2bad4u@users.noreply.github.com"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Nick2bad4u/eslint-plugin-typefest.git"
+        "url": "git+https://github.com/Nick2bad4u/eslint-plugin-copilot.git"
     },
     "license": "MIT",
     "author": "Nick2bad4u <20943337+Nick2bad4u@users.noreply.github.com> (https://github.com/Nick2bad4u)",
@@ -57,26 +57,12 @@
         "docs/docusaurus"
     ],
     "scripts": {
-        "prebench": "npm run build",
-        "bench": "node benchmarks/run-eslint-stats.mjs",
-        "prebench:compare": "npm run build",
-        "bench:compare": "node benchmarks/run-eslint-stats.mjs --iterations=6 --warmup=2 --compare=coverage/benchmarks/eslint-stats.json",
-        "prebench:eslint:stats": "npm run build",
-        "bench:eslint:stats": "node benchmarks/run-eslint-stats.mjs",
-        "prebench:eslint:timing": "npm run build",
-        "bench:eslint:timing": "cross-env TIMING=all eslint --config benchmarks/eslint-timing.config.mjs --stats \"test/fixtures/typed/*.invalid.ts\"",
-        "prebench:rule-benchmark": "npm run build",
-        "bench:rule-benchmark": "eslint-rule-benchmark run",
-        "prebench:ui": "npm run build",
-        "bench:ui": "vitest bench --ui",
-        "prebench:watch": "npm run build",
-        "bench:watch": "vitest bench",
         "build": "tsc -p tsconfig.build.json && npm run build:types:cjs && npm run build:cjs",
         "build:cjs": "esbuild dist/plugin.js --bundle --format=cjs --platform=node --packages=external --sourcemap --outfile=dist/plugin.cjs --footer:js=\"module.exports = module.exports.default;\"",
         "build:clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
-        "build:eslint-inspector": "npx -y @eslint/config-inspector@1.4.2 build --outDir \"docs/docusaurus/static/eslint-inspector\" --base \"/eslint-plugin-typefest/eslint-inspector/\"",
+        "build:eslint-inspector": "npx -y @eslint/config-inspector@1.4.2 build --outDir \"docs/docusaurus/static/eslint-inspector\" --base \"/eslint-plugin-copilot/eslint-inspector/\"",
         "build:eslint-inspector:local": "npx @eslint/config-inspector",
-        "build:stylelint-inspector": "npx -y stylelint-config-inspector@latest build --outDir \"docs/docusaurus/static/stylelint-inspector\" --base \"/eslint-plugin-typefest/stylelint-inspector/\"",
+        "build:stylelint-inspector": "npx -y stylelint-config-inspector@latest build --outDir \"docs/docusaurus/static/stylelint-inspector\" --base \"/eslint-plugin-copilot/stylelint-inspector/\"",
         "build:stylelint-inspector:local": "npx stylelint-config-inspector@latest",
         "build:types:cjs": "node -e \"require('node:fs').copyFileSync('dist/plugin.d.ts','dist/plugin.d.cts')\"",
         "changelog:generate": "git-cliff --config cliff.toml --output CHANGELOG.md",
@@ -141,7 +127,7 @@
         "lint:exports": "ts-unused-exports tsconfig.json src/plugin.ts --excludePathsFromReport=plugin.ts",
         "lint:fix": "cross-env NODE_OPTIONS=--max_old_space_size=16384 eslint --cache --cache-strategy content --cache-location .cache/.eslintcache --fix",
         "lint:fix:quiet": "cross-env ESLINT_PROGRESS=off NODE_OPTIONS=--max_old_space_size=16384 eslint --cache --cache-strategy content --cache-location .cache/.eslintcache --fix && echo \"Eslint fix done!\"",
-        "lint:grype": "grype . -c .grype.yaml --name eslint-plugin-typefest",
+        "lint:grype": "grype . -c .grype.yaml --name eslint-plugin-copilot",
         "lint:knip": "npm run knip",
         "lint:knip:exports": "npm run knip -- --include exports,nsExports,classMembers,types,nsTypes,enumMembers,duplicates",
         "lint:knip:unused:exports": "npm run knip -- --dependencies --exports",
@@ -181,12 +167,10 @@
         "sync:peer-eslint-range": "node scripts/sync-peer-eslint-range.mjs",
         "sync:presets-rules-matrix": "node scripts/sync-presets-rules-matrix.mjs",
         "sync:readme-rules-table": "node scripts/sync-readme-rules-table.mjs",
-        "sync:readme-rules-table:update": "npm run build && cross-env TYPEFEST_UPDATE_GENERATED_DOCS=1 vitest run test/readme-rules-table-sync.test.ts -u",
+        "sync:readme-rules-table:update": "npm run build && cross-env COPILOT_UPDATE_GENERATED_DOCS=1 vitest run test/readme-rules-table-sync.test.ts -u",
         "sync:readme-rules-table:write": "node scripts/sync-readme-rules-table.mjs --write",
         "pretest": "npm run build",
         "test": "vitest run",
-        "test:autofix:fixtures": "cross-env TYPEFEST_AUTOFIX_SMOKE=1 vitest run test/autofix-fixtures-all-rules-smoke.test.ts",
-        "test:autofix:fixtures:typed": "cross-env TYPEFEST_AUTOFIX_SMOKE=1 TYPEFEST_AUTOFIX_FIXTURE_DIR=test/fixtures/typed vitest run test/autofix-fixtures-all-rules-smoke.test.ts",
         "test:ci": "cross-env CI=true vitest run --reporter=default",
         "test:coverage": "vitest run --coverage --reporter=default",
         "test:coverage:detailed": "vitest run --coverage --reporter=verbose",
@@ -217,9 +201,7 @@
     "dependencies": {
         "@typescript-eslint/parser": "^8.57.1",
         "@typescript-eslint/type-utils": "^8.57.1",
-        "@typescript-eslint/utils": "^8.57.1",
-        "ts-extras": "^0.17.0",
-        "type-fest": "^5.4.4"
+        "@typescript-eslint/utils": "^8.57.1"
     },
     "devDependencies": {
         "@arethetypeswrong/cli": "^0.18.2",
@@ -341,7 +323,6 @@
         "eslint-plugin-total-functions": "^7.1.0",
         "eslint-plugin-tsdoc": "^0.5.2",
         "eslint-plugin-tsdoc-require-2": "^1.0.5",
-        "eslint-plugin-typefest": "^1.0.4",
         "eslint-plugin-undefined-css-classes": "^0.1.5",
         "eslint-plugin-unicorn": "^63.0.0",
         "eslint-plugin-unused-imports": "^4.4.1",

@@ -1,6 +1,7 @@
 ---
 name: audit-eslint-plugin-best-practices
 description: "🤖🤖 Use this prompt to audit the repository against modern ESLint plugin authoring best practices and official guidance."
+mode: ask
 argument-hint: Provide any surfaces to compare first, such as rule metadata, presets, docs, tests, or plugin exports.
 ---
 

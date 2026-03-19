@@ -6,45 +6,25 @@
 
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
 
 import builtPlugin from "../dist/plugin.js";
 import {
-    typefestConfigMetadataByName,
-    typefestConfigNamesByReadmeOrder,
-    typefestConfigReferenceToName,
-} from "../dist/_internal/typefest-config-references.js";
+    copilotConfigMetadataByName,
+    copilotConfigNamesByReadmeOrder,
+} from "../dist/_internal/copilot-config-references.js";
 
-/**
- * @typedef {Readonly<{
- *     meta?: {
- *         docs?: {
- *             typefestConfigs?: readonly string[] | string;
- *             url?: string;
- *         };
- *         fixable?: string;
- *         hasSuggestions?: boolean;
- *     };
- * }>} ReadmeRuleModule
- */
-
-/** @typedef {Readonly<Record<string, ReadmeRuleModule>>} ReadmeRulesMap */
-
-/** @typedef {import("../dist/_internal/typefest-config-references.js").TypefestConfigName} PresetName */
-
-const presetOrder = [...typefestConfigNamesByReadmeOrder];
-const presetNameSet = new Set(presetOrder);
+/** @typedef {import("../dist/_internal/copilot-config-references.js").CopilotConfigName} PresetName */
 
 const rulesSectionHeading = "## Rules";
 const PRESET_DOCS_URL_BASE =
-    "https://nick2bad4u.github.io/eslint-plugin-typefest/docs/rules/presets";
+    "https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets";
+
+const presetOrder = [...copilotConfigNamesByReadmeOrder];
 
 /**
- * Locate the rules section bounds within README markdown.
- *
  * @param {string} markdown
  *
- * @returns {Readonly<{ endOffset: number; startOffset: number }>}
+ * @returns {{ endOffset: number; startOffset: number }}
  */
 const getReadmeRulesSectionBounds = (markdown) => {
     const startOffset = markdown.indexOf(rulesSectionHeading);
@@ -65,23 +45,6 @@ const getReadmeRulesSectionBounds = (markdown) => {
 };
 
 /**
- * Extract the README rules section without including the blank separator line
- * that belongs to the following section.
- *
- * @param {string} markdown
- *
- * @returns {string}
- */
-export const extractReadmeRulesSection = (markdown) => {
-    const { endOffset, startOffset } = getReadmeRulesSectionBounds(markdown);
-
-    return markdown.slice(startOffset, endOffset);
-};
-
-/**
- * Normalize markdown table row spacing so formatter-aligned columns compare
- * equivalently to compact generated rows.
- *
  * @param {string} markdown
  *
  * @returns {string}
@@ -100,30 +63,7 @@ export const normalizeRulesSectionMarkdown = (markdown) =>
             const cells = trimmedLine
                 .split("|")
                 .slice(1, -1)
-                .map((cell) => {
-                    const trimmedCell = cell.trim();
-
-                    if (!/^:?-+:?$/v.test(trimmedCell)) {
-                        return trimmedCell;
-                    }
-
-                    const hasStartColon = trimmedCell.startsWith(":");
-                    const hasEndColon = trimmedCell.endsWith(":");
-
-                    if (hasStartColon && hasEndColon) {
-                        return ":-:";
-                    }
-
-                    if (hasStartColon) {
-                        return ":--";
-                    }
-
-                    if (hasEndColon) {
-                        return "--:";
-                    }
-
-                    return "---";
-                });
+                .map((cell) => cell.trim());
 
             return `| ${cells.join(" | ")} |`;
         })
@@ -131,25 +71,11 @@ export const normalizeRulesSectionMarkdown = (markdown) =>
         .trimEnd();
 
 /** @type {Readonly<Record<PresetName, string>>} */
-const presetDocsSlugByName = {
-    all: "all",
-    minimal: "minimal",
-    recommended: "recommended",
-    "recommended-type-checked": "recommended-type-checked",
-    strict: "strict",
-    "ts-extras/type-guards": "ts-extras-type-guards",
-    "type-fest/types": "type-fest-types",
-};
-
-/** @type {Readonly<Record<PresetName, string>>} */
 const presetConfigReferenceByName = {
-    all: "typefest.configs.all",
-    minimal: "typefest.configs.minimal",
-    recommended: "typefest.configs.recommended",
-    "recommended-type-checked": 'typefest.configs["recommended-type-checked"]',
-    strict: "typefest.configs.strict",
-    "ts-extras/type-guards": 'typefest.configs["ts-extras/type-guards"]',
-    "type-fest/types": 'typefest.configs["type-fest/types"]',
+    all: "copilot.configs.all",
+    minimal: "copilot.configs.minimal",
+    recommended: "copilot.configs.recommended",
+    strict: "copilot.configs.strict",
 };
 
 /**
@@ -158,87 +84,32 @@ const presetConfigReferenceByName = {
  * @returns {string}
  */
 const createPresetDocsUrl = (presetName) =>
-    `${PRESET_DOCS_URL_BASE}/${presetDocsSlugByName[presetName]}`;
+    `${PRESET_DOCS_URL_BASE}/${presetName}`;
 
-/**
- * @returns {readonly string[]}
- */
+/** @returns {readonly string[]} */
 const createPresetLegendLines = () =>
     presetOrder.map((presetName) => {
         const docsUrl = createPresetDocsUrl(presetName);
-        const presetIcon = typefestConfigMetadataByName[presetName].icon;
+        const presetIcon = copilotConfigMetadataByName[presetName].icon;
         const configReference = presetConfigReferenceByName[presetName];
 
         return `  - [${presetIcon}](${docsUrl}) — [\`${configReference}\`](${docsUrl})`;
     });
 
 /**
- * @param {string} reference
- *
- * @returns {null | PresetName}
- */
-const normalizeTypefestConfigName = (reference) => {
-    if (Object.hasOwn(typefestConfigReferenceToName, reference)) {
-        const referenceKey =
-            /** @type {keyof typeof typefestConfigReferenceToName} */ (
-                reference
-            );
-
-        return typefestConfigReferenceToName[referenceKey];
-    }
-
-    const presetName = /** @type {PresetName} */ (reference);
-
-    return presetNameSet.has(presetName) ? presetName : null;
-};
-
-/**
- * @param {readonly string[] | string | undefined} typefestConfigs
- *
- * @returns {readonly PresetName[]}
- */
-const normalizeTypefestConfigNames = (typefestConfigs) => {
-    const references = Array.isArray(typefestConfigs)
-        ? typefestConfigs
-        : [typefestConfigs];
-
-    /** @type {PresetName[]} */
-    const names = [];
-    /** @type {Set<PresetName>} */
-    const seenPresetNames = new Set();
-
-    for (const reference of references) {
-        if (typeof reference !== "string") {
-            continue;
-        }
-
-        const configName = normalizeTypefestConfigName(reference);
-
-        if (configName === null) {
-            continue;
-        }
-
-        if (!presetNameSet.has(configName)) {
-            continue;
-        }
-
-        if (!seenPresetNames.has(configName)) {
-            seenPresetNames.add(configName);
-            names.push(configName);
-        }
-    }
-
-    return names;
-};
-
-/**
- * @param {ReadmeRuleModule} ruleModule
+ * @param {Readonly<Record<string, unknown>>} ruleModule
  *
  * @returns {"—" | "💡" | "🔧" | "🔧 💡"}
  */
 const getRuleFixIndicator = (ruleModule) => {
-    const fixable = ruleModule.meta?.fixable === "code";
-    const hasSuggestions = ruleModule.meta?.hasSuggestions === true;
+    const meta = ruleModule["meta"];
+
+    if (typeof meta !== "object" || meta === null) {
+        return "—";
+    }
+
+    const fixable = meta["fixable"] === "code";
+    const hasSuggestions = meta["hasSuggestions"] === true;
 
     if (fixable && hasSuggestions) {
         return "🔧 💡";
@@ -248,45 +119,68 @@ const getRuleFixIndicator = (ruleModule) => {
         return "🔧";
     }
 
-    if (hasSuggestions) {
-        return "💡";
-    }
-
-    return "—";
+    return hasSuggestions ? "💡" : "—";
 };
 
 /**
- * @param {ReadmeRuleModule} ruleModule
+ * @param {Readonly<Record<string, unknown>>} ruleModule
+ *
+ * @returns {readonly PresetName[]}
+ */
+const getPresetNamesForRule = (ruleModule) => {
+    const meta = ruleModule["meta"];
+
+    if (typeof meta !== "object" || meta === null) {
+        return [];
+    }
+
+    const docs = meta["docs"];
+
+    if (typeof docs !== "object" || docs === null) {
+        return [];
+    }
+
+    const configNames = docs["copilotConfigNames"];
+
+    return Array.isArray(configNames)
+        ? /** @type {readonly PresetName[]} */ (configNames)
+        : [];
+};
+
+/**
+ * @param {Readonly<Record<string, unknown>>} ruleModule
  *
  * @returns {string}
  */
 const getPresetIndicator = (ruleModule) => {
-    const docsTypefestConfigs = ruleModule.meta?.docs?.typefestConfigs;
-    const presetNames = normalizeTypefestConfigNames(docsTypefestConfigs);
-    const presetNamesSet = new Set(presetNames);
-
-    /** @type {string[]} */
+    const presetNames = new Set(getPresetNamesForRule(ruleModule));
     const icons = [];
 
     for (const presetName of presetOrder) {
-        if (presetNamesSet.has(presetName)) {
-            const docsUrl = createPresetDocsUrl(presetName);
-            const presetIcon = typefestConfigMetadataByName[presetName].icon;
-
-            icons.push(`[${presetIcon}](${docsUrl})`);
+        if (!presetNames.has(presetName)) {
+            continue;
         }
+
+        const docsUrl = createPresetDocsUrl(presetName);
+        const presetIcon = copilotConfigMetadataByName[presetName].icon;
+
+        icons.push(`[${presetIcon}](${docsUrl})`);
     }
 
     return icons.length === 0 ? "—" : icons.join(" ");
 };
 
 /**
- * @param {readonly [string, ReadmeRuleModule]} entry
+ * @param {readonly [string, Readonly<Record<string, unknown>>]} entry
  *
  * @returns {string}
  */
 const toRuleTableRow = ([ruleName, ruleModule]) => {
-    const docsUrl = ruleModule.meta?.docs?.url;
+    const meta = ruleModule["meta"];
+    const docs =
+        typeof meta === "object" && meta !== null ? meta["docs"] : undefined;
+    const docsUrl =
+        typeof docs === "object" && docs !== null ? docs["url"] : undefined;
 
     if (typeof docsUrl !== "string" || docsUrl.trim().length === 0) {
         throw new TypeError(`Rule '${ruleName}' is missing meta.docs.url.`);
@@ -296,17 +190,14 @@ const toRuleTableRow = ([ruleName, ruleModule]) => {
 };
 
 /**
- * Generate the canonical README rules section from plugin rules metadata.
+ * @param {Readonly<Record<string, Readonly<Record<string, unknown>>>>} rules
  *
- * @param {ReadmeRulesMap} rules - Plugin `rules` map.
- *
- * @returns {string} Full markdown section text starting at `## Rules`.
+ * @returns {string}
  */
 export const generateReadmeRulesSectionFromRules = (rules) => {
     const ruleEntries = Object.entries(rules).toSorted((left, right) =>
         left[0].localeCompare(right[0])
     );
-
     const rows = ruleEntries.map(toRuleTableRow);
 
     return [
@@ -320,89 +211,47 @@ export const generateReadmeRulesSectionFromRules = (rules) => {
         ...createPresetLegendLines(),
         "",
         "| Rule | Fix | Preset key |",
-        "| --- | :-: | :-- |",
+        "| --- | :-: | --- |",
         ...rows,
-        "",
     ].join("\n");
 };
 
 /**
- * Synchronize the README rules table with canonical plugin metadata.
+ * @param {Readonly<{ writeChanges?: boolean }>} [options]
  *
- * @param {{ writeChanges: boolean }} input
- *
- * @returns {Promise<Readonly<{ changed: boolean }>>}
+ * @returns {Promise<{ changed: boolean; markdown: string }>}
  */
-export const syncReadmeRulesTable = async ({ writeChanges }) => {
-    const workspaceRoot = resolve(fileURLToPath(import.meta.url), "../..");
-    const readmePath = resolve(workspaceRoot, "README.md");
-    const readmeText = await readFile(readmePath, "utf8");
-
-    const { endOffset, startOffset } = getReadmeRulesSectionBounds(readmeText);
-    const readmePrefix = readmeText.slice(0, startOffset).trimEnd();
-    const readmeSuffix = readmeText.slice(endOffset);
-
-    const generatedRulesSection = generateReadmeRulesSectionFromRules(
-        /** @type {ReadmeRulesMap} */ (builtPlugin.rules)
+export const syncReadmeRulesTable = async (options = {}) => {
+    const readmePath = resolve(process.cwd(), "README.md");
+    const currentMarkdown = await readFile(readmePath, "utf8");
+    const generatedSection = generateReadmeRulesSectionFromRules(
+        /** @type {Readonly<
+    Record<string, Readonly<Record<string, unknown>>>
+>} */ (builtPlugin.rules)
     );
+    const { endOffset, startOffset } =
+        getReadmeRulesSectionBounds(currentMarkdown);
+    const nextMarkdown =
+        currentMarkdown.slice(0, startOffset) +
+        generatedSection +
+        currentMarkdown.slice(endOffset);
+    const changed =
+        normalizeRulesSectionMarkdown(
+            currentMarkdown.slice(startOffset, endOffset)
+        ) !== normalizeRulesSectionMarkdown(generatedSection);
 
-    const existingRulesSection = extractReadmeRulesSection(readmeText);
-
-    if (
-        normalizeRulesSectionMarkdown(existingRulesSection) ===
-        normalizeRulesSectionMarkdown(generatedRulesSection)
-    ) {
-        return {
-            changed: false,
-        };
+    if (changed && options.writeChanges === true) {
+        await writeFile(readmePath, nextMarkdown, "utf8");
     }
-
-    const nextReadmeText = `${readmePrefix}\n\n${generatedRulesSection}${readmeSuffix}`;
-
-    if (readmeText === nextReadmeText) {
-        return {
-            changed: false,
-        };
-    }
-
-    if (!writeChanges) {
-        return {
-            changed: true,
-        };
-    }
-
-    await writeFile(readmePath, nextReadmeText, "utf8");
 
     return {
-        changed: true,
+        changed,
+        markdown: nextMarkdown,
     };
 };
 
-const runCli = async () => {
-    const writeChanges = process.argv.includes("--write");
-    const result = await syncReadmeRulesTable({ writeChanges });
+const shouldWriteChanges = process.argv.includes("--write");
 
-    if (!result.changed) {
-        console.log("README rules table is already synchronized.");
-
-        return;
-    }
-
-    if (writeChanges) {
-        console.log("README rules table synchronized from plugin metadata.");
-
-        return;
-    }
-
-    console.error(
-        "README rules table is out of sync. Run: npm run sync:readme-rules-table:write (or npm run sync:readme-rules-table:update to refresh snapshots too)."
-    );
-    process.exitCode = 1;
-};
-
-if (
-    typeof process.argv[1] === "string" &&
-    import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-    await runCli();
+if (import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+    await syncReadmeRulesTable({ writeChanges: shouldWriteChanges });
 }

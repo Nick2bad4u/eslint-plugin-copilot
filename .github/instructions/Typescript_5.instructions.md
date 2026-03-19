@@ -8,9 +8,9 @@ applyTo: "**/*.ts, **/*.tsx"
 
 > We are using TypeScript 5.9+ and targeting ES2024/Latest output.
 
-- Prefer native features over polyfills and external helpers.
+- Prefer native features over polyfills and avoid introducing helper libraries unless the repository already relies on them for a clear reason.
 - Use pure ES modules; never emit `require`, `module.exports`, or CommonJS helpers.
-- Prefer modern core APIs (e.g., `Array.prototype.at`, `Object.hasOwn`, `Promise.allSettled`) when they align with repository conventions; if a rule, fixer, or docs page intentionally standardizes on an already-installed helper library, follow that project convention instead of defaulting to the native helper.
+- Prefer modern core APIs (e.g., `Array.prototype.at`, `Object.hasOwn`, `Promise.allSettled`) when they align with repository conventions.
 
 ---
 
