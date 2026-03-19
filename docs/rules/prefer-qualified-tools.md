@@ -13,10 +13,13 @@ Prefer fully-qualified tool names in Copilot prompt files, custom agents, and le
 ## What this rule reports
 
 - entries in `tools` frontmatter arrays that are not fully qualified with a provider or namespace segment
+- except for documented built-in subagent tools such as `agent` and `runSubagent`
 
 ## Why this rule exists
 
 Modern Copilot tooling supports fully-qualified tool names such as `search/codebase` to reduce ambiguity between built-in tools, extension-provided tools, and MCP tools.
+
+The built-in `agent` and `runSubagent` tools are exceptions because current VS Code subagent documentation refers to those aliases directly when enabling subagent orchestration.
 
 ## ❌ Incorrect
 

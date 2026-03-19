@@ -25,12 +25,32 @@ describe("plugin entry module", () => {
         ]);
 
         expect(Object.keys(copilotPlugin.rules).toSorted()).toEqual([
+            "no-blank-customization-body",
             "no-blank-repository-instructions",
+            "no-deprecated-agent-infer",
+            "no-legacy-chatmode-files",
             "prefer-qualified-tools",
+            "require-agent-tool-for-subagents",
             "require-chatmode-file-metadata",
+            "require-github-copilot-target-for-mcp-servers",
             "require-instructions-apply-to",
             "require-prompt-file-metadata",
+            "require-qualified-agent-handoff-models",
+            "require-relative-agent-hook-cwd",
+            "require-relative-prompt-links",
             "require-repository-instructions-file",
+            "require-valid-agent-handoff-send",
+            "require-valid-agent-handoffs",
+            "require-valid-agent-hook-events",
+            "require-valid-agent-hook-timeouts",
+            "require-valid-agent-hooks",
+            "require-valid-agent-invocation-controls",
+            "require-valid-agent-mcp-servers",
+            "require-valid-agent-model",
+            "require-valid-agent-subagents",
+            "require-valid-agent-target",
+            "require-valid-agent-tools",
+            "require-valid-prompt-model",
         ]);
     });
 

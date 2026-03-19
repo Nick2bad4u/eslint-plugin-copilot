@@ -17,6 +17,8 @@ import {
 const isQualifiedToolName = (toolName: string): boolean =>
     toolName.includes("/");
 
+const allowedUnqualifiedToolNames = new Set(["agent", "runSubagent"]);
+
 const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -39,7 +41,9 @@ const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
             }
 
             const firstUnqualifiedTool = tools.find(
-                (toolName) => !isQualifiedToolName(toolName)
+                (toolName) =>
+                    !isQualifiedToolName(toolName) &&
+                    !allowedUnqualifiedToolNames.has(toolName)
             );
 
             if (firstUnqualifiedTool === undefined) {
@@ -65,7 +69,7 @@ const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
         },
         messages: {
             preferQualifiedTool:
-                "Prefer fully-qualified Copilot tool names in `tools` metadata. `{{toolName}}` should include a provider or tool-set prefix such as `search/codebase`.",
+                "Prefer fully-qualified Copilot tool names in `tools` metadata when a documented built-in alias is not required. `{{toolName}}` should include a provider or tool-set prefix such as `search/codebase`.",
         },
         schema: [],
         type: "suggestion",

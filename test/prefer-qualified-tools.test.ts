@@ -13,6 +13,16 @@ describe("prefer-qualified-tools", () => {
         expect(messages).toHaveLength(0);
     });
 
+    it("allows documented built-in subagent tools", async () => {
+        const messages = await lintMarkdownRule({
+            filePath: ".github/prompts/review.prompt.md",
+            ruleId: "prefer-qualified-tools",
+            text: "---\ndescription: Research and implement changes\nagent: agent\ntools: [agent, runSubagent, search/read_file]\n---\nUse a subagent for isolated research before editing files.\n",
+        });
+
+        expect(messages).toHaveLength(0);
+    });
+
     it("reports legacy unqualified tool names", async () => {
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",

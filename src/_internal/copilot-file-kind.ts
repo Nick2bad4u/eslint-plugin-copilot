@@ -17,6 +17,28 @@ export type CopilotFileKind =
 const normalizeFilePath = (filePath: string): string =>
     path.resolve(filePath).replaceAll("\\", "/");
 
+/** Check whether a path points to a legacy workspace chat mode file. */
+export const isLegacyChatmodeFilePath = (filePath: string): boolean => {
+    const normalizedFilePath = normalizeFilePath(filePath);
+    const basename = path.posix.basename(normalizedFilePath);
+
+    return (
+        normalizedFilePath.includes("/.github/chatmodes/") &&
+        basename.endsWith(".chatmode.md")
+    );
+};
+
+/** Check whether a path points to a workspace-level custom agent file. */
+export const isCustomAgentFilePath = (filePath: string): boolean => {
+    const normalizedFilePath = normalizeFilePath(filePath);
+    const basename = path.posix.basename(normalizedFilePath);
+
+    return (
+        normalizedFilePath.includes("/.github/agents/") &&
+        basename.endsWith(".agent.md")
+    );
+};
+
 /** Check whether a basename is one of the supported agent instruction names. */
 const isAgentInstructionsBasename = (basename: string): boolean =>
     basename === "AGENTS.md" ||
@@ -49,10 +71,8 @@ export const getCopilotFileKind = (
     }
 
     if (
-        (normalizedFilePath.includes("/.github/chatmodes/") &&
-            basename.endsWith(".chatmode.md")) ||
-        (normalizedFilePath.includes("/.github/agents/") &&
-            basename.endsWith(".agent.md"))
+        isLegacyChatmodeFilePath(normalizedFilePath) ||
+        isCustomAgentFilePath(normalizedFilePath)
     ) {
         return "chatmode";
     }

@@ -15,12 +15,32 @@ export type CopilotRuleCatalogId = `R${string}`;
 
 /** Pattern for unqualified rule names supported by eslint-plugin-copilot. */
 type CopilotRuleNamePattern =
+    | "no-deprecated-agent-infer"
+    | "no-blank-customization-body"
     | "no-blank-repository-instructions"
+    | "no-legacy-chatmode-files"
     | "prefer-qualified-tools"
+    | "require-agent-tool-for-subagents"
+    | "require-qualified-agent-handoff-models"
     | "require-chatmode-file-metadata"
+    | "require-github-copilot-target-for-mcp-servers"
     | "require-instructions-apply-to"
     | "require-prompt-file-metadata"
-    | "require-repository-instructions-file";
+    | "require-valid-prompt-model"
+    | "require-relative-agent-hook-cwd"
+    | "require-relative-prompt-links"
+    | "require-repository-instructions-file"
+    | "require-valid-agent-tools"
+    | "require-valid-agent-hook-events"
+    | "require-valid-agent-hooks"
+    | "require-valid-agent-hook-timeouts"
+    | "require-valid-agent-handoffs"
+    | "require-valid-agent-handoff-send"
+    | "require-valid-agent-invocation-controls"
+    | "require-valid-agent-mcp-servers"
+    | "require-valid-agent-model"
+    | "require-valid-agent-subagents"
+    | "require-valid-agent-target";
 
 /** Stable global ordering used for rule catalog ids. */
 const orderedRuleNames = [
@@ -30,6 +50,26 @@ const orderedRuleNames = [
     "no-blank-repository-instructions",
     "require-repository-instructions-file",
     "prefer-qualified-tools",
+    "no-deprecated-agent-infer",
+    "require-agent-tool-for-subagents",
+    "no-blank-customization-body",
+    "require-github-copilot-target-for-mcp-servers",
+    "no-legacy-chatmode-files",
+    "require-valid-agent-handoffs",
+    "require-qualified-agent-handoff-models",
+    "require-valid-agent-hook-events",
+    "require-valid-agent-hooks",
+    "require-valid-agent-hook-timeouts",
+    "require-valid-agent-subagents",
+    "require-relative-agent-hook-cwd",
+    "require-valid-agent-target",
+    "require-valid-agent-invocation-controls",
+    "require-valid-agent-handoff-send",
+    "require-valid-agent-model",
+    "require-valid-agent-mcp-servers",
+    "require-relative-prompt-links",
+    "require-valid-agent-tools",
+    "require-valid-prompt-model",
 ] as const satisfies readonly CopilotRuleNamePattern[];
 
 const toRuleCatalogId = (ruleNumber: number): CopilotRuleCatalogId =>
