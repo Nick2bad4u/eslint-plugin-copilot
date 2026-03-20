@@ -389,6 +389,7 @@ export default defineConfig([
             "public/mockServiceWorker.js",
             "temp/**",
             ".temp/**",
+            ".tmp-eslint.json",
         ],
         name: "Global: Ignore Patterns **/**",
     },
@@ -572,6 +573,13 @@ export default defineConfig([
             "tsdoc-require-2/require-throws": "off",
             "tsdoc-require-2/require-type-param": "off",
             "tsdoc-require-2/require-virtual": "off",
+        },
+    },
+    {
+        files: ["src/rules/**/*.{ts,mts,cts,tsx}"],
+        name: "TSDoc rules - rule implementation modules",
+        rules: {
+            "tsdoc-require-2/require": "off",
         },
     },
     // #endregion
@@ -1576,7 +1584,39 @@ export default defineConfig([
         },
         name: "ESLint Plugin Source - root compatibility shims",
         rules: {
+            "canonical/no-re-export": "off",
             "no-barrel-files/no-barrel-files": "off",
+        },
+    },
+    {
+        files: ["src/_internal/frontmatter.ts"],
+        name: "Frontmatter parser mutable helper overrides",
+        rules: {
+            "@typescript-eslint/prefer-readonly-parameter-types": "off",
+        },
+    },
+    {
+        files: ["src/_internal/create-copilot-rule.ts"],
+        name: "Rule factory generic helper overrides",
+        rules: {
+            "total-functions/no-hidden-type-assertions": "off",
+        },
+    },
+    {
+        files: [
+            "scripts/sync-presets-rules-matrix.mjs",
+            "scripts/sync-readme-rules-table.mjs",
+        ],
+        name: "Sync script JSDoc escaping overrides",
+        rules: {
+            "jsdoc/text-escaping": "off",
+        },
+    },
+    {
+        files: ["test/**/*.{js,mjs,cjs,ts,mts,cts,tsx}"],
+        name: "Tests - import default naming overrides",
+        rules: {
+            "import-x/no-rename-default": "off",
         },
     },
     {
@@ -2245,6 +2285,13 @@ export default defineConfig([
             "markdown/no-unused-definitions": "warn",
             "markdown/require-alt-text": "warn",
             "markdown/table-column-count": "warn",
+        },
+    },
+    {
+        files: ["**/*.prompt.md", ".github/prompts/**/*.prompt.md"],
+        name: "Prompt metadata markdown frontmatter exceptions",
+        rules: {
+            "markdown/no-missing-label-refs": "off",
         },
     },
     // #endregion

@@ -52,7 +52,7 @@ const preferCustomInstructionsUnderCodeReviewLimitRule: CopilotRuleModule =
                     "copilot.configs.all",
                 ],
                 description:
-                    "prefer repository and path-specific Copilot instruction files to stay within the 4,000-character code-review instruction budget.",
+                    "enforce repository and path-specific Copilot instruction files staying within the 4,000-character code-review instruction budget.",
                 frozen: false,
                 recommended: false,
                 requiresTypeChecking: false,

@@ -1,6 +1,6 @@
 {
     "hooks": {
-        "sessionStart": [
+        "sessionEnd": [
             {
                 "bash": ".github/hooks/scripts/remove-temp.sh",
                 "command": "\".github/hooks/scripts/remove-temp.ps1\"",
@@ -15,7 +15,7 @@
                 "windows": "powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -File .github/hooks/scripts/remove-temp.ps1"
             }
         ],
-        "sessionEnd": [
+        "sessionStart": [
             {
                 "bash": ".github/hooks/scripts/remove-temp.sh",
                 "command": "\".github/hooks/scripts/remove-temp.ps1\"",

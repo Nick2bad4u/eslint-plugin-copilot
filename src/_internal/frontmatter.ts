@@ -148,20 +148,6 @@ const collectIndentedBlockLines = (
     };
 };
 
-/** Assign a parsed YAML `key: value` pair into an object-list entry. */
-const setObjectEntryField = (
-    target: Record<string, string>,
-    source: string
-): void => {
-    const property = parseFieldLine(source.trim());
-
-    if (property === null) {
-        return;
-    }
-
-    target[property.key] = normalizeScalarValue(property.value);
-};
-
 /** Strip balanced HTML comments from Markdown body text. */
 const stripHtmlComments = (text: string): string => {
     let result = "";
@@ -229,8 +215,23 @@ const stripQuotes = (value: string): string => {
 };
 
 /** Normalize a scalar-like YAML token into a trimmed string value. */
-const normalizeScalarValue = (value: string): string =>
-    stripQuotes(value.trim()).trim();
+function normalizeScalarValue(value: string): string {
+    return stripQuotes(value.trim()).trim();
+}
+
+/** Assign a parsed YAML `key: value` pair into an object-list entry. */
+const setObjectEntryField = (
+    target: Record<string, string>,
+    source: string
+): void => {
+    const property = parseFieldLine(source.trim());
+
+    if (property === null) {
+        return;
+    }
+
+    target[property.key] = normalizeScalarValue(property.value);
+};
 
 /** Parse a one-line YAML flow sequence such as `["a", "b"]`. */
 const parseInlineList = (value: string): readonly string[] => {

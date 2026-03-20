@@ -33,6 +33,7 @@ export default function Home(): React.JSX.Element {
                         <p className={styles.kicker}>
                             GitHub Copilot repository linting
                         </p>
+                        {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                         <h1 className={styles.title}>eslint-plugin-copilot</h1>
                         <p className={styles.subtitle}>
                             Lint GitHub Copilot repository instructions, prompt
@@ -58,6 +59,7 @@ export default function Home(): React.JSX.Element {
                 <section className={`container ${styles.cards}`}>
                     {featureCards.map((card) => (
                         <article key={card.title} className={styles.card}>
+                            {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                             <h2 className={styles.cardTitle}>{card.title}</h2>
                             <p className={styles.cardDescription}>
                                 {card.description}

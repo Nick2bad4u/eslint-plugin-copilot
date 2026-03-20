@@ -38,10 +38,16 @@ const preferFastRepositoryHooksRule: CopilotRuleModule = createCopilotRule({
                     return;
                 }
 
+                const timeout = slowHook.hook["timeoutSec"];
+
+                if (!isJsonNumber(timeout)) {
+                    return;
+                }
+
                 reportAtDocumentStart(context, {
                     data: {
                         eventName: slowHook.eventName,
-                        timeout: String(slowHook.hook["timeoutSec"]),
+                        timeout: String(timeout),
                     },
                     messageId: "slowRepositoryHookTimeout",
                 });
@@ -54,7 +60,7 @@ const preferFastRepositoryHooksRule: CopilotRuleModule = createCopilotRule({
         docs: {
             copilotConfigs: ["copilot.configs.strict", "copilot.configs.all"],
             description:
-                "prefer repository hooks to stay at or below the default 30-second timeout unless a slower hook is truly necessary.",
+                "enforce repository hooks staying at or below the default 30-second timeout unless a slower hook is truly necessary.",
             frozen: false,
             recommended: false,
             requiresTypeChecking: false,

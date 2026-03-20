@@ -20,10 +20,42 @@ const getOptionalFrontmatterScalar = (
 export const normalizeNameForComparison = (value: string): string =>
     normalizeSlashName(value).toLowerCase();
 
-/** Determine whether a skill identifier matches the documented lowercase-hyphen
-form. */
-export const isValidSkillIdentifier = (value: string): boolean =>
-    /^[0-9a-z]+(?:-[0-9a-z]+)*$/u.test(value.trim());
+const isAsciiLowercaseAlphaNumeric = (character: string): boolean =>
+    (character >= "0" && character <= "9") ||
+    (character >= "a" && character <= "z");
+
+/**
+ * Determine whether a skill identifier matches the documented lowercase-hyphen
+ * form.
+ */
+export const isValidSkillIdentifier = (value: string): boolean => {
+    const trimmedValue = value.trim();
+
+    if (trimmedValue.length === 0) {
+        return false;
+    }
+
+    let previousCharacterWasHyphen = false;
+
+    for (const character of trimmedValue) {
+        if (character === "-") {
+            if (previousCharacterWasHyphen) {
+                return false;
+            }
+
+            previousCharacterWasHyphen = true;
+            continue;
+        }
+
+        if (!isAsciiLowercaseAlphaNumeric(character)) {
+            return false;
+        }
+
+        previousCharacterWasHyphen = false;
+    }
+
+    return !trimmedValue.startsWith("-") && !trimmedValue.endsWith("-");
+};
 
 /** Get the default prompt name derived from a `.prompt.md` file name. */
 export const getDefaultPromptName = (filePath: string): string =>

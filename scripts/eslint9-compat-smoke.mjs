@@ -7,6 +7,43 @@ import plugin from "../plugin.mjs";
 
 /**
  * @typedef {Readonly<{
+ *     children: readonly unknown[];
+ *     comments: readonly unknown[];
+ *     loc: Readonly<{
+ *         end: Readonly<{ column: number; line: number }>;
+ *         start: Readonly<{ column: number; line: number }>;
+ *     }>;
+ *     range: readonly [number, number];
+ *     tokens: readonly unknown[];
+ *     type: "root";
+ * }>} CompatAst
+ */
+
+/**
+ * @typedef {{
+ *     block: CompatAst;
+ *     childScopes: CompatScope[];
+ *     isStrict: boolean;
+ *     references: unknown[];
+ *     set: Map<string, unknown>;
+ *     through: unknown[];
+ *     type: "global";
+ *     upper: null;
+ *     variableScope: CompatScope;
+ *     variables: unknown[];
+ * }} CompatScope
+ */
+
+/**
+ * @typedef {Readonly<{
+ *     acquire: (node: unknown) => CompatScope | null;
+ *     getDeclaredVariables: (node?: unknown) => readonly unknown[];
+ *     scopes: readonly [CompatScope];
+ * }>} CompatScopeManager
+ */
+
+/**
+ * @typedef {Readonly<{
  *     configName: "all" | "minimal";
  *     expectedMaximumMessages?: number;
  *     expectedMinimumMessages: number;
@@ -22,6 +59,11 @@ const expectedEslintMajorArgumentPrefix = "--expect-eslint-major=";
 const minimumLanguageKeyRuntimeMajor = 9;
 const minimumLanguageKeyRuntimeMinor = 15;
 
+/**
+ * @param {string} text
+ *
+ * @returns {CompatAst}
+ */
 const createEmptyProgramAst = (text) => {
     const lineBreaks = text.match(/\n/gv) ?? [];
     const lastLineStartOffset = text.lastIndexOf("\n") + 1;
@@ -46,10 +88,12 @@ const createEmptyProgramAst = (text) => {
 };
 
 /**
- * @param {ReturnType<typeof createEmptyProgramAst>} ast
+ * @param {CompatAst} ast
+ *
+ * @returns {CompatScopeManager}
  */
 const createLegacyScopeManager = (ast) => {
-    const globalScope = {
+    const globalScope = /** @type {CompatScope} */ ({
         block: ast,
         childScopes: [],
         isStrict: true,
@@ -58,13 +102,14 @@ const createLegacyScopeManager = (ast) => {
         through: [],
         type: "global",
         upper: null,
-        variableScope: null,
+        variableScope: /** @type {CompatScope} */ ({}),
         variables: [],
-    };
+    });
 
     globalScope.variableScope = globalScope;
 
     return {
+        /** @param {unknown} node */
         acquire(node) {
             return node === ast ? globalScope : null;
         },
@@ -80,6 +125,7 @@ const legacySmokeParser = {
         name: "eslint-plugin-copilot/compat-smoke-parser",
         version: "1.0.0",
     },
+    /** @param {string} text */
     parseForESLint(text) {
         const ast = createEmptyProgramAst(text);
 
@@ -234,19 +280,22 @@ const normalizeConfigEntryForLegacyFlatConfig = (configEntry) => {
 
     const { language: _language, ...legacyCompatibleConfigEntry } = configEntry;
 
-    const normalizedPlugins =
-        configEntry.plugins !== undefined && "copilot" in configEntry.plugins
-            ? { copilot: configEntry.plugins.copilot }
-            : configEntry.plugins;
-
-    return {
+    /** @type {import("eslint").Linter.Config} */
+    const normalizedConfigEntry = {
         ...legacyCompatibleConfigEntry,
         languageOptions: {
             ...legacyCompatibleConfigEntry.languageOptions,
             parser: legacySmokeParser,
         },
-        plugins: normalizedPlugins,
     };
+
+    if (configEntry.plugins !== undefined && "copilot" in configEntry.plugins) {
+        normalizedConfigEntry.plugins = {
+            copilot: configEntry.plugins["copilot"],
+        };
+    }
+
+    return normalizedConfigEntry;
 };
 
 /**

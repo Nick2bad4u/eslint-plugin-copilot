@@ -63,7 +63,7 @@ const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
         docs: {
             copilotConfigs: ["copilot.configs.all"],
             description:
-                "prefer fully-qualified tool names in Copilot prompt files, custom agents, and legacy chat modes.",
+                "enforce fully-qualified tool names in Copilot prompt files, custom agents, and legacy chat modes.",
             frozen: false,
             recommended: false,
             requiresTypeChecking: false,

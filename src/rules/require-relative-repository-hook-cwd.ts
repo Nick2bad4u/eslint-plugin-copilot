@@ -39,9 +39,15 @@ const requireRelativeRepositoryHookCwdRule: CopilotRuleModule =
                         return;
                     }
 
+                    const cwd = invalidHook.hook["cwd"];
+
+                    if (!isJsonString(cwd)) {
+                        return;
+                    }
+
                     reportAtDocumentStart(context, {
                         data: {
-                            cwd: String(invalidHook.hook["cwd"]),
+                            cwd,
                             eventName: invalidHook.eventName,
                         },
                         messageId: "nonRelativeRepositoryHookCwd",

@@ -15,7 +15,27 @@ import {
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
 
-const NUMERIC_TIMEOUT_PATTERN = /^\d+(?:\.\d+)?$/u;
+const isNumericTimeoutValue = (value: string): boolean => {
+    let decimalPointCount = 0;
+
+    for (const character of value) {
+        if (character === ".") {
+            decimalPointCount += 1;
+
+            if (decimalPointCount > 1) {
+                return false;
+            }
+
+            continue;
+        }
+
+        if (character < "0" || character > "9") {
+            return false;
+        }
+    }
+
+    return value.length > 0 && !value.startsWith(".") && !value.endsWith(".");
+};
 
 const requireValidAgentHookTimeoutsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
@@ -46,7 +66,7 @@ const requireValidAgentHookTimeoutsRule: CopilotRuleModule = createCopilotRule({
                     if (
                         timeout === undefined ||
                         timeout.length === 0 ||
-                        NUMERIC_TIMEOUT_PATTERN.test(timeout)
+                        isNumericTimeoutValue(timeout)
                     ) {
                         continue;
                     }

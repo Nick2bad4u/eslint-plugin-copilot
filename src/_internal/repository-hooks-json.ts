@@ -3,17 +3,25 @@
  * Shared JSON helpers for repository hook configuration rules.
  */
 
-export type JsonArray = JsonValue[];
-export type JsonObject = { [key: string]: JsonValue };
+/** Read-only JSON array value. */
+export type JsonArray = readonly JsonValue[];
+/** Read-only JSON object value. */
+export interface JsonObject {
+    readonly [key: string]: JsonValue;
+}
+/** JSON primitive scalar value. */
 export type JsonPrimitive = boolean | null | number | string;
+/** Any supported JSON value. */
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
+/** Repository hook entry paired with its source event name and array index. */
 export type RepositoryHookEntry = Readonly<{
     eventName: string;
     hook: JsonObject;
     index: number;
 }>;
 
+/** Supported repository hook event names. */
 export type RepositoryHookEventName =
     | "agentStop"
     | "errorOccurred"
@@ -24,10 +32,13 @@ export type RepositoryHookEventName =
     | "subagentStop"
     | "userPromptSubmitted";
 
+/** Supported repository hook transport types. */
 export type RepositoryHookType = "command" | "prompt";
 
+/** Default repository hook timeout used by GitHub Copilot. */
 export const DEFAULT_REPOSITORY_HOOK_TIMEOUT_SECONDS = 30;
 
+/** Known valid repository hook event names. */
 export const VALID_REPOSITORY_HOOK_EVENT_NAMES: ReadonlySet<RepositoryHookEventName> =
     new Set([
         "agentStop",
@@ -40,6 +51,7 @@ export const VALID_REPOSITORY_HOOK_EVENT_NAMES: ReadonlySet<RepositoryHookEventN
         "userPromptSubmitted",
     ]);
 
+/** Known valid repository hook types. */
 export const VALID_REPOSITORY_HOOK_TYPES: ReadonlySet<RepositoryHookType> =
     new Set(["command", "prompt"]);
 

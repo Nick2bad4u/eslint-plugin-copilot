@@ -21,7 +21,10 @@ const PRESET_DOCS_URL_BASE =
 
 const presetOrder = [...copilotConfigNamesByReadmeOrder];
 
-/** @param {unknown} value @returns {value is Readonly<Record<string, unknown>>} */
+/**
+ * @param {unknown} value - @returns {value is Readonly<Record<string,
+ *   unknown>>}
+ */
 const isUnknownRecord = (value) =>
     typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -73,6 +76,23 @@ export const normalizeRulesSectionMarkdown = (markdown) =>
         })
         .join("\n")
         .trimEnd();
+
+/** @param {string} text - @returns {string} */
+const normalizeLineEndings = (text) => text.replace(/\r\n/gv, "\n");
+
+/**
+ * @param {string} templateText
+ * @param {string} outputText
+ *
+ * @returns {string}
+ */
+const restorePreferredLineEndings = (templateText, outputText) => {
+    const normalizedOutputText = normalizeLineEndings(outputText);
+
+    return templateText.includes("\r\n")
+        ? normalizedOutputText.replace(/\n/gv, "\r\n")
+        : normalizedOutputText;
+};
 
 /** @type {Readonly<Record<PresetName, string>>} */
 const presetConfigReferenceByName = {
@@ -245,7 +265,11 @@ export const syncReadmeRulesTable = async (options = {}) => {
         ) !== normalizeRulesSectionMarkdown(generatedSection);
 
     if (changed && options.writeChanges === true) {
-        await writeFile(readmePath, nextMarkdown, "utf8");
+        await writeFile(
+            readmePath,
+            restorePreferredLineEndings(currentMarkdown, nextMarkdown),
+            "utf8"
+        );
     }
 
     return {

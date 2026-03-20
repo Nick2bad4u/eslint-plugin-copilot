@@ -180,7 +180,7 @@ const partitionRuleNamesByPresetLayer = (
 /** Build one public preset config as layered flat-config entries. */
 const createPresetConfig = (
     configName: CopilotConfigName,
-    plugin: CopilotPluginContract
+    plugin: Readonly<CopilotPluginContract>
 ): CopilotPresetConfig => {
     const presetName = copilotConfigMetadataByName[configName].presetName;
     const { jsonRuleNames, markdownRuleNames } =
@@ -214,6 +214,7 @@ const createPresetConfig = (
     return configLayers;
 };
 
+/** Public ESLint plugin entrypoint, including runtime presets and rule metadata. */
 const plugin: CopilotPluginContract = {
     configs: {} as CopilotConfigsContract,
     meta: {

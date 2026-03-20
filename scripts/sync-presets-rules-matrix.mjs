@@ -14,13 +14,17 @@ const matrixSectionHeading = "## Rule matrix";
 const presetRulesSectionHeading = "## Rules in this preset";
 const presetsDocsDirectoryPath = "docs/rules/presets";
 
-/** @param {unknown} value - @returns {value is Readonly<Record<string,
-  unknown>>} */
+/**
+ * @param {unknown} value - @returns {value is Readonly<Record<string,
+ *   unknown>>}
+ */
 const isUnknownRecord = (value) =>
     typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** @param {unknown} value - @returns {readonly Readonly<Record<string,
-  unknown>>[]} */
+/**
+ * @param {unknown} value - @returns {readonly Readonly<Record<string,
+ *   unknown>>[]}
+ */
 const toConfigArray = (value) =>
     Array.isArray(value)
         ? value.filter(isUnknownRecord)
@@ -203,6 +207,23 @@ const normalizeMarkdownTableSpacing = (markdown) =>
         .join("\n")
         .trimEnd();
 
+/** @param {string} text - @returns {string} */
+const normalizeLineEndings = (text) => text.replace(/\r\n/gv, "\n");
+
+/**
+ * @param {string} templateText
+ * @param {string} outputText
+ *
+ * @returns {string}
+ */
+const restorePreferredLineEndings = (templateText, outputText) => {
+    const normalizedOutputText = normalizeLineEndings(outputText);
+
+    return templateText.includes("\r\n")
+        ? normalizedOutputText.replace(/\n/gv, "\r\n")
+        : normalizedOutputText;
+};
+
 /**
  * @param {Readonly<Record<string, Readonly<Record<string, unknown>>>>} [rules]
  *
@@ -278,7 +299,14 @@ export const syncPresetsRulesMatrix = async (options = {}) => {
         ) !== normalizeMarkdownTableSpacing(generatedMatrixSection);
 
     if (changed && options.writeChanges === true) {
-        await writeFile(presetsIndexPath, nextIndexMarkdown, "utf8");
+        await writeFile(
+            presetsIndexPath,
+            restorePreferredLineEndings(
+                currentIndexMarkdown,
+                nextIndexMarkdown
+            ),
+            "utf8"
+        );
     }
 
     for (const presetConfigName of copilotConfigNames) {
@@ -314,7 +342,14 @@ export const syncPresetsRulesMatrix = async (options = {}) => {
             currentPresetMarkdown.slice(sectionEndOffset);
 
         if (options.writeChanges === true) {
-            await writeFile(presetDocPath, nextPresetMarkdown, "utf8");
+            await writeFile(
+                presetDocPath,
+                restorePreferredLineEndings(
+                    currentPresetMarkdown,
+                    nextPresetMarkdown
+                ),
+                "utf8"
+            );
         }
     }
 

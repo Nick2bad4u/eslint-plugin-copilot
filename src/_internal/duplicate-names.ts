@@ -3,6 +3,7 @@
  * Shared duplicate-name helpers for Copilot customization files.
  */
 
+/** A named Copilot customization file paired with its normalized display name. */
 export type NamedCustomizationFile = Readonly<{
     filePath: string;
     name: string;

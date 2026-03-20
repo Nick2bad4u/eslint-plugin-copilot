@@ -6,11 +6,11 @@ import type { TSESLint } from "@typescript-eslint/utils";
 
 import { ESLintUtils } from "@typescript-eslint/utils";
 
-import {
-    type CopilotConfigName,
-    type CopilotConfigReference,
-    copilotConfigReferenceToName,
+import type {
+    CopilotConfigName,
+    CopilotConfigReference,
 } from "./copilot-config-references.js";
+
 import { getRuleCatalogEntryForRuleName } from "./rule-catalog.js";
 import { createRuleDocsUrl } from "./rule-docs-url.js";
 
@@ -29,13 +29,9 @@ export type CopilotRuleDocs = Readonly<{
 
 /** Public runtime rule module shape emitted by this plugin. */
 export type CopilotRuleModule = Readonly<{
-        name: string;
-    }> &
-    TSESLint.RuleModule<
-    string,
-    readonly unknown[],
-    CopilotRuleDocs
->;
+    name: string;
+}> &
+    TSESLint.RuleModule<string, readonly unknown[], CopilotRuleDocs>;
 
 type BaseRuleCreator = ReturnType<
     typeof ESLintUtils.RuleCreator<CopilotRuleInputDocs>
@@ -53,6 +49,34 @@ type CopilotRuleInputDocs = Readonly<{
 const baseRuleCreator: BaseRuleCreator =
     ESLintUtils.RuleCreator<CopilotRuleInputDocs>(createRuleDocsUrl);
 
+const getCopilotConfigNameFromReference = (
+    reference: CopilotConfigReference
+): CopilotConfigName => {
+    switch (reference) {
+        case "copilot.configs.all": {
+            return "all";
+        }
+
+        case "copilot.configs.minimal": {
+            return "minimal";
+        }
+
+        case "copilot.configs.recommended": {
+            return "recommended";
+        }
+
+        case "copilot.configs.strict": {
+            return "strict";
+        }
+
+        default: {
+            throw new TypeError(
+                `Unsupported Copilot config reference: ${reference}`
+            );
+        }
+    }
+};
+
 /** Normalize preset references into stable preset-name keys. */
 const normalizeCopilotConfigNames: (
     value: CopilotConfigReference | readonly CopilotConfigReference[]
@@ -63,9 +87,7 @@ const normalizeCopilotConfigNames: (
     const normalizedNames = new Set<CopilotConfigName>();
 
     for (const reference of references) {
-        normalizedNames.add(
-            copilotConfigReferenceToName[reference as CopilotConfigReference]
-        );
+        normalizedNames.add(getCopilotConfigNameFromReference(reference));
     }
 
     return [...normalizedNames];
@@ -93,10 +115,12 @@ export const createCopilotRule = <
         url: createRuleDocsUrl(ruleDefinition.name),
     };
 
-    const decoratedRule = createdRule as unknown as CopilotRuleModule;
-
-    decoratedRule.meta.docs = docs;
-    decoratedRule.name = ruleDefinition.name;
-
-    return decoratedRule;
+    return {
+        ...createdRule,
+        meta: {
+            ...createdRule.meta,
+            docs,
+        },
+        name: ruleDefinition.name,
+    } satisfies CopilotRuleModule;
 };
