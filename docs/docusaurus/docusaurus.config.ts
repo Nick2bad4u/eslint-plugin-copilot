@@ -56,6 +56,15 @@ const config: Config = {
             {
                 blog: false,
                 docs: false,
+                pages: {
+                    editUrl: `https://github.com/${organizationName}/${projectName}/blob/main/docs/docusaurus/`,
+                    exclude: [
+                        // Declarations (often generated next to CSS modules)
+                        // must never become routable pages.
+                        "**/*.d.ts",
+                        "**/*.d.tsx",
+                    ],
+                },
                 theme: {
                     customCss: "./src/css/custom.css",
                 },
