@@ -1,10 +1,11 @@
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
+
 /**
  * @packageDocumentation
  * ESLint rule implementation for `require-valid-agent-handoff-send`.
  */
 import { isCustomAgentFilePath } from "../_internal/copilot-file-kind.js";
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
-import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 import {
     extractFrontmatter,
     getFrontmatterObjectList,

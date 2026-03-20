@@ -1,8 +1,10 @@
+---
 name: review-repo-consistency-dedupe
 description: "🤖🤖 Use this prompt to audit the repository for consistency drift, duplicate logic, and normalization opportunities."
 agent: BeastMode-[3.1]
 argument-hint: Provide any subsystems, rule families, files, or patterns to prioritize, if applicable.
-agent: BeastMode-[3.1]
+---
+
 # Task: Looping Repository Consistency, Dedupe, and Pattern Audit
 
 Audit this eslint-plugin repository for consistency drift, duplicate logic, naming mismatches, and repeated patterns that should be centralized.

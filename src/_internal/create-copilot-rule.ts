@@ -2,12 +2,14 @@
  * @packageDocumentation
  * Shared rule creator wrapper used by eslint-plugin-copilot rules.
  */
-import { ESLintUtils, TSESLint } from "@typescript-eslint/utils";
+import type { TSESLint } from "@typescript-eslint/utils";
+
+import { ESLintUtils } from "@typescript-eslint/utils";
 
 import {
-    copilotConfigReferenceToName,
     type CopilotConfigName,
     type CopilotConfigReference,
+    copilotConfigReferenceToName,
 } from "./copilot-config-references.js";
 import { getRuleCatalogEntryForRuleName } from "./rule-catalog.js";
 import { createRuleDocsUrl } from "./rule-docs-url.js";
@@ -15,7 +17,7 @@ import { createRuleDocsUrl } from "./rule-docs-url.js";
 /** Copilot-specific metadata extensions stored in `meta.docs`. */
 export type CopilotRuleDocs = Readonly<{
     copilotConfigNames: readonly CopilotConfigName[];
-    copilotConfigs: readonly CopilotConfigReference[] | CopilotConfigReference;
+    copilotConfigs: CopilotConfigReference | readonly CopilotConfigReference[];
     description: string;
     frozen: boolean;
     recommended: boolean;
@@ -26,36 +28,36 @@ export type CopilotRuleDocs = Readonly<{
 }>;
 
 /** Public runtime rule module shape emitted by this plugin. */
-export type CopilotRuleModule = TSESLint.RuleModule<
+export type CopilotRuleModule = Readonly<{
+        name: string;
+    }> &
+    TSESLint.RuleModule<
     string,
     readonly unknown[],
     CopilotRuleDocs
-> &
-    Readonly<{
-        name: string;
-    }>;
+>;
+
+type BaseRuleCreator = ReturnType<
+    typeof ESLintUtils.RuleCreator<CopilotRuleInputDocs>
+>;
 
 /** Authored docs metadata accepted by individual rule modules. */
 type CopilotRuleInputDocs = Readonly<{
-    copilotConfigs: readonly CopilotConfigReference[] | CopilotConfigReference;
+    copilotConfigs: CopilotConfigReference | readonly CopilotConfigReference[];
     description: string;
     frozen: boolean;
     recommended: boolean;
     requiresTypeChecking: boolean;
 }>;
 
-type BaseRuleCreator = ReturnType<
-    typeof ESLintUtils.RuleCreator<CopilotRuleInputDocs>
->;
-
 const baseRuleCreator: BaseRuleCreator =
     ESLintUtils.RuleCreator<CopilotRuleInputDocs>(createRuleDocsUrl);
 
 /** Normalize preset references into stable preset-name keys. */
 const normalizeCopilotConfigNames: (
-    value: readonly CopilotConfigReference[] | CopilotConfigReference
+    value: CopilotConfigReference | readonly CopilotConfigReference[]
 ) => readonly CopilotConfigName[] = (
-    value: readonly CopilotConfigReference[] | CopilotConfigReference
+    value: CopilotConfigReference | readonly CopilotConfigReference[]
 ) => {
     const references = Array.isArray(value) ? value : [value];
     const normalizedNames = new Set<CopilotConfigName>();

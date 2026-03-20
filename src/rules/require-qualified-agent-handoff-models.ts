@@ -1,10 +1,11 @@
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
+
 /**
  * @packageDocumentation
  * ESLint rule implementation for `require-qualified-agent-handoff-models`.
  */
 import { isCustomAgentFilePath } from "../_internal/copilot-file-kind.js";
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
-import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 import {
     extractFrontmatter,
     getFrontmatterObjectList,
@@ -14,7 +15,27 @@ import {
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
 
-const QUALIFIED_MODEL_NAME_PATTERN = /.+\s\([^()]+\)$/u;
+const isQualifiedModelName = (value: string): boolean => {
+    const trimmedValue = value.trim();
+
+    if (!trimmedValue.endsWith(")")) {
+        return false;
+    }
+
+    const separatorIndex = trimmedValue.lastIndexOf(" (");
+
+    if (separatorIndex <= 0) {
+        return false;
+    }
+
+    const qualifier = trimmedValue.slice(separatorIndex + 2, -1).trim();
+
+    return (
+        qualifier.length > 0 &&
+        !qualifier.includes("(") &&
+        !qualifier.includes(")")
+    );
+};
 
 const requireQualifiedAgentHandoffModelsRule: CopilotRuleModule =
     createCopilotRule({
@@ -45,7 +66,7 @@ const requireQualifiedAgentHandoffModelsRule: CopilotRuleModule =
                     if (
                         model === undefined ||
                         model.length === 0 ||
-                        QUALIFIED_MODEL_NAME_PATTERN.test(model)
+                        isQualifiedModelName(model)
                     ) {
                         continue;
                     }

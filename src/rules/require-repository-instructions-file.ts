@@ -4,12 +4,13 @@
  */
 import * as fs from "node:fs";
 
-import { createCopilotRule } from "../_internal/create-copilot-rule.js";
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
+
 import {
     getCopilotFileKind,
     getRepositoryInstructionsPath,
 } from "../_internal/copilot-file-kind.js";
+import { createCopilotRule } from "../_internal/create-copilot-rule.js";
 import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,

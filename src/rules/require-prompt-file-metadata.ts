@@ -1,10 +1,11 @@
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
+
+import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
 /**
  * @packageDocumentation
  * ESLint rule implementation for `require-prompt-file-metadata`.
  */
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
-import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
-import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
 import {
     extractFrontmatter,
     getFrontmatterList,
@@ -115,18 +116,18 @@ const requirePromptFileMetadataRule: CopilotRuleModule = createCopilotRule({
         messages: {
             deprecatedMode:
                 "Copilot prompt files should use `agent` instead of the deprecated `mode` frontmatter key.",
-            emptyDescription:
-                "Copilot prompt files must define a non-empty `description` frontmatter value.",
             emptyAgent:
                 "Copilot prompt files must define a non-empty `agent` frontmatter value.",
+            emptyDescription:
+                "Copilot prompt files must define a non-empty `description` frontmatter value.",
             emptyTools:
                 "Built-in `agent` Copilot prompt files must define a non-empty `tools` frontmatter list.",
+            missingAgent:
+                "Copilot prompt files must define an `agent` frontmatter value.",
             missingDescription:
                 "Copilot prompt files must define a `description` frontmatter value.",
             missingFrontmatter:
                 "Copilot prompt files must start with YAML frontmatter that declares at least `description` and `agent`.",
-            missingAgent:
-                "Copilot prompt files must define an `agent` frontmatter value.",
             missingTools:
                 "Built-in `agent` Copilot prompt files must define a `tools` frontmatter list.",
             unexpectedTools:

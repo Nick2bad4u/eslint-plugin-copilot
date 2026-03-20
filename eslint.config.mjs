@@ -689,29 +689,14 @@ export default defineConfig([
     //         "src/**/*.{ts,tsx,mts,cts}",
     //         //    "test/**/*.{ts,tsx,mts,cts}"
     //     ],
-    //     name: "Local Plugin Rules from Source",
-    //     plugins: {
-    //         copilot: copilot,
-    //     },
-    //     rules: {
-    //         ...copilot.configs.all.rules,
-    //     },
     // },
+    // ...copilot.configs.all,
     // #endregion
     // #region 🤖 Copilot Customization Rules
     // ═══════════════════════════════════════════════════════════════════════════════
     // SECTION: 🤖 Copilot Customization Rules (copilot/*)
     // ═══════════════════════════════════════════════════════════════════════════════
-    {
-        ...copilot.configs.all,
-        name: "Copilot Customization Rules",
-        plugins: {
-            ...copilot.configs.all.plugins,
-        },
-        rules: {
-            ...copilot.configs.all.rules,
-        },
-    },
+    ...copilot.configs.all,
     // #endregion
     // #region ⌨ Etc-Misc
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1453,7 +1438,8 @@ export default defineConfig([
             "eslint-plugin/require-meta-default-options": "error",
             "eslint-plugin/require-meta-docs-description": "warn",
             "eslint-plugin/require-meta-docs-recommended": "warn",
-            "eslint-plugin/require-meta-docs-url": "error",
+            // Factory-authored rules receive canonical docs URLs via `createCopilotRule`.
+            "eslint-plugin/require-meta-docs-url": "off",
             "eslint-plugin/require-meta-fixable": "error",
             "eslint-plugin/require-meta-has-suggestions": "error",
             "eslint-plugin/require-meta-schema": "error",
@@ -1577,6 +1563,20 @@ export default defineConfig([
             "total-functions/require-strict-mode": "warn",
             "unused-imports/no-unused-imports": "error",
             "unused-imports/no-unused-vars": "error",
+        },
+    },
+    {
+        files: ["require-repository-instructions-file.ts"],
+        languageOptions: {
+            parserOptions: {
+                project: false,
+                projectService: true,
+                tsconfigRootDir: configDirectoryPath,
+            },
+        },
+        name: "ESLint Plugin Source - root compatibility shims",
+        rules: {
+            "no-barrel-files/no-barrel-files": "off",
         },
     },
     {

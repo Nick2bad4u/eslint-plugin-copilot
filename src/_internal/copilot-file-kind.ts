@@ -11,7 +11,9 @@ export type CopilotFileKind =
     | "chatmode"
     | "instructions"
     | "prompt"
-    | "repository-instructions";
+    | "repository-hook"
+    | "repository-instructions"
+    | "skill";
 
 /** Normalize a path to slash-separated form for pattern checks. */
 const normalizeFilePath = (filePath: string): string =>
@@ -36,6 +38,48 @@ export const isCustomAgentFilePath = (filePath: string): boolean => {
     return (
         normalizedFilePath.includes("/.github/agents/") &&
         basename.endsWith(".agent.md")
+    );
+};
+
+/** Check whether a path points to a supported repository skill directory. */
+const isSupportedSkillDirectoryPath = (filePath: string): boolean => {
+    const normalizedFilePath = normalizeFilePath(filePath);
+
+    return (
+        normalizedFilePath.includes("/.github/skills/") ||
+        normalizedFilePath.includes("/.claude/skills/")
+    );
+};
+
+/** Check whether a path points to a Markdown file inside a skill directory. */
+export const isSkillMarkdownFilePath = (filePath: string): boolean => {
+    const normalizedFilePath = normalizeFilePath(filePath);
+
+    return (
+        isSupportedSkillDirectoryPath(normalizedFilePath) &&
+        normalizedFilePath.endsWith(".md")
+    );
+};
+
+/** Check whether a path points to a `SKILL.md` skill definition file. */
+export const isSkillFilePath = (filePath: string): boolean => {
+    const normalizedFilePath = normalizeFilePath(filePath);
+    const basename = path.posix.basename(normalizedFilePath);
+
+    return (
+        isSupportedSkillDirectoryPath(normalizedFilePath) &&
+        basename === "SKILL.md"
+    );
+};
+
+/** Check whether a path points to a repository hook configuration file. */
+export const isRepositoryHookFilePath = (filePath: string): boolean => {
+    const normalizedFilePath = normalizeFilePath(filePath);
+    const basename = path.posix.basename(normalizedFilePath);
+
+    return (
+        normalizedFilePath.includes("/.github/hooks/") &&
+        basename.endsWith(".json")
     );
 };
 
@@ -68,6 +112,14 @@ export const getCopilotFileKind = (
         basename.endsWith(".prompt.md")
     ) {
         return "prompt";
+    }
+
+    if (isSkillFilePath(normalizedFilePath)) {
+        return "skill";
+    }
+
+    if (isRepositoryHookFilePath(normalizedFilePath)) {
+        return "repository-hook";
     }
 
     if (

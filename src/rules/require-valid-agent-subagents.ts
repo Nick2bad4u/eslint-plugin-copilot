@@ -1,10 +1,11 @@
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
+
 /**
  * @packageDocumentation
  * ESLint rule implementation for `require-valid-agent-subagents`.
  */
 import { isCustomAgentFilePath } from "../_internal/copilot-file-kind.js";
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
-import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 import {
     extractFrontmatter,
     getFrontmatterList,
@@ -73,7 +74,9 @@ const requireValidAgentSubagentsRule: CopilotRuleModule = createCopilotRule({
             if (
                 allowedAgents !== undefined &&
                 allowedAgents.length > 0 &&
-                allowedAgents.every(isValidExplicitAgentName)
+                allowedAgents.every((agentName) =>
+                    isValidExplicitAgentName(agentName)
+                )
             ) {
                 return;
             }

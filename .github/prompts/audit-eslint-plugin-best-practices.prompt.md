@@ -1,8 +1,10 @@
+---
 name: audit-eslint-plugin-best-practices
 description: "🤖🤖 Use this prompt to audit the repository against modern ESLint plugin authoring best practices and official guidance."
 agent: BeastMode-[3.1]
 argument-hint: Provide any surfaces to compare first, such as rule metadata, presets, docs, tests, or plugin exports.
-agent: BeastMode-[3.1]
+---
+
 # Task: Looping ESLint Plugin Best-Practices Audit
 
 Compare this repository against modern ESLint plugin authoring and rule-authoring best practices, especially official ESLint guidance and relevant `typescript-eslint` guidance where applicable.

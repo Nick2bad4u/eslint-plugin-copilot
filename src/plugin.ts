@@ -4,14 +4,16 @@
  */
 import type { ESLint, Linter } from "eslint";
 
+import json from "@eslint/json";
 import markdown from "@eslint/markdown";
+
+import type { CopilotRuleDocs } from "./_internal/create-copilot-rule.js";
 
 import packageJson from "../package.json" with { type: "json" };
 import {
     copilotConfigMetadataByName,
     type CopilotConfigName,
 } from "./_internal/copilot-config-references.js";
-import type { CopilotRuleDocs } from "./_internal/create-copilot-rule.js";
 import { copilotRules } from "./_internal/rules-registry.js";
 
 /** ESLint severity used by generated preset rule maps. */
@@ -24,21 +26,47 @@ const COPILOT_MARKDOWN_FILES = [
     ".github/prompts/**/*.prompt.md",
     ".github/agents/**/*.agent.md",
     ".github/chatmodes/**/*.chatmode.md",
+    ".github/skills/**/*.md",
+    ".claude/skills/**/*.md",
+    "**/SKILL.md",
     "**/AGENTS.md",
     "**/CLAUDE.md",
     "**/GEMINI.md",
 ] as const;
 
+/** Repository hook JSON files linted by the shipped Copilot presets. */
+const COPILOT_JSON_FILES = [".github/hooks/**/*.json"] as const;
+
+/** Hook JSON rules that should only be enabled in the JSON preset layer. */
+const REPOSITORY_HOOK_JSON_RULE_NAMES = new Set<CopilotRuleName>([
+    "no-empty-repository-hook-arrays",
+    "prefer-fast-repository-hooks",
+    "require-existing-repository-hook-cwd",
+    "require-relative-repository-hook-cwd",
+    "require-repository-hook-arrays",
+    "require-repository-hook-command-shell",
+    "require-repository-hooks-object",
+    "require-string-repository-hook-env-values",
+    "require-valid-repository-hook-command-type",
+    "require-valid-repository-hook-env",
+    "require-valid-repository-hook-events",
+    "require-valid-repository-hook-timeouts",
+    "require-valid-repository-hook-version",
+]);
+
+/** Flat-config preset layers produced by this plugin. */
+export type CopilotPresetConfig = CopilotPresetLayer[];
+
 /** Flat-config preset shape produced by this plugin. */
-export type CopilotPresetConfig = Linter.Config & {
+export type CopilotPresetLayer = Linter.Config & {
     rules: NonNullable<Linter.Config["rules"]>;
 };
 
-/** Unqualified rule names supported by eslint-plugin-copilot. */
-export type CopilotRuleName = keyof typeof copilotRules;
-
 /** Fully qualified Copilot rule ids. */
 export type CopilotRuleId = `copilot/${CopilotRuleName}`;
+
+/** Unqualified rule names supported by eslint-plugin-copilot. */
+export type CopilotRuleName = keyof typeof copilotRules;
 
 /** Contract for the exported preset map. */
 type CopilotConfigsContract = Record<CopilotConfigName, CopilotPresetConfig>;
@@ -70,6 +98,7 @@ const getPackageVersion = (pkg: unknown): string => {
 const eslintRules: NonNullable<ESLint.Plugin["rules"]> & typeof copilotRules =
     copilotRules as NonNullable<ESLint.Plugin["rules"]> & typeof copilotRules;
 const markdownPlugin = markdown as unknown as ESLint.Plugin;
+const jsonPlugin = json as unknown as ESLint.Plugin;
 
 /** Stable ordered entries used to derive preset membership. */
 const copilotRuleEntries = Object.entries(copilotRules).toSorted(
@@ -121,8 +150,8 @@ const derivePresetRuleNamesByConfig = (): Readonly<
 /** Build a flat-config rules map that enables the provided rules at error. */
 const errorRulesFor = (
     ruleNames: readonly CopilotRuleName[]
-): CopilotPresetConfig["rules"] => {
-    const rules: CopilotPresetConfig["rules"] = {};
+): CopilotPresetLayer["rules"] => {
+    const rules: CopilotPresetLayer["rules"] = {};
 
     for (const ruleName of ruleNames) {
         rules[`copilot/${ruleName}`] = ERROR_SEVERITY;
@@ -133,20 +162,57 @@ const errorRulesFor = (
 
 const presetRuleNamesByConfig = derivePresetRuleNamesByConfig();
 
-/** Build one public preset config. */
+/** Split preset rule names into markdown-backed and JSON-backed layers. */
+const partitionRuleNamesByPresetLayer = (
+    ruleNames: readonly CopilotRuleName[]
+): Readonly<{
+    jsonRuleNames: readonly CopilotRuleName[];
+    markdownRuleNames: readonly CopilotRuleName[];
+}> => ({
+    jsonRuleNames: ruleNames.filter((ruleName) =>
+        REPOSITORY_HOOK_JSON_RULE_NAMES.has(ruleName)
+    ),
+    markdownRuleNames: ruleNames.filter(
+        (ruleName) => !REPOSITORY_HOOK_JSON_RULE_NAMES.has(ruleName)
+    ),
+});
+
+/** Build one public preset config as layered flat-config entries. */
 const createPresetConfig = (
     configName: CopilotConfigName,
     plugin: CopilotPluginContract
-): CopilotPresetConfig => ({
-    files: [...COPILOT_MARKDOWN_FILES],
-    language: "markdown/gfm",
-    name: copilotConfigMetadataByName[configName].presetName,
-    plugins: {
-        copilot: plugin,
-        markdown: markdownPlugin,
-    },
-    rules: errorRulesFor(presetRuleNamesByConfig[configName]),
-});
+): CopilotPresetConfig => {
+    const presetName = copilotConfigMetadataByName[configName].presetName;
+    const { jsonRuleNames, markdownRuleNames } =
+        partitionRuleNamesByPresetLayer(presetRuleNamesByConfig[configName]);
+    const configLayers: CopilotPresetLayer[] = [
+        {
+            files: [...COPILOT_MARKDOWN_FILES],
+            language: "markdown/gfm",
+            name: `${presetName}:markdown`,
+            plugins: {
+                copilot: plugin,
+                markdown: markdownPlugin,
+            },
+            rules: errorRulesFor(markdownRuleNames),
+        },
+    ];
+
+    if (jsonRuleNames.length > 0) {
+        configLayers.push({
+            files: [...COPILOT_JSON_FILES],
+            language: "json/json",
+            name: `${presetName}:json`,
+            plugins: {
+                copilot: plugin,
+                json: jsonPlugin,
+            },
+            rules: errorRulesFor(jsonRuleNames),
+        });
+    }
+
+    return configLayers;
+};
 
 const plugin: CopilotPluginContract = {
     configs: {} as CopilotConfigsContract,

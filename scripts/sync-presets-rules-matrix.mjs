@@ -14,15 +14,25 @@ const matrixSectionHeading = "## Rule matrix";
 const presetRulesSectionHeading = "## Rules in this preset";
 const presetsDocsDirectoryPath = "docs/rules/presets";
 
-/** @param {unknown} value @returns {value is Readonly<Record<string, unknown>>} */
+/** @param {unknown} value - @returns {value is Readonly<Record<string,
+  unknown>>} */
 const isUnknownRecord = (value) =>
     typeof value === "object" && value !== null && !Array.isArray(value);
 
-/** @param {readonly string[]} values @returns {readonly string[]} */
+/** @param {unknown} value - @returns {readonly Readonly<Record<string,
+  unknown>>[]} */
+const toConfigArray = (value) =>
+    Array.isArray(value)
+        ? value.filter(isUnknownRecord)
+        : isUnknownRecord(value)
+          ? [value]
+          : [];
+
+/** @param {readonly string[]} values - @returns {readonly string[]} */
 const sortStrings = (values) =>
     [...values].toSorted((left, right) => left.localeCompare(right));
 
-/** @param {string} configRuleKey @returns {null | string} */
+/** @param {string} configRuleKey - @returns {null | string} */
 const toPluginRuleName = (configRuleKey) => {
     if (!configRuleKey.startsWith("copilot/")) {
         return null;
@@ -34,29 +44,32 @@ const toPluginRuleName = (configRuleKey) => {
 /** @param {import("../dist/_internal/copilot-config-references.js").CopilotConfigName} presetConfigName */
 const collectPresetRuleNames = (presetConfigName) => {
     const presetConfig = builtPlugin.configs[presetConfigName];
+    const presetLayers = toConfigArray(presetConfig);
 
-    if (!isUnknownRecord(presetConfig)) {
+    if (presetLayers.length === 0) {
         throw new TypeError(
             `Missing preset config '${presetConfigName}' in built plugin.`
         );
     }
 
-    const rules = presetConfig["rules"];
+    const names = presetLayers.flatMap((presetLayer) => {
+        const rules = presetLayer["rules"];
 
-    if (!isUnknownRecord(rules)) {
-        return [];
-    }
+        if (!isUnknownRecord(rules)) {
+            return [];
+        }
 
-    const names = Object.keys(rules)
-        .map(toPluginRuleName)
-        .filter((name) => typeof name === "string");
+        return Object.keys(rules)
+            .map(toPluginRuleName)
+            .filter((name) => typeof name === "string");
+    });
 
     return sortStrings(names);
 };
 
 /**
- * @param {Readonly<Record<string, unknown>>} ruleModule @returns {"—" | "💡" |
- *   "🔧" | "🔧 💡"}
+ * @param {Readonly<Record<string, unknown>>} ruleModule - @returns {"—" | "💡"
+ *   | "🔧" | "🔧 💡"}
  */
 const getRuleFixIndicator = (ruleModule) => {
     const meta = ruleModule["meta"];
@@ -79,7 +92,7 @@ const getRuleFixIndicator = (ruleModule) => {
     return hasSuggestions ? "💡" : "—";
 };
 
-/** @param {string} ruleName @returns {Readonly<Record<string, unknown>>} */
+/** @param {string} ruleName - @returns {Readonly<Record<string, unknown>>} */
 const getRuleModuleByName = (ruleName) => {
     const candidate = builtPlugin.rules[ruleName];
 
@@ -90,7 +103,7 @@ const getRuleModuleByName = (ruleName) => {
     return candidate;
 };
 
-/** @param {string} ruleName @returns {string} */
+/** @param {string} ruleName - @returns {string} */
 const toPresetRuleRow = (ruleName) => {
     const ruleModule = getRuleModuleByName(ruleName);
     const meta = ruleModule["meta"];
@@ -104,7 +117,7 @@ const toPresetRuleRow = (ruleName) => {
     return `| [\`${ruleName}\`](${docsUrl}) | ${getRuleFixIndicator(ruleModule)} |`;
 };
 
-/** @param {readonly string[]} ruleNames @returns {string} */
+/** @param {readonly string[]} ruleNames - @returns {string} */
 const createPresetRulesTable = (ruleNames) => {
     if (ruleNames.length === 0) {
         return [
@@ -144,8 +157,8 @@ const generatePresetRulesSection = (presetConfigName) => {
 };
 
 /**
- * @param {string} markdown @returns {{ headingOffset: number; sectionEndOffset:
- *   number }}
+ * @param {string} markdown - @returns {{ headingOffset: number;
+ *   sectionEndOffset: number }}
  */
 const findMatrixSectionBounds = (markdown) => {
     const headingOffset = markdown.indexOf(matrixSectionHeading);
@@ -168,7 +181,7 @@ const findMatrixSectionBounds = (markdown) => {
     };
 };
 
-/** @param {string} markdown @returns {string} */
+/** @param {string} markdown - @returns {string} */
 const normalizeMarkdownTableSpacing = (markdown) =>
     markdown
         .replace(/\r\n/gv, "\n")

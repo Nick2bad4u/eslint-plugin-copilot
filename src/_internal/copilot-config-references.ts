@@ -11,6 +11,14 @@ export const copilotConfigNames = [
     "strict",
 ] as const;
 
+/** Metadata contract shared across preset wiring, docs, and README rendering. */
+export type CopilotConfigMetadata = Readonly<{
+    icon: string;
+    presetName: `copilot:${CopilotConfigName}`;
+    readmeOrder: number;
+    requiresTypeChecking: boolean;
+}>;
+
 /** Canonical flat-config preset key type exposed through `plugin.configs`. */
 export type CopilotConfigName = (typeof copilotConfigNames)[number];
 
@@ -20,14 +28,6 @@ type CopilotConfigReferenceMap = Readonly<{
     "copilot.configs.minimal": "minimal";
     "copilot.configs.recommended": "recommended";
     "copilot.configs.strict": "strict";
-}>;
-
-/** Metadata contract shared across preset wiring, docs, and README rendering. */
-export type CopilotConfigMetadata = Readonly<{
-    icon: string;
-    presetName: `copilot:${CopilotConfigName}`;
-    readmeOrder: number;
-    requiresTypeChecking: boolean;
 }>;
 
 /** Canonical metadata for every exported `copilot` preset key. */
@@ -85,4 +85,4 @@ export const isCopilotConfigReference: (
 ) => value is CopilotConfigReference = (
     value
 ): value is CopilotConfigReference =>
-    Object.prototype.hasOwnProperty.call(copilotConfigReferenceToName, value);
+    Object.hasOwn(copilotConfigReferenceToName, value);

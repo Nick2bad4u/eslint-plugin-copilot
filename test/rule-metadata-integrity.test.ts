@@ -1,9 +1,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-
 import { describe, expect, it } from "vitest";
 
 import type { CopilotRuleModule } from "../src/_internal/create-copilot-rule";
+
 import { createRuleDocsUrl } from "../src/_internal/rule-docs-url";
 import copilotPlugin from "../src/plugin";
 
@@ -19,9 +19,11 @@ const getRuleSourceFileNames = (): readonly string[] => {
 
 describe("rule metadata integrity", () => {
     it("registers one runtime rule per source file", () => {
-        expect(Object.keys(copilotPlugin.rules).toSorted()).toEqual(
-            getRuleSourceFileNames()
-        );
+        expect(
+            Object.keys(copilotPlugin.rules).toSorted((left, right) =>
+                left.localeCompare(right)
+            )
+        ).toEqual(getRuleSourceFileNames());
     });
 
     it("keeps canonical docs metadata on every rule", () => {
@@ -32,14 +34,13 @@ describe("rule metadata integrity", () => {
             const docs = copilotRule.meta.docs;
 
             expect(docs).toBeDefined();
-            if (docs === undefined) {
-                continue;
-            }
 
-            expect(docs.url).toBe(createRuleDocsUrl(ruleName));
-            expect(docs.ruleId).toMatch(/^R\d{3}$/v);
-            expect(docs.ruleNumber).toBeGreaterThan(0);
-            expect(docs.copilotConfigNames.length).toBeGreaterThan(0);
+            if (docs !== undefined) {
+                expect(docs.url).toBe(createRuleDocsUrl(ruleName));
+                expect(docs.ruleId).toMatch(/^R\d{3}$/v);
+                expect(docs.ruleNumber).toBeGreaterThan(0);
+                expect(docs.copilotConfigNames.length).toBeGreaterThan(0);
+            }
         }
     });
 });

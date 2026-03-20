@@ -25,6 +25,7 @@
         "*.cjs",
         "*.d.cts",
         "*.d.ts",
+        "*.ts",
         "*.mjs",
         ".remarkrc.mjs",
         "benchmarks/**/*.mjs",

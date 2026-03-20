@@ -1,10 +1,12 @@
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
+
 /**
  * @packageDocumentation
  * ESLint rule implementation for `require-relative-agent-hook-cwd`.
  */
 import { isCustomAgentFilePath } from "../_internal/copilot-file-kind.js";
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
-import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
+import { isRelativeWorkspacePath } from "../_internal/file-system.js";
 import {
     extractFrontmatter,
     getFrontmatterObjectListGroups,
@@ -14,16 +16,10 @@ import {
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
 
-const ABSOLUTE_OR_NON_REPOSITORY_RELATIVE_CWD_PATTERN =
-    /^(?:[A-Za-z]:($|[\\/])|[\\/]|~($|[\\/])|[A-Za-z][A-Za-z0-9+.-]*:\/\/)/u;
-
 const isValidRelativeHookCwd = (cwd: string): boolean => {
     const trimmedCwd = cwd.trim();
 
-    return (
-        trimmedCwd.length > 0 &&
-        !ABSOLUTE_OR_NON_REPOSITORY_RELATIVE_CWD_PATTERN.test(trimmedCwd)
-    );
+    return trimmedCwd.length > 0 && isRelativeWorkspacePath(trimmedCwd);
 };
 
 const requireRelativeAgentHookCwdRule: CopilotRuleModule = createCopilotRule({

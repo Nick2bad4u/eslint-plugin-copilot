@@ -3,6 +3,13 @@
  * Lightweight Markdown frontmatter helpers for Copilot customization files.
  */
 
+/** Parsed frontmatter bundle extracted from the start of a Markdown document. */
+export type FrontmatterDocument = Readonly<{
+    body: string;
+    content: string;
+    fields: ReadonlyMap<string, FrontmatterField>;
+}>;
+
 /** Parsed frontmatter field variants supported by this plugin. */
 export type FrontmatterField =
     | Readonly<{
@@ -14,13 +21,6 @@ export type FrontmatterField =
           value: string;
       }>;
 
-/** Parsed frontmatter bundle extracted from the start of a Markdown document. */
-export type FrontmatterDocument = Readonly<{
-    body: string;
-    content: string;
-    fields: ReadonlyMap<string, FrontmatterField>;
-}>;
-
 /** Parsed object entry from a supported nested frontmatter list block. */
 export type FrontmatterObjectListEntry = Readonly<Record<string, string>>;
 
@@ -30,10 +30,165 @@ export type FrontmatterObjectListGroupMap = ReadonlyMap<
     readonly FrontmatterObjectListEntry[]
 >;
 
-const FRONTMATTER_PATTERN = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/u;
-const TOP_LEVEL_FIELD_PATTERN = /^([A-Za-z][A-Za-z0-9-]*)\s*:\s*(.*)$/u;
-const BLOCK_LIST_ITEM_PATTERN = /^\s*-\s*(.+)$/u;
-const NESTED_OBJECT_FIELD_PATTERN = /^([A-Za-z][A-Za-z0-9-]*)\s*:\s*(.*)$/u;
+/** Determine whether a character is an ASCII letter. */
+const isAsciiLetter = (character: string): boolean =>
+    (character >= "A" && character <= "Z") ||
+    (character >= "a" && character <= "z");
+
+/** Determine whether a character is valid after the first YAML field letter. */
+const isYamlIdentifierCharacter = (character: string): boolean =>
+    isAsciiLetter(character) ||
+    (character >= "0" && character <= "9") ||
+    character === "-";
+
+/** Validate the limited frontmatter field names this plugin supports. */
+const isSupportedFrontmatterFieldName = (value: string): boolean => {
+    if (value.length === 0 || !isAsciiLetter(value[0] ?? "")) {
+        return false;
+    }
+
+    for (const character of value.slice(1)) {
+        if (!isYamlIdentifierCharacter(character)) {
+            return false;
+        }
+    }
+
+    return true;
+};
+
+/** Parse a supported `key: value` frontmatter line. */
+const parseFieldLine = (
+    line: string
+): null | Readonly<{ key: string; value: string }> => {
+    const separatorIndex = line.indexOf(":");
+
+    if (separatorIndex <= 0) {
+        return null;
+    }
+
+    const key = line.slice(0, separatorIndex).trim();
+
+    if (!isSupportedFrontmatterFieldName(key)) {
+        return null;
+    }
+
+    return {
+        key,
+        value: line.slice(separatorIndex + 1),
+    };
+};
+
+/** Read a single line and its ending index from a source string. */
+const readLine = (
+    text: string,
+    startIndex: number
+): Readonly<{ line: string; nextIndex: number }> => {
+    const lineFeedIndex = text.indexOf("\n", startIndex);
+
+    if (lineFeedIndex === -1) {
+        return {
+            line: text.endsWith("\r")
+                ? text.slice(startIndex, -1)
+                : text.slice(startIndex),
+            nextIndex: text.length,
+        };
+    }
+
+    const lineEndIndex =
+        text[lineFeedIndex - 1] === "\r" ? lineFeedIndex - 1 : lineFeedIndex;
+
+    return {
+        line: text.slice(startIndex, lineEndIndex),
+        nextIndex: lineFeedIndex + 1,
+    };
+};
+
+/** Remove one trailing CRLF or LF sequence when present. */
+const trimTrailingLineBreak = (value: string): string => {
+    if (value.endsWith("\r\n")) {
+        return value.slice(0, -2);
+    }
+
+    if (value.endsWith("\n")) {
+        return value.slice(0, -1);
+    }
+
+    return value;
+};
+
+/** Collect an indented frontmatter block after a top-level field. */
+const collectIndentedBlockLines = (
+    lines: readonly string[],
+    startIndex: number
+): Readonly<{ blockLines: readonly string[]; nextIndex: number }> => {
+    const blockLines: string[] = [];
+    let nextIndex = startIndex;
+
+    while (nextIndex < lines.length) {
+        const nextLine = lines[nextIndex] ?? "";
+
+        if (
+            nextLine.trim().length > 0 &&
+            !nextLine.startsWith(" ") &&
+            !nextLine.startsWith("\t")
+        ) {
+            break;
+        }
+
+        if (nextLine.trim().length > 0) {
+            blockLines.push(nextLine);
+        }
+
+        nextIndex += 1;
+    }
+
+    return {
+        blockLines,
+        nextIndex,
+    };
+};
+
+/** Assign a parsed YAML `key: value` pair into an object-list entry. */
+const setObjectEntryField = (
+    target: Record<string, string>,
+    source: string
+): void => {
+    const property = parseFieldLine(source.trim());
+
+    if (property === null) {
+        return;
+    }
+
+    target[property.key] = normalizeScalarValue(property.value);
+};
+
+/** Strip balanced HTML comments from Markdown body text. */
+const stripHtmlComments = (text: string): string => {
+    let result = "";
+    let searchIndex = 0;
+
+    while (searchIndex < text.length) {
+        const commentStartIndex = text.indexOf("<!--", searchIndex);
+
+        if (commentStartIndex === -1) {
+            result += text.slice(searchIndex);
+            break;
+        }
+
+        result += text.slice(searchIndex, commentStartIndex);
+
+        const commentEndIndex = text.indexOf("-->", commentStartIndex + 4);
+
+        if (commentEndIndex === -1) {
+            result += text.slice(commentStartIndex);
+            break;
+        }
+
+        searchIndex = commentEndIndex + 3;
+    }
+
+    return result;
+};
 
 /** Count leading spaces or tabs for indentation-sensitive YAML subsets. */
 const getIndentationWidth = (line: string): number => {
@@ -101,19 +256,13 @@ const parseInlineList = (value: string): readonly string[] => {
 const parseBlockList = (lines: readonly string[]): readonly string[] =>
     lines
         .map((line) => {
-            const listItemMatch = BLOCK_LIST_ITEM_PATTERN.exec(line);
+            const trimmedLine = line.trim();
 
-            if (listItemMatch === null) {
+            if (!trimmedLine.startsWith("-")) {
                 return "";
             }
 
-            const rawValue = listItemMatch[1];
-
-            if (rawValue === undefined) {
-                return "";
-            }
-
-            return normalizeScalarValue(rawValue);
+            return normalizeScalarValue(trimmedLine.slice(1));
         })
         .filter((value) => value.length > 0);
 
@@ -123,87 +272,67 @@ const parseFrontmatterFields = (
 ): ReadonlyMap<string, FrontmatterField> => {
     const lines = content.replaceAll("\r\n", "\n").split("\n");
     const fields = new Map<string, FrontmatterField>();
+    let index = 0;
 
-    for (let index = 0; index < lines.length; index += 1) {
+    while (index < lines.length) {
         const currentLine = lines[index]?.trimEnd() ?? "";
 
         if (currentLine.trim().length === 0) {
+            index += 1;
             continue;
         }
 
-        const fieldMatch = TOP_LEVEL_FIELD_PATTERN.exec(
-            currentLine.trimStart()
-        );
+        const field = parseFieldLine(currentLine.trimStart());
 
-        if (fieldMatch === null) {
+        if (field === null) {
+            index += 1;
             continue;
         }
 
-        const key = fieldMatch[1];
-        const rawValue = fieldMatch[2];
-
-        if (key === undefined || rawValue === undefined) {
-            continue;
-        }
-
-        const normalizedValue = rawValue.trim();
+        const normalizedValue = field.value.trim();
 
         if (normalizedValue.length > 0) {
             const inlineList = parseInlineList(normalizedValue);
 
             if (inlineList.length > 0) {
-                fields.set(key, {
+                fields.set(field.key, {
                     kind: "list",
                     values: inlineList,
                 });
+                index += 1;
                 continue;
             }
 
-            fields.set(key, {
+            fields.set(field.key, {
                 kind: "scalar",
                 value: normalizeScalarValue(normalizedValue),
             });
+            index += 1;
             continue;
         }
 
-        const blockLines: string[] = [];
-
-        for (
-            let nextIndex = index + 1;
-            nextIndex < lines.length;
-            nextIndex += 1
-        ) {
-            const nextLine = lines[nextIndex] ?? "";
-
-            if (
-                nextLine.trim().length > 0 &&
-                !nextLine.startsWith(" ") &&
-                !nextLine.startsWith("\t")
-            ) {
-                break;
-            }
-
-            if (nextLine.trim().length > 0) {
-                blockLines.push(nextLine);
-            }
-
-            index = nextIndex;
-        }
+        const { blockLines, nextIndex } = collectIndentedBlockLines(
+            lines,
+            index + 1
+        );
 
         const parsedBlockValues = parseBlockList(blockLines);
 
         if (parsedBlockValues.length > 0) {
-            fields.set(key, {
+            fields.set(field.key, {
                 kind: "list",
                 values: parsedBlockValues,
             });
+            index = nextIndex;
             continue;
         }
 
-        fields.set(key, {
+        fields.set(field.key, {
             kind: "scalar",
             value: "",
         });
+
+        index = nextIndex;
     }
 
     return fields;
@@ -213,24 +342,37 @@ const parseFrontmatterFields = (
 export const extractFrontmatter = (
     text: string
 ): FrontmatterDocument | null => {
-    const frontmatterMatch = FRONTMATTER_PATTERN.exec(text);
-
-    if (frontmatterMatch === null) {
+    if (!text.startsWith("---")) {
         return null;
     }
 
-    const rawFrontmatter = frontmatterMatch[0];
-    const content = frontmatterMatch[1];
+    const openingLine = readLine(text, 0);
 
-    if (rawFrontmatter === undefined || content === undefined) {
+    if (openingLine.line !== "---" || openingLine.nextIndex >= text.length) {
         return null;
     }
 
-    return {
-        body: text.slice(rawFrontmatter.length),
-        content,
-        fields: parseFrontmatterFields(content),
-    };
+    let lineStartIndex = openingLine.nextIndex;
+
+    while (lineStartIndex < text.length) {
+        const currentLine = readLine(text, lineStartIndex);
+
+        if (currentLine.line === "---") {
+            const content = trimTrailingLineBreak(
+                text.slice(openingLine.nextIndex, lineStartIndex)
+            );
+
+            return {
+                body: text.slice(currentLine.nextIndex),
+                content,
+                fields: parseFrontmatterFields(content),
+            };
+        }
+
+        lineStartIndex = currentLine.nextIndex;
+    }
+
+    return null;
 };
 
 /** Read a non-empty scalar frontmatter value. */
@@ -269,26 +411,29 @@ export const getFrontmatterObjectList = (
     key: string
 ): readonly FrontmatterObjectListEntry[] | undefined => {
     const lines = document.content.replaceAll("\r\n", "\n").split("\n");
+    let index = 0;
 
-    for (let index = 0; index < lines.length; index += 1) {
+    while (index < lines.length) {
         const currentLine = lines[index] ?? "";
 
         if (currentLine.startsWith(" ") || currentLine.startsWith("\t")) {
+            index += 1;
             continue;
         }
 
-        const fieldMatch = TOP_LEVEL_FIELD_PATTERN.exec(currentLine.trimEnd());
+        const field = parseFieldLine(currentLine.trimEnd());
 
-        if (fieldMatch === null) {
+        if (field === null) {
+            index += 1;
             continue;
         }
 
-        const fieldKey = fieldMatch[1];
-        const rawValue = fieldMatch[2]?.trim() ?? "";
-
-        if (fieldKey !== key) {
+        if (field.key !== key) {
+            index += 1;
             continue;
         }
+
+        const rawValue = field.value.trim();
 
         if (rawValue === "[]") {
             return [];
@@ -298,69 +443,24 @@ export const getFrontmatterObjectList = (
             return undefined;
         }
 
-        const blockLines: string[] = [];
-
-        for (
-            let nextIndex = index + 1;
-            nextIndex < lines.length;
-            nextIndex += 1
-        ) {
-            const nextLine = lines[nextIndex] ?? "";
-
-            if (
-                nextLine.trim().length > 0 &&
-                !nextLine.startsWith(" ") &&
-                !nextLine.startsWith("\t")
-            ) {
-                break;
-            }
-
-            if (nextLine.trim().length > 0) {
-                blockLines.push(nextLine);
-            }
-
-            index = nextIndex;
-        }
+        const { blockLines } = collectIndentedBlockLines(lines, index + 1);
 
         const entries: Record<string, string>[] = [];
-        let currentEntry: Record<string, string> | null = null;
-
-        const setEntryField = (
-            target: Record<string, string>,
-            source: string
-        ): void => {
-            const propertyMatch = NESTED_OBJECT_FIELD_PATTERN.exec(
-                source.trim()
-            );
-
-            if (propertyMatch === null) {
-                return;
-            }
-
-            const propertyKey = propertyMatch[1];
-            const propertyValue = propertyMatch[2];
-
-            if (propertyKey === undefined || propertyValue === undefined) {
-                return;
-            }
-
-            target[propertyKey] = normalizeScalarValue(propertyValue);
-        };
+        let currentEntry: null | Record<string, string> = null;
 
         for (const blockLine of blockLines) {
-            const listItemMatch = /^\s*-\s*(.*)$/u.exec(blockLine);
+            const trimmedLine = blockLine.trim();
 
-            if (listItemMatch !== null) {
+            if (trimmedLine.startsWith("-")) {
                 if (currentEntry !== null) {
                     entries.push(currentEntry);
                 }
 
                 currentEntry = {};
-
-                const inlineProperty = listItemMatch[1]?.trim() ?? "";
+                const inlineProperty = trimmedLine.slice(1).trim();
 
                 if (inlineProperty.length > 0) {
-                    setEntryField(currentEntry, inlineProperty);
+                    setObjectEntryField(currentEntry, inlineProperty);
                 }
 
                 continue;
@@ -370,7 +470,7 @@ export const getFrontmatterObjectList = (
                 continue;
             }
 
-            setEntryField(currentEntry, blockLine);
+            setObjectEntryField(currentEntry, trimmedLine);
         }
 
         if (currentEntry !== null) {
@@ -389,80 +489,39 @@ export const getFrontmatterObjectListGroups = (
     key: string
 ): FrontmatterObjectListGroupMap | undefined => {
     const lines = document.content.replaceAll("\r\n", "\n").split("\n");
+    let index = 0;
 
-    for (let index = 0; index < lines.length; index += 1) {
+    while (index < lines.length) {
         const currentLine = lines[index] ?? "";
 
         if (currentLine.startsWith(" ") || currentLine.startsWith("\t")) {
+            index += 1;
             continue;
         }
 
-        const fieldMatch = TOP_LEVEL_FIELD_PATTERN.exec(currentLine.trimEnd());
+        const field = parseFieldLine(currentLine.trimEnd());
 
-        if (fieldMatch === null) {
+        if (field === null) {
+            index += 1;
             continue;
         }
 
-        const fieldKey = fieldMatch[1];
-        const rawValue = fieldMatch[2]?.trim() ?? "";
-
-        if (fieldKey !== key) {
+        if (field.key !== key) {
+            index += 1;
             continue;
         }
+
+        const rawValue = field.value.trim();
 
         if (rawValue.length > 0) {
             return undefined;
         }
 
-        const blockLines: string[] = [];
-
-        for (
-            let nextIndex = index + 1;
-            nextIndex < lines.length;
-            nextIndex += 1
-        ) {
-            const nextLine = lines[nextIndex] ?? "";
-
-            if (
-                nextLine.trim().length > 0 &&
-                !nextLine.startsWith(" ") &&
-                !nextLine.startsWith("\t")
-            ) {
-                break;
-            }
-
-            if (nextLine.trim().length > 0) {
-                blockLines.push(nextLine);
-            }
-
-            index = nextIndex;
-        }
+        const { blockLines } = collectIndentedBlockLines(lines, index + 1);
 
         const groups = new Map<string, FrontmatterObjectListEntry[]>();
-        let currentGroupName: string | null = null;
-        let currentEntry: Record<string, string> | null = null;
-
-        const setEntryField = (
-            target: Record<string, string>,
-            source: string
-        ): void => {
-            const propertyMatch = NESTED_OBJECT_FIELD_PATTERN.exec(
-                source.trim()
-            );
-
-            if (propertyMatch === null) {
-                return;
-            }
-
-            const propertyKey = propertyMatch[1];
-            const propertyValue = propertyMatch[2];
-
-            if (propertyKey === undefined || propertyValue === undefined) {
-                return;
-            }
-
-            target[propertyKey] = normalizeScalarValue(propertyValue);
-        };
+        let currentGroupName: null | string = null;
+        let currentEntry: null | Record<string, string> = null;
 
         const flushCurrentEntry = (): void => {
             if (currentGroupName === null || currentEntry === null) {
@@ -486,14 +545,14 @@ export const getFrontmatterObjectListGroups = (
             if (!trimmedLine.startsWith("-") && indentationWidth <= 4) {
                 flushCurrentEntry();
 
-                const groupMatch = TOP_LEVEL_FIELD_PATTERN.exec(trimmedLine);
+                const groupField = parseFieldLine(trimmedLine);
 
-                if (groupMatch === null) {
+                if (groupField === null) {
                     currentGroupName = null;
                     continue;
                 }
 
-                currentGroupName = groupMatch[1] ?? null;
+                currentGroupName = groupField.key;
 
                 if (
                     currentGroupName !== null &&
@@ -516,7 +575,7 @@ export const getFrontmatterObjectListGroups = (
                 const inlineProperty = trimmedLine.slice(1).trim();
 
                 if (inlineProperty.length > 0) {
-                    setEntryField(currentEntry, inlineProperty);
+                    setObjectEntryField(currentEntry, inlineProperty);
                 }
 
                 continue;
@@ -526,7 +585,7 @@ export const getFrontmatterObjectListGroups = (
                 continue;
             }
 
-            setEntryField(currentEntry, trimmedLine);
+            setObjectEntryField(currentEntry, trimmedLine);
         }
 
         flushCurrentEntry();
@@ -539,4 +598,4 @@ export const getFrontmatterObjectListGroups = (
 
 /** Remove HTML comments before checking whether Markdown body content exists. */
 export const getMeaningfulMarkdownBody = (text: string): string =>
-    text.replaceAll(/<!--([\s\S]*?)-->/gu, "").trim();
+    stripHtmlComments(text).trim();
