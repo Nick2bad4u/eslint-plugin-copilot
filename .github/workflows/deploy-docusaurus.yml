@@ -62,7 +62,11 @@ jobs:
             - name: List TypeDoc output directories
               run: |
                   echo "TypeDoc output directories:"
-                  ls -l docs/docusaurus/site-docs
+                  if [ -d docs/docusaurus/site-docs ]; then
+                    ls -l docs/docusaurus/site-docs
+                  else
+                    echo "docs/docusaurus/site-docs not present (no generated API docs configured)."
+                  fi
                   ls -l docs
 
             - name: Setup GitHub Pages

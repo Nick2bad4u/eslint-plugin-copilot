@@ -19,6 +19,81 @@ import plugin from "../plugin.mjs";
 
 const expectedEslintMajorArgumentPrefix = "--expect-eslint-major=";
 
+const minimumLanguageKeyRuntimeMajor = 9;
+const minimumLanguageKeyRuntimeMinor = 15;
+
+const createEmptyProgramAst = (text) => {
+    const lineBreaks = text.match(/\n/gv) ?? [];
+    const lastLineStartOffset = text.lastIndexOf("\n") + 1;
+
+    return {
+        children: [],
+        comments: [],
+        loc: {
+            end: {
+                column: text.length - lastLineStartOffset,
+                line: lineBreaks.length + 1,
+            },
+            start: {
+                column: 0,
+                line: 1,
+            },
+        },
+        range: [0, text.length],
+        tokens: [],
+        type: "root",
+    };
+};
+
+/**
+ * @param {ReturnType<typeof createEmptyProgramAst>} ast
+ */
+const createLegacyScopeManager = (ast) => {
+    const globalScope = {
+        block: ast,
+        childScopes: [],
+        isStrict: true,
+        references: [],
+        set: new Map(),
+        through: [],
+        type: "global",
+        upper: null,
+        variableScope: null,
+        variables: [],
+    };
+
+    globalScope.variableScope = globalScope;
+
+    return {
+        acquire(node) {
+            return node === ast ? globalScope : null;
+        },
+        getDeclaredVariables() {
+            return [];
+        },
+        scopes: [globalScope],
+    };
+};
+
+const legacySmokeParser = {
+    meta: {
+        name: "eslint-plugin-copilot/compat-smoke-parser",
+        version: "1.0.0",
+    },
+    parseForESLint(text) {
+        const ast = createEmptyProgramAst(text);
+
+        return {
+            ast,
+            scopeManager: createLegacyScopeManager(ast),
+            services: {},
+            visitorKeys: {
+                root: [],
+            },
+        };
+    },
+};
+
 /**
  * @param {readonly string[]} argv
  *
@@ -95,6 +170,86 @@ const assertEslintMajor = (expectedMajor) => {
 };
 
 /**
+ * @returns {readonly [major: number, minor: number, patch: number]}
+ */
+const getRuntimeVersionTuple = () => {
+    const runtimeVersion = ESLint.version;
+
+    if (typeof runtimeVersion !== "string" || runtimeVersion.length === 0) {
+        throw new Error(
+            `Unable to determine ESLint runtime version: ${String(runtimeVersion)}`
+        );
+    }
+
+    const [
+        majorText = "0",
+        minorText = "0",
+        patchText = "0",
+    ] = runtimeVersion.split(".");
+    const major = Number.parseInt(majorText, 10);
+    const minor = Number.parseInt(minorText, 10);
+    const patch = Number.parseInt(patchText, 10);
+
+    if (
+        [
+            major,
+            minor,
+            patch,
+        ].some((value) => Number.isNaN(value))
+    ) {
+        throw new Error(
+            `Unable to parse ESLint runtime version tuple: ${runtimeVersion}`
+        );
+    }
+
+    return [
+        major,
+        minor,
+        patch,
+    ];
+};
+
+/**
+ * @returns {boolean}
+ */
+const runtimeSupportsLanguageKey = () => {
+    const [major, minor] = getRuntimeVersionTuple();
+
+    if (major !== minimumLanguageKeyRuntimeMajor) {
+        return major > minimumLanguageKeyRuntimeMajor;
+    }
+
+    return minor >= minimumLanguageKeyRuntimeMinor;
+};
+
+/**
+ * @param {import("eslint").Linter.Config} configEntry
+ *
+ * @returns {import("eslint").Linter.Config}
+ */
+const normalizeConfigEntryForLegacyFlatConfig = (configEntry) => {
+    if (runtimeSupportsLanguageKey()) {
+        return configEntry;
+    }
+
+    const { language: _language, ...legacyCompatibleConfigEntry } = configEntry;
+
+    const normalizedPlugins =
+        configEntry.plugins !== undefined && "copilot" in configEntry.plugins
+            ? { copilot: configEntry.plugins.copilot }
+            : configEntry.plugins;
+
+    return {
+        ...legacyCompatibleConfigEntry,
+        languageOptions: {
+            ...legacyCompatibleConfigEntry.languageOptions,
+            parser: legacySmokeParser,
+        },
+        plugins: normalizedPlugins,
+    };
+};
+
+/**
  * @param {"all" | "minimal"} configName
  *
  * @returns {import("eslint").Linter.Config[]}
@@ -117,7 +272,7 @@ const createCompatibilityConfig = (configName) => {
             );
 
         return {
-            ...normalizedConfigEntry,
+            ...normalizeConfigEntryForLegacyFlatConfig(normalizedConfigEntry),
             name:
                 index === 0
                     ? `compat-smoke:${configName}`

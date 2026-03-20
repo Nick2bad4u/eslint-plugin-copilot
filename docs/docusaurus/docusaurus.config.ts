@@ -116,7 +116,7 @@ const config: Config = {
             items: [
                 {
                     label: "Rules",
-                    to: "/docs/rules",
+                    to: "/docs/rules/overview",
                 },
                 {
                     label: "Presets",

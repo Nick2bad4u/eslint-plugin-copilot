@@ -20,7 +20,7 @@ const featureCards = [
         description:
             "Every rule includes targeted examples and links back to the canonical docs route used in runtime metadata.",
         title: "Consistent rule docs",
-        to: "/docs/rules",
+        to: "/docs/rules/overview",
     },
 ] as const;
 
