@@ -358,6 +358,177 @@ body {
     --sidebar-accent: #06b6d4;
 }
 
+.theme-doc-sidebar-item-link.sb-cat-developer > .menu__link,
+.theme-doc-sidebar-item-link.sb-cat-developer-ops > .menu__link {
+    border-inline-start: 0.28rem solid var(--sidebar-accent, #4f46e5);
+    border-radius: 0.95rem;
+    background: rgb(79 70 229 / 6%);
+    font-weight: 800;
+    padding-inline-start: 0.9rem;
+}
+
+.theme-doc-sidebar-item-link.sb-cat-developer {
+    --sidebar-accent: #22c55e;
+}
+
+.theme-doc-sidebar-item-link.sb-cat-developer-ops {
+    --sidebar-accent: #38bdf8;
+}
+
+.theme-doc-sidebar-item-category.sb-cat-api-overview,
+.theme-doc-sidebar-item-category.sb-cat-developer-adr,
+.theme-doc-sidebar-item-category.sb-cat-dev-charts,
+.theme-doc-sidebar-item-category.sb-cat-api-types,
+.theme-doc-sidebar-item-category.sb-cat-api-runtime,
+.theme-doc-sidebar-item-category.sb-cat-dev-links,
+.theme-doc-sidebar-item-category.sb-subcat-api-runtime-plugin,
+.theme-doc-sidebar-item-category.sb-subcat-api-runtime-internal {
+    margin-block-start: 0.5rem;
+}
+
+.theme-doc-sidebar-item-category.sb-cat-api-overview
+    > .menu__list-item-collapsible,
+.theme-doc-sidebar-item-category.sb-cat-developer-adr
+    > .menu__list-item-collapsible,
+.theme-doc-sidebar-item-category.sb-cat-dev-charts
+    > .menu__list-item-collapsible,
+.theme-doc-sidebar-item-category.sb-cat-api-types
+    > .menu__list-item-collapsible,
+.theme-doc-sidebar-item-category.sb-cat-api-runtime
+    > .menu__list-item-collapsible,
+.theme-doc-sidebar-item-category.sb-cat-dev-links
+    > .menu__list-item-collapsible,
+.theme-doc-sidebar-item-category.sb-subcat-api-runtime-plugin
+    > .menu__list-item-collapsible,
+.theme-doc-sidebar-item-category.sb-subcat-api-runtime-internal
+    > .menu__list-item-collapsible {
+    background: color-mix(in srgb, var(--sidebar-accent, #4f46e5) 8%, transparent);
+    border-inline-start: 0.28rem solid
+        var(--sidebar-accent, var(--ifm-color-primary));
+    border-radius: 0.95rem;
+}
+
+.theme-doc-sidebar-item-category.sb-cat-api-overview
+    > .menu__list-item-collapsible
+    .menu__link,
+.theme-doc-sidebar-item-category.sb-cat-developer-adr
+    > .menu__list-item-collapsible
+    .menu__link,
+.theme-doc-sidebar-item-category.sb-cat-dev-charts
+    > .menu__list-item-collapsible
+    .menu__link,
+.theme-doc-sidebar-item-category.sb-cat-api-types
+    > .menu__list-item-collapsible
+    .menu__link,
+.theme-doc-sidebar-item-category.sb-cat-api-runtime
+    > .menu__list-item-collapsible
+    .menu__link,
+.theme-doc-sidebar-item-category.sb-cat-dev-links
+    > .menu__list-item-collapsible
+    .menu__link,
+.theme-doc-sidebar-item-category.sb-subcat-api-runtime-plugin
+    > .menu__list-item-collapsible
+    .menu__link,
+.theme-doc-sidebar-item-category.sb-subcat-api-runtime-internal
+    > .menu__list-item-collapsible
+    .menu__link {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.6rem;
+    inline-size: 100%;
+    justify-content: space-between;
+    padding-inline-start: 0.9rem;
+}
+
+.theme-doc-sidebar-item-category.sb-cat-api-overview
+    > .menu__list-item-collapsible
+    .menu__link::after,
+.theme-doc-sidebar-item-category.sb-cat-developer-adr
+    > .menu__list-item-collapsible
+    .menu__link::after,
+.theme-doc-sidebar-item-category.sb-cat-dev-charts
+    > .menu__list-item-collapsible
+    .menu__link::after,
+.theme-doc-sidebar-item-category.sb-cat-api-types
+    > .menu__list-item-collapsible
+    .menu__link::after,
+.theme-doc-sidebar-item-category.sb-cat-api-runtime
+    > .menu__list-item-collapsible
+    .menu__link::after,
+.theme-doc-sidebar-item-category.sb-cat-dev-links
+    > .menu__list-item-collapsible
+    .menu__link::after {
+    background: color-mix(in srgb, var(--sidebar-accent, #4f46e5) 18%, transparent);
+    border: 1px solid color-mix(in srgb, var(--sidebar-accent, #4f46e5) 42%, transparent);
+    border-radius: 999px;
+    color: var(--sidebar-accent, var(--ifm-color-primary));
+    content: var(--sidebar-badge, "DOCS");
+    display: inline-flex;
+    flex: none;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    margin-inline-start: auto;
+    padding: 0.28rem 0.46rem;
+    text-orientation: mixed;
+    text-transform: uppercase;
+    transform: none;
+    white-space: nowrap;
+    writing-mode: horizontal-tb;
+}
+
+.theme-doc-sidebar-item-category.sb-cat-api-overview {
+    --sidebar-accent: #60a5fa;
+    --sidebar-badge: "API";
+}
+
+.theme-doc-sidebar-item-category.sb-cat-developer-adr {
+    --sidebar-accent: #f59e0b;
+    --sidebar-badge: "ADR";
+}
+
+.theme-doc-sidebar-item-category.sb-cat-dev-charts {
+    --sidebar-accent: #22c55e;
+    --sidebar-badge: "CHARTS";
+}
+
+.theme-doc-sidebar-item-category.sb-cat-api-types {
+    --sidebar-accent: #8b5cf6;
+    --sidebar-badge: "TYPES";
+}
+
+.theme-doc-sidebar-item-category.sb-cat-api-runtime {
+    --sidebar-accent: #fb7185;
+    --sidebar-badge: "RUNTIME";
+}
+
+.theme-doc-sidebar-item-category.sb-cat-dev-links {
+    --sidebar-accent: #f97316;
+    --sidebar-badge: "LINKS";
+}
+
+.theme-doc-sidebar-item-category.sb-subcat-api-runtime-plugin {
+    --sidebar-accent: #ec4899;
+}
+
+.theme-doc-sidebar-item-category.sb-subcat-api-runtime-internal {
+    --sidebar-accent: #f43f5e;
+}
+
+.theme-doc-sidebar-item-link.sb-api-overview-item > .menu__link,
+.theme-doc-sidebar-item-link.sb-adr-item > .menu__link {
+    font-weight: 700;
+}
+
+.theme-doc-sidebar-item-link.sb-api-overview-item > .menu__link {
+    border-inline-start: 0.22rem solid #60a5fa;
+}
+
+.theme-doc-sidebar-item-link.sb-adr-item > .menu__link {
+    border-inline-start: 0.22rem solid #f59e0b;
+}
+
 .sidebar-doc--rule.menu__link,
 .sidebar-doc--rule > .menu__link,
 .sidebar-doc--rule .menu__link {
@@ -579,7 +750,6 @@ body {
     margin: 0.85rem 0 0;
     font-size: clamp(2.75rem, 5.4vi, 4.35rem);
     line-height: 1.02;
-    max-inline-size: 9ch;
 }
 
 .home-hero__subtitle {
@@ -779,7 +949,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
-    margin-block-start: 1.75rem;
+    margin-block-start: 3.5rem;
 }
 
 .site-badge-strip {

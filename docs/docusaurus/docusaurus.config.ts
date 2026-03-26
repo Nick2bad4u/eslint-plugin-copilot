@@ -119,22 +119,22 @@ const config: Config = {
                     items: [
                         {
                             className: "footer-link--overview",
-                            label: "Getting started",
+                            label: "\uead3 Getting started",
                             to: "/docs/rules/getting-started",
                         },
                         {
                             className: "footer-link--rules",
-                            label: "Rule overview",
+                            label: "\uea96 Rule overview",
                             to: "/docs/rules/overview",
                         },
                         {
                             className: "footer-link--presets",
-                            label: "Presets",
+                            label: "\ue690 Presets",
                             to: "/docs/rules/presets",
                         },
                         {
                             className: "footer-link--reference",
-                            label: "Rule reference",
+                            label: "\udb81\udd6e Rule reference",
                             to: "/docs/rules/overview",
                         },
                     ],
@@ -145,22 +145,22 @@ const config: Config = {
                         {
                             className: "footer-link--github",
                             href: `https://github.com/${organizationName}/${projectName}`,
-                            label: "GitHub",
+                            label: "\uf09b GitHub",
                         },
                         {
                             className: "footer-link--npm",
                             href: "https://www.npmjs.com/package/eslint-plugin-copilot",
-                            label: "npm package",
+                            label: "\uf1fa npm package",
                         },
                         {
                             className: "footer-link--releases",
                             href: `https://github.com/${organizationName}/${projectName}/releases`,
-                            label: "Releases",
+                            label: "\uf0c5 Releases",
                         },
                         {
                             className: "footer-link--changelog",
                             href: `https://github.com/${organizationName}/${projectName}/blob/main/CHANGELOG.md`,
-                            label: "Changelog",
+                            label: "\uf0f6 Changelog",
                         },
                     ],
                     title: "Project",
@@ -169,33 +169,23 @@ const config: Config = {
                     items: [
                         {
                             className: "footer-link--developer",
-                            label: "Developer guide",
+                            label: "\uf121 Developer guide",
                             to: "/developer",
                         },
                         {
                             className: "footer-link--adrs",
-                            label: "ADRs",
+                            label: "\uf02d ADRs",
                             to: "/developer/adrs",
-                        },
-                        {
-                            className: "footer-link--resources",
-                            label: "Resources",
-                            to: "/resources",
-                        },
-                        {
-                            className: "footer-link--project-page",
-                            label: "Project page",
-                            to: "/project",
                         },
                         {
                             className: "footer-link--contributing",
                             href: `https://github.com/${organizationName}/${projectName}/blob/main/CONTRIBUTING.md`,
-                            label: "Contributing",
+                            label: "\uf0c0 Contributing",
                         },
                         {
                             className: "footer-link--support",
                             href: `https://github.com/${organizationName}/${projectName}/blob/main/SUPPORT.md`,
-                            label: "Support",
+                            label: "\uf1cd Support",
                         },
                     ],
                     title: "Developer",
@@ -214,7 +204,7 @@ const config: Config = {
                 {
                     className: "navbar-link--overview",
                     label: "Get started",
-                    to: "/docs/rules/overview",
+                    to: "/docs/rules/getting-started",
                 },
                 {
                     className: "navbar-link--presets",

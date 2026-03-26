@@ -44,55 +44,19 @@ function getConfigFileName(cliArgs) {
 }
 
 /**
- * Resolve the nearest hoisted/local TypeDoc CLI executable by walking up from
- * cwd.
- *
- * @param {string} cwd - Starting directory for lookup.
- *
- * @returns {string} Path to a TypeDoc CLI script.
- */
-function resolveTypedocCliFromCwd(cwd) {
-    let currentPath = cwd;
-
-    while (true) {
-        const candidatePath = resolve(
-            currentPath,
-            "node_modules",
-            "typedoc",
-            "bin",
-            "typedoc"
-        );
-
-        if (existsSync(candidatePath)) {
-            return candidatePath;
-        }
-
-        const parentPath = dirname(currentPath);
-
-        if (parentPath === currentPath) {
-            break;
-        }
-
-        currentPath = parentPath;
-    }
-
-    return typedocCliPath;
-}
-
-/**
  * Execute TypeDoc with the provided options file in a specific working
  * directory.
  *
  * @param {string} cwd - Working directory for the TypeDoc process.
  * @param {string} configFile - TypeDoc options file to pass to `--options`.
+ * @param {string} [cliPath=typedocCliPath] - TypeDoc CLI path to execute.
+ *   Default is `typedocCliPath`
  */
-function runTypedoc(cwd, configFile) {
-    const resolvedTypedocCliPath = resolveTypedocCliFromCwd(cwd);
-
+function runTypedoc(cwd, configFile, cliPath = typedocCliPath) {
     execFileSync(
         process.execPath,
         [
-            resolvedTypedocCliPath,
+            cliPath,
             "--options",
             configFile,
         ],
@@ -133,17 +97,89 @@ function collectMarkdownFiles(directoryPath) {
 }
 
 /**
+ * Recursively collect TypeDoc navigation titles by generated markdown path.
+ *
+ * @param {unknown} navigationNode - Parsed navigation node or subtree.
+ * @param {Map<string, string>} titleByPath - Mutable path/title map.
+ */
+function collectNavigationTitles(navigationNode, titleByPath) {
+    if (Array.isArray(navigationNode)) {
+        for (const childNode of navigationNode) {
+            collectNavigationTitles(childNode, titleByPath);
+        }
+
+        return;
+    }
+
+    if (
+        navigationNode === null ||
+        typeof navigationNode !== "object" ||
+        !("title" in navigationNode)
+    ) {
+        return;
+    }
+
+    const titleValue = navigationNode.title;
+    const pathValue =
+        "path" in navigationNode ? navigationNode.path : undefined;
+
+    if (typeof pathValue === "string" && typeof titleValue === "string") {
+        titleByPath.set(pathValue.replaceAll("\\", "/"), titleValue);
+    }
+
+    if ("children" in navigationNode) {
+        collectNavigationTitles(navigationNode.children, titleByPath);
+    }
+}
+
+/**
+ * Build a markdown-path to title lookup map from TypeDoc navigation JSON.
+ *
+ * @param {string} apiDocsRootDirectory - Absolute generated API docs directory.
+ *
+ * @returns {ReadonlyMap<string, string>} Lookup map keyed by docs-relative
+ *   markdown path.
+ */
+function getGeneratedApiNavigationTitleMap(apiDocsRootDirectory) {
+    const navigationJsonPath = resolve(apiDocsRootDirectory, "navigation.json");
+
+    if (!existsSync(navigationJsonPath)) {
+        return new Map();
+    }
+
+    /** @type {unknown} */
+    const navigationJson = JSON.parse(readFileSync(navigationJsonPath, "utf8"));
+    const titleByPath = new Map();
+
+    collectNavigationTitles(navigationJson, titleByPath);
+
+    return titleByPath;
+}
+
+/**
  * Create a stable frontmatter block for generated API docs.
  *
  * @param {string} filePath - Absolute markdown file path.
  * @param {string} apiDocsRootDirectory - Absolute generated API docs directory.
+ * @param {ReadonlyMap<string, string>} generatedTitleByPath - TypeDoc
+ *   navigation title lookup.
  *
  * @returns {string} YAML frontmatter block including trailing blank line.
  */
-function createGeneratedApiFrontMatter(filePath, apiDocsRootDirectory) {
-    const relativePath = relative(apiDocsRootDirectory, filePath);
+function createGeneratedApiFrontMatter(
+    filePath,
+    apiDocsRootDirectory,
+    generatedTitleByPath
+) {
+    const relativePath = relative(apiDocsRootDirectory, filePath).replaceAll(
+        "\\",
+        "/"
+    );
     const isReadme = relativePath === "README.md";
-    const title = isReadme ? "API reference" : basename(filePath, ".md");
+    const generatedTitle = generatedTitleByPath.get(relativePath);
+    const title = isReadme
+        ? "API reference"
+        : (generatedTitle ?? basename(filePath, ".md"));
 
     return [
         "---",
@@ -189,13 +225,17 @@ function postprocessGeneratedDeveloperApiDocs(apiDocsRootDirectory) {
         return;
     }
 
+    const generatedTitleByPath =
+        getGeneratedApiNavigationTitleMap(apiDocsRootDirectory);
+
     for (const markdownFilePath of collectMarkdownFiles(apiDocsRootDirectory)) {
         const markdownSourceText = readFileSync(markdownFilePath, "utf8");
         const normalizedMarkdown =
             normalizeGeneratedMarkdown(markdownSourceText);
         const frontMatter = createGeneratedApiFrontMatter(
             markdownFilePath,
-            apiDocsRootDirectory
+            apiDocsRootDirectory,
+            generatedTitleByPath
         );
 
         writeFileSync(
@@ -261,7 +301,19 @@ function runViaTemporaryDrive(
             `${driveRoot}\\`,
             docsWorkspaceRelativePath
         );
-        runTypedoc(mappedDocsWorkspaceDirectory, configFile);
+        const mappedTypedocCliPath = resolve(
+            `${driveRoot}\\`,
+            "node_modules",
+            "typedoc",
+            "bin",
+            "typedoc"
+        );
+
+        runTypedoc(
+            mappedDocsWorkspaceDirectory,
+            configFile,
+            mappedTypedocCliPath
+        );
     } finally {
         execFileSync("subst", [driveRoot, "/d"], {
             stdio: "ignore",
