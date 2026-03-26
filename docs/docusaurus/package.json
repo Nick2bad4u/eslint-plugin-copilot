@@ -35,17 +35,17 @@
         "build"
     ],
     "scripts": {
-        "build": "docusaurus build",
-        "build:fast": "cross-env DOCUSAURUS_ENABLE_EXPERIMENTAL=true docusaurus build",
-        "build:local": "docusaurus build",
+        "build": "npm run docs:api && docusaurus build",
+        "build:fast": "npm run docs:api && cross-env DOCUSAURUS_ENABLE_EXPERIMENTAL=true docusaurus build",
+        "build:local": "npm run docs:api:local && docusaurus build",
         "clear": "docusaurus clear",
         "deploy": "docusaurus deploy",
-        "docs:api": "node -e \"console.log('No generated API docs configured for eslint-plugin-copilot.')\"",
-        "docs:api:local": "node -e \"console.log('No generated API docs configured for eslint-plugin-copilot.')\"",
+        "docs:api": "node ../../scripts/run-typedoc-docs.mjs --config typedoc.config.json",
+        "docs:api:local": "node ../../scripts/run-typedoc-docs.mjs --config typedoc.config.json",
         "docusaurus": "docusaurus",
         "serve": "docusaurus serve",
-        "start": "docusaurus start --host localhost",
-        "start:devtools": "cross-env DOCUSAURUS_BASE_URL=/ docusaurus start --host localhost",
+        "start": "npm run docs:api:local && docusaurus start --host localhost",
+        "start:devtools": "npm run docs:api:local && cross-env DOCUSAURUS_BASE_URL=/ docusaurus start --host localhost",
         "type:css": "npx typed-css-modules .\\src",
         "typecheck": "tsc --project tsconfig.json --noEmit",
         "write-heading-ids": "docusaurus write-heading-ids",
@@ -57,6 +57,7 @@
         "@docusaurus/plugin-content-docs": "^3.9.2",
         "@docusaurus/preset-classic": "^3.9.2",
         "@docusaurus/types": "^3.9.2",
+        "@easyops-cn/docusaurus-search-local": "^0.55.1",
         "clsx": "^2.1.1",
         "prism-react-renderer": "^2.4.1"
     },
@@ -69,6 +70,7 @@
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
         "typed-css-modules": "^0.9.1",
+        "typedoc-plugin-markdown": "^4.11.0",
         "typescript": "^5.9.3"
     },
     "peerDependencies": {

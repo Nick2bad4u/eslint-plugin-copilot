@@ -10,9 +10,9 @@ Its an eslint plugin to lint ALL things to do with <NEW_PLUGIN>. We must have qu
 
 Lots of documentaion can be found online I suggest you read it and go through as much as possible to get everything nailed down perfectly.
 
-https://example.com/docs
-https://example.com/api
-https://example.com/guides
+<https://example.com/docs>
+<https://example.com/api>
+<https://example.com/guides>
 
 Theres 100s of docs and guides online to scan through online. Use #tavily-remote-mcp-system as needed.
 

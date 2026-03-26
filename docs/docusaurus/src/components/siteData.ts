@@ -1,0 +1,326 @@
+export type SiteLinkCard = Readonly<{
+    cta: string;
+    description: string;
+    href?: string;
+    icon?: string;
+    title: string;
+    to?: string;
+}>;
+
+export function getSiteLinkProps(
+    linkCard: SiteLinkCard
+): { href: string } | { to: string } {
+    if (typeof linkCard.href === "string") {
+        return { href: linkCard.href };
+    }
+
+    if (typeof linkCard.to === "string") {
+        return { to: linkCard.to };
+    }
+
+    throw new TypeError(
+        `Link card \"${linkCard.title}\" is missing a destination.`
+    );
+}
+
+export type SiteBadge = Readonly<{
+    alt: string;
+    href: string;
+    src: string;
+}>;
+
+export type SiteFeatureCard = Readonly<{
+    description: string;
+    eyebrow: string;
+    icon: string;
+    meta: string;
+    title: string;
+}>;
+
+export type SiteStat = Readonly<{
+    detail: string;
+    label: string;
+    value: string;
+}>;
+
+export type SiteReason = Readonly<{
+    description: string;
+    title: string;
+}>;
+
+export type SiteResourceGroup = Readonly<{
+    items: readonly SiteLinkCard[];
+    title: string;
+}>;
+
+const projectBase = "https://github.com/Nick2bad4u/eslint-plugin-copilot";
+
+export const liveBadges = [
+    {
+        alt: "npm license",
+        href: `${projectBase}/blob/main/LICENSE`,
+        src: "https://flat.badgen.net/npm/license/eslint-plugin-copilot?color=6d28d9",
+    },
+    {
+        alt: "npm downloads",
+        href: "https://www.npmjs.com/package/eslint-plugin-copilot",
+        src: "https://flat.badgen.net/npm/dt/eslint-plugin-copilot?color=ec4899",
+    },
+    {
+        alt: "latest GitHub release",
+        href: `${projectBase}/releases`,
+        src: "https://flat.badgen.net/github/release/Nick2bad4u/eslint-plugin-copilot?color=06b6d4",
+    },
+    {
+        alt: "GitHub stars",
+        href: `${projectBase}/stargazers`,
+        src: "https://flat.badgen.net/github/stars/Nick2bad4u/eslint-plugin-copilot?color=facc15",
+    },
+    {
+        alt: "GitHub open issues",
+        href: `${projectBase}/issues`,
+        src: "https://flat.badgen.net/github/open-issues/Nick2bad4u/eslint-plugin-copilot?color=ef4444",
+    },
+    {
+        alt: "Codecov",
+        href: "https://codecov.io/gh/Nick2bad4u/eslint-plugin-copilot",
+        src: "https://codecov.io/gh/Nick2bad4u/eslint-plugin-copilot/branch/main/graph/badge.svg",
+    },
+] as const satisfies readonly SiteBadge[];
+
+export const homePrimaryCards = [
+    {
+        cta: "Open section",
+        description:
+            "Install the plugin, choose a preset, and start linting GitHub Copilot customization files in a modern flat config.",
+        icon: "overview",
+        title: "Get Started",
+        to: "/docs/rules/getting-started",
+    },
+    {
+        cta: "Open section",
+        description:
+            "Compare minimal, recommended, strict, and all to pick the right baseline for your repository.",
+        icon: "presets",
+        title: "Presets",
+        to: "/docs/rules/presets",
+    },
+    {
+        cta: "Open section",
+        description:
+            "Browse the rule catalog, overview guidance, and stable documentation routes used by the plugin metadata.",
+        icon: "rules",
+        title: "Rule Reference",
+        to: "/docs/rules/overview",
+    },
+] as const satisfies readonly SiteLinkCard[];
+
+export const entryPoints = [
+    {
+        cta: "Open getting started",
+        description:
+            "Install the package, enable a preset, and understand the supported file surfaces before rolling it out repository-wide.",
+        icon: "🚀",
+        title: "Start integrating in minutes",
+        to: "/docs/rules/getting-started",
+    },
+    {
+        cta: "Compare presets",
+        description:
+            "See the rule matrix for minimal, recommended, strict, and all, and choose the right baseline for your team.",
+        icon: "📦",
+        title: "Choose the right preset",
+        to: "/docs/rules/presets",
+    },
+    {
+        cta: "Browse the rules",
+        description:
+            "Explore the grouped rule catalog, overview guidance, and stable documentation routes used by plugin metadata.",
+        icon: "📘",
+        title: "Browse the rule reference",
+        to: "/docs/rules/overview",
+    },
+    {
+        cta: "Review project signals",
+        description:
+            "Check releases, quality links, changelog, repository health, and package distribution details from one place.",
+        icon: "📈",
+        title: "Inspect project health",
+        to: "/project",
+    },
+    {
+        cta: "Open resources",
+        description:
+            "Jump to contributor-facing references, repository standards, scripts, and docs pages that matter during implementation.",
+        icon: "🛠️",
+        title: "Use developer resources",
+        to: "/resources",
+    },
+    {
+        cta: "View on npm",
+        description:
+            "Audit the published package, install instructions, and release cadence directly from the npm package page.",
+        href: "https://www.npmjs.com/package/eslint-plugin-copilot",
+        icon: "📦",
+        title: "Track distribution",
+    },
+] as const satisfies readonly SiteLinkCard[];
+
+export const projectHighlights = [
+    {
+        cta: "Open releases",
+        description:
+            "Review tagged releases, compare versions, and inspect the public release stream for the plugin.",
+        href: `${projectBase}/releases`,
+        icon: "🏷️",
+        title: "Releases",
+    },
+    {
+        cta: "Read changelog",
+        description:
+            "Track behavior changes, fixes, and user-facing improvements in the repository changelog.",
+        href: `${projectBase}/blob/main/CHANGELOG.md`,
+        icon: "📝",
+        title: "Changelog",
+    },
+    {
+        cta: "View package",
+        description:
+            "Inspect install metadata, versioning, and package distribution from npm.",
+        href: "https://www.npmjs.com/package/eslint-plugin-copilot",
+        icon: "📦",
+        title: "npm package",
+    },
+    {
+        cta: "Inspect coverage",
+        description:
+            "Use live Codecov reports to monitor test coverage for the repository over time.",
+        href: "https://codecov.io/gh/Nick2bad4u/eslint-plugin-copilot",
+        icon: "📊",
+        title: "Coverage",
+    },
+    {
+        cta: "Report an issue",
+        description:
+            "Open or review repository issues when you need to track gaps, fixes, or docs improvements.",
+        href: `${projectBase}/issues`,
+        icon: "🐞",
+        title: "Issues",
+    },
+    {
+        cta: "Review security",
+        description:
+            "Check the public security policy and security-adjacent repository guidance.",
+        href: `${projectBase}/security`,
+        icon: "🔐",
+        title: "Security",
+    },
+] as const satisfies readonly SiteLinkCard[];
+
+export const projectSignals = [
+    {
+        description:
+            "This repository treats docs as part of the product surface, not as an afterthought. Release notes, README links, preset sync, and docs link validation are already part of the broader quality story.",
+        title: "Docs and metadata stay aligned",
+    },
+    {
+        description:
+            "The plugin is focused on real GitHub Copilot repository customization assets, so examples and rule pages map directly to files teams already maintain.",
+        title: "Built for real repository workflows",
+    },
+    {
+        description:
+            "Public signals like releases, issues, downloads, stars, and coverage are surfaced directly here so maintainers and adopters can assess project health quickly.",
+        title: "Live health signals are front and center",
+    },
+] as const satisfies readonly SiteReason[];
+
+export const resourceGroups = [
+    {
+        items: [
+            {
+                cta: "Read guide",
+                description:
+                    "Start with the supported Copilot customization file families and the conventions the plugin is built to enforce.",
+                icon: "📚",
+                title: "Customization files guide",
+                to: "/docs/rules/guides/copilot-customization-files",
+            },
+            {
+                cta: "Read overview",
+                description:
+                    "See the high-level coverage model and the design goals behind the rule set.",
+                icon: "🧭",
+                title: "Rule overview",
+                to: "/docs/rules/overview",
+            },
+            {
+                cta: "Compare presets",
+                description:
+                    "Use the preset matrix to decide whether your repository needs a minimal baseline or strict enforcement.",
+                icon: "📦",
+                title: "Preset matrix",
+                to: "/docs/rules/presets",
+            },
+        ],
+        title: "Documentation paths",
+    },
+    {
+        items: [
+            {
+                cta: "Open README",
+                description:
+                    "Review installation, quick start, preset examples, and the public-facing rule catalog from the repository root.",
+                href: `${projectBase}/blob/main/README.md`,
+                icon: "📄",
+                title: "README",
+            },
+            {
+                cta: "Read contributing guide",
+                description:
+                    "Use the contributor guide when changing rules, docs, release surfaces, or repository workflows.",
+                href: `${projectBase}/blob/main/CONTRIBUTING.md`,
+                icon: "🤝",
+                title: "Contributing",
+            },
+            {
+                cta: "Browse scripts",
+                description:
+                    "Inspect the sync, docs, validation, and maintenance scripts that keep the repository consistent.",
+                href: `${projectBase}/tree/main/scripts`,
+                icon: "🧰",
+                title: "Repository scripts",
+            },
+        ],
+        title: "Implementation references",
+    },
+    {
+        items: [
+            {
+                cta: "Open support policy",
+                description:
+                    "Understand how the repository handles support expectations and communication channels.",
+                href: `${projectBase}/blob/main/SUPPORT.md`,
+                icon: "💬",
+                title: "Support",
+            },
+            {
+                cta: "Review security policy",
+                description:
+                    "Check the security policy before reporting vulnerabilities or making security-adjacent changes.",
+                href: `${projectBase}/blob/main/SECURITY.md`,
+                icon: "🛡️",
+                title: "Security policy",
+            },
+            {
+                cta: "Read code of conduct",
+                description:
+                    "Use the project’s code of conduct and community guidance when contributing or moderating interactions.",
+                href: `${projectBase}/blob/main/CODE_OF_CONDUCT.md`,
+                icon: "🌐",
+                title: "Code of conduct",
+            },
+        ],
+        title: "Community and policy",
+    },
+] as const satisfies readonly SiteResourceGroup[];

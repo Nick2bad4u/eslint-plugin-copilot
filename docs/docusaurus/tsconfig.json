@@ -24,6 +24,7 @@
     "include": [
         "docusaurus.config.ts",
         "sidebars.ts",
+        "sidebars.developer.ts",
         "sidebars.rules.ts",
         "src/**/*"
     ]

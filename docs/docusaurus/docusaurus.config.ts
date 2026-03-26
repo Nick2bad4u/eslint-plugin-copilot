@@ -49,6 +49,18 @@ const config: Config = {
                 sidebarPath: "./sidebars.rules.ts",
             } satisfies DocsPluginOptions,
         ],
+        [
+            "@docusaurus/plugin-content-docs",
+            {
+                editUrl: `https://github.com/${organizationName}/${projectName}/blob/main/docs/docusaurus/`,
+                id: "developer",
+                path: "./site-docs/developer",
+                routeBasePath: "developer",
+                showLastUpdateAuthor: true,
+                showLastUpdateTime: true,
+                sidebarPath: "./sidebars.developer.ts",
+            } satisfies DocsPluginOptions,
+        ],
     ],
     presets: [
         [
@@ -64,12 +76,7 @@ const config: Config = {
                 },
                 pages: {
                     editUrl: `https://github.com/${organizationName}/${projectName}/blob/main/docs/docusaurus/`,
-                    exclude: [
-                        // Declarations (often generated next to CSS modules)
-                        // must never become routable pages.
-                        "**/*.d.ts",
-                        "**/*.d.tsx",
-                    ],
+                    exclude: ["**/*.d.ts", "**/*.d.tsx"],
                 },
                 theme: {
                     customCss: "./src/css/custom.css",
@@ -80,6 +87,25 @@ const config: Config = {
     projectName,
     tagline:
         "Lint GitHub Copilot repository instructions, prompt files, custom agents, legacy chat modes, and related customization assets.",
+    themes: [
+        [
+            "@easyops-cn/docusaurus-search-local",
+            {
+                docsDir: ["../rules", "./site-docs/developer"],
+                docsPluginIdForPreferredVersion: "rules",
+                docsRouteBasePath: ["docs/rules", "developer"],
+                explicitSearchResultPath: true,
+                hashed: true,
+                highlightSearchTermsOnTargetPage: true,
+                indexBlog: false,
+                indexDocs: true,
+                indexPages: true,
+                language: ["en"],
+                searchBarPosition: "right",
+                searchResultLimits: 10,
+            },
+        ],
+    ],
     themeConfig: {
         colorMode: {
             respectPrefersColorScheme: true,
@@ -92,12 +118,24 @@ const config: Config = {
                 {
                     items: [
                         {
-                            label: "Overview",
+                            className: "footer-link--overview",
+                            label: "Getting started",
+                            to: "/docs/rules/getting-started",
+                        },
+                        {
+                            className: "footer-link--rules",
+                            label: "Rule overview",
                             to: "/docs/rules/overview",
                         },
                         {
+                            className: "footer-link--presets",
                             label: "Presets",
                             to: "/docs/rules/presets",
+                        },
+                        {
+                            className: "footer-link--reference",
+                            label: "Rule reference",
+                            to: "/docs/rules/overview",
                         },
                     ],
                     title: "Docs",
@@ -105,38 +143,104 @@ const config: Config = {
                 {
                     items: [
                         {
+                            className: "footer-link--github",
                             href: `https://github.com/${organizationName}/${projectName}`,
                             label: "GitHub",
                         },
                         {
+                            className: "footer-link--npm",
                             href: "https://www.npmjs.com/package/eslint-plugin-copilot",
-                            label: "npm",
+                            label: "npm package",
+                        },
+                        {
+                            className: "footer-link--releases",
+                            href: `https://github.com/${organizationName}/${projectName}/releases`,
+                            label: "Releases",
+                        },
+                        {
+                            className: "footer-link--changelog",
+                            href: `https://github.com/${organizationName}/${projectName}/blob/main/CHANGELOG.md`,
+                            label: "Changelog",
                         },
                     ],
                     title: "Project",
                 },
+                {
+                    items: [
+                        {
+                            className: "footer-link--developer",
+                            label: "Developer guide",
+                            to: "/developer",
+                        },
+                        {
+                            className: "footer-link--adrs",
+                            label: "ADRs",
+                            to: "/developer/adrs",
+                        },
+                        {
+                            className: "footer-link--resources",
+                            label: "Resources",
+                            to: "/resources",
+                        },
+                        {
+                            className: "footer-link--project-page",
+                            label: "Project page",
+                            to: "/project",
+                        },
+                        {
+                            className: "footer-link--contributing",
+                            href: `https://github.com/${organizationName}/${projectName}/blob/main/CONTRIBUTING.md`,
+                            label: "Contributing",
+                        },
+                        {
+                            className: "footer-link--support",
+                            href: `https://github.com/${organizationName}/${projectName}/blob/main/SUPPORT.md`,
+                            label: "Support",
+                        },
+                    ],
+                    title: "Developer",
+                },
             ],
+            logo: {
+                alt: "GitHub Copilot footer logo",
+                href: baseUrl,
+                src: "img/github-copilot-light.png",
+            },
+            style: "dark",
         },
-        image: "img/logo.svg",
+        image: "img/logo.png",
         navbar: {
             items: [
                 {
-                    label: "Rules",
+                    className: "navbar-link--overview",
+                    label: "Get started",
                     to: "/docs/rules/overview",
                 },
                 {
+                    className: "navbar-link--presets",
                     label: "Presets",
                     to: "/docs/rules/presets",
                 },
                 {
+                    className: "navbar-link--rules",
+                    label: "Rules",
+                    to: "/docs/rules/overview",
+                },
+                {
+                    className: "navbar-link--developer",
+                    label: "Developer",
+                    to: "/developer",
+                },
+                {
+                    className: "navbar-link--github",
                     href: `https://github.com/${organizationName}/${projectName}`,
                     label: "GitHub",
                     position: "right",
                 },
                 {
-                    href: "https://www.npmjs.com/package/eslint-plugin-copilot",
-                    label: "npm",
+                    className: "navbar-link--search",
                     position: "right",
+                    type: "search",
                 },
             ],
             logo: {

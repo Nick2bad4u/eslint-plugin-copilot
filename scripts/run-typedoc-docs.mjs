@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { dirname, relative, resolve } from "node:path";
+import { basename, dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
@@ -104,6 +104,109 @@ function runTypedoc(cwd, configFile) {
 }
 
 /**
+ * Collect all markdown files under a directory recursively.
+ *
+ * @param {string} directoryPath - Root directory to walk.
+ *
+ * @returns {string[]} Absolute markdown file paths.
+ */
+function collectMarkdownFiles(directoryPath) {
+    /** @type {string[]} */
+    const markdownFilePaths = [];
+
+    for (const directoryEntry of readdirSync(directoryPath, {
+        withFileTypes: true,
+    })) {
+        const absoluteEntryPath = resolve(directoryPath, directoryEntry.name);
+
+        if (directoryEntry.isDirectory()) {
+            markdownFilePaths.push(...collectMarkdownFiles(absoluteEntryPath));
+            continue;
+        }
+
+        if (absoluteEntryPath.endsWith(".md")) {
+            markdownFilePaths.push(absoluteEntryPath);
+        }
+    }
+
+    return markdownFilePaths;
+}
+
+/**
+ * Create a stable frontmatter block for generated API docs.
+ *
+ * @param {string} filePath - Absolute markdown file path.
+ * @param {string} apiDocsRootDirectory - Absolute generated API docs directory.
+ *
+ * @returns {string} YAML frontmatter block including trailing blank line.
+ */
+function createGeneratedApiFrontMatter(filePath, apiDocsRootDirectory) {
+    const relativePath = relative(apiDocsRootDirectory, filePath);
+    const isReadme = relativePath === "README.md";
+    const title = isReadme ? "API reference" : basename(filePath, ".md");
+
+    return [
+        "---",
+        `title: ${title}`,
+        isReadme
+            ? "description: Generated API reference for the public eslint-plugin-copilot plugin surface."
+            : `description: Generated API reference page for ${title}.`,
+        isReadme ? "sidebar_label: API overview" : null,
+        "hide_title: true",
+        "---",
+        "",
+    ]
+        .filter((line) => line !== null)
+        .join("\n");
+}
+
+/**
+ * Normalize generated markdown so Docusaurus renders a single clean title.
+ *
+ * @param {string} markdownSourceText - Raw generated markdown.
+ *
+ * @returns {string} Cleaned markdown without duplicate TypeDoc banner text.
+ */
+function normalizeGeneratedMarkdown(markdownSourceText) {
+    const withoutFrontMatter = markdownSourceText.replace(
+        /^---\r?\n[\s\S]*?\r?\n---\r?\n\r?\n/u,
+        ""
+    );
+
+    return withoutFrontMatter.replace(
+        /^(?:\[\*\*.*?\*\*\]\([^)]+\)|\*\*.*?\*\*)\r?\n\r?\n---\r?\n\r?\n/u,
+        ""
+    );
+}
+
+/**
+ * Postprocess the generated developer API markdown for Docusaurus docs output.
+ *
+ * @param {string} apiDocsRootDirectory - Absolute generated API docs directory.
+ */
+function postprocessGeneratedDeveloperApiDocs(apiDocsRootDirectory) {
+    if (!existsSync(apiDocsRootDirectory)) {
+        return;
+    }
+
+    for (const markdownFilePath of collectMarkdownFiles(apiDocsRootDirectory)) {
+        const markdownSourceText = readFileSync(markdownFilePath, "utf8");
+        const normalizedMarkdown =
+            normalizeGeneratedMarkdown(markdownSourceText);
+        const frontMatter = createGeneratedApiFrontMatter(
+            markdownFilePath,
+            apiDocsRootDirectory
+        );
+
+        writeFileSync(
+            markdownFilePath,
+            `${frontMatter}${normalizedMarkdown}`,
+            "utf8"
+        );
+    }
+}
+
+/**
  * Pick an unused drive letter suitable for a temporary `subst` mapping.
  *
  * @returns {string} Drive letter (without colon).
@@ -173,6 +276,12 @@ const docsWorkspaceRelativePath = relative(
     repositoryRoot,
     docsWorkspaceDirectory
 );
+const developerApiDocsDirectory = resolve(
+    docsWorkspaceDirectory,
+    "site-docs",
+    "developer",
+    "api"
+);
 const configFile = getConfigFileName(process.argv.slice(2));
 
 if (process.platform === "win32" && /[()]/u.test(repositoryRoot)) {
@@ -180,3 +289,5 @@ if (process.platform === "win32" && /[()]/u.test(repositoryRoot)) {
 } else {
     runTypedoc(docsWorkspaceDirectory, configFile);
 }
+
+postprocessGeneratedDeveloperApiDocs(developerApiDocsDirectory);

@@ -15,15 +15,17 @@ const presetRulesSectionHeading = "## Rules in this preset";
 const presetsDocsDirectoryPath = "docs/rules/presets";
 
 /**
- * @param {unknown} value - @returns {value is Readonly<Record<string,
- *   unknown>>}
+ * @param {unknown} value
+ *
+ * @returns {value is Readonly<Record<string, unknown>>}
  */
 const isUnknownRecord = (value) =>
     typeof value === "object" && value !== null && !Array.isArray(value);
 
 /**
- * @param {unknown} value - @returns {readonly Readonly<Record<string,
- *   unknown>>[]}
+ * @param {unknown} value
+ *
+ * @returns {readonly Readonly<Record<string, unknown>>[]}
  */
 const toConfigArray = (value) =>
     Array.isArray(value)

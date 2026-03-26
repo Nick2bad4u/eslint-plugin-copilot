@@ -1,71 +1,222 @@
 import Link from "@docusaurus/Link";
+import Head from "@docusaurus/Head";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 import Layout from "@theme/Layout";
 
-import styles from "./index.module.css";
+import {
+    getSiteLinkProps,
+    homePrimaryCards,
+    liveBadges,
+} from "../components/siteData";
 
-const featureCards = [
-    {
-        description:
-            "Lint repository instructions, path-specific instructions, prompt files, custom agents, legacy chat modes, and agent instructions.",
-        title: "Repository customization focus",
-        to: "/docs/rules/overview",
-    },
-    {
-        description:
-            "Start with a minimal metadata baseline or opt into stricter repository setup guarantees.",
-        title: "Practical presets",
-        to: "/docs/rules/presets",
-    },
-    {
-        description:
-            "Every rule includes targeted examples and links back to the canonical docs route used in runtime metadata.",
-        title: "Consistent rule docs",
-        to: "/docs/rules/overview",
-    },
-] as const;
+function OverviewIcon(): React.JSX.Element {
+    return (
+        <svg aria-hidden className="ui-icon" viewBox="0 0 24 24">
+            <path
+                d="M5.25 6.75h13.5m-13.5 5.25h13.5m-13.5 5.25h8.25"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+        </svg>
+    );
+}
+
+function PresetsIcon(): React.JSX.Element {
+    return (
+        <svg aria-hidden className="ui-icon" viewBox="0 0 24 24">
+            <path
+                d="M4.5 7.5h15m-15 4.5h15m-15 4.5h15"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+            <circle cx="8.25" cy="7.5" fill="currentColor" r="1.1" />
+            <circle cx="12" cy="12" fill="currentColor" r="1.1" />
+            <circle cx="15.75" cy="16.5" fill="currentColor" r="1.1" />
+        </svg>
+    );
+}
+
+function RulesIcon(): React.JSX.Element {
+    return (
+        <svg aria-hidden className="ui-icon" viewBox="0 0 24 24">
+            <path
+                d="M7.5 5.25h7.25l3.75 3.75v9.75a1.5 1.5 0 0 1-1.5 1.5h-9.5a1.5 1.5 0 0 1-1.5-1.5v-12a1.5 1.5 0 0 1 1.5-1.5Z"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+            <path
+                d="M14.75 5.25V9h3.75M8.75 12.75h6.5m-6.5 3h4.5"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+        </svg>
+    );
+}
+
+function ArrowRightIcon(): React.JSX.Element {
+    return (
+        <svg aria-hidden className="ui-icon ui-icon--sm" viewBox="0 0 24 24">
+            <path
+                d="M5.25 12h13.5m-5.25-5.25 5.25 5.25-5.25 5.25"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+        </svg>
+    );
+}
+
+function getHomeIcon(icon: string | undefined): React.JSX.Element {
+    switch (icon) {
+        case "overview": {
+            return <OverviewIcon />;
+        }
+
+        case "presets": {
+            return <PresetsIcon />;
+        }
+
+        case "rules": {
+            return <RulesIcon />;
+        }
+
+        default: {
+            return <ArrowRightIcon />;
+        }
+    }
+}
 
 export default function Home(): React.JSX.Element {
+    const logoSource = useBaseUrl("/img/logo.svg");
+    const copilotLightSource = useBaseUrl("/img/github-copilot-light.png");
+    const copilotDarkSource = useBaseUrl("/img/github-copilot-dark.png");
+
     return (
         <Layout>
-            <main className={styles.page}>
-                <section className={styles.hero}>
-                    <div className="container">
-                        <p className={styles.kicker}>
-                            GitHub Copilot repository linting
-                        </p>
-                        {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
-                        <h1 className={styles.title}>eslint-plugin-copilot</h1>
-                        <p className={styles.subtitle}>
-                            Lint GitHub Copilot repository instructions, prompt
-                            files, custom agents, legacy chat modes, and related
-                            markdown-first customization surfaces.
-                        </p>
-                        <div className={styles.actions}>
-                            <Link
-                                className="button button--primary button--lg"
-                                to="/docs/rules/getting-started"
-                            >
-                                Get started
-                            </Link>
-                            <Link
-                                className="button button--secondary button--lg"
-                                to="/docs/rules/presets"
-                            >
-                                Compare presets
-                            </Link>
+            <Head>
+                <title>
+                    eslint-plugin-copilot | GitHub Copilot repository linting
+                </title>
+                <meta
+                    content="eslint-plugin-copilot helps teams lint GitHub Copilot repository instructions, prompts, agents, skills, and repository hooks with flat-config-native presets."
+                    name="description"
+                />
+            </Head>
+            <main className="site-shell site-shell--home">
+                <section className="home-hero">
+                    <div className="container home-hero__inner home-hero__layout">
+                        <div className="home-hero__content">
+                            <div className="home-hero__brand">
+                                <img
+                                    alt="eslint-plugin-copilot logo"
+                                    className="home-hero__logo"
+                                    src={logoSource}
+                                />
+                                <p className="site-kicker">
+                                    GitHub Copilot repository linting
+                                </p>
+                            </div>
+                            {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                            <h1 className="home-hero__title">
+                                eslint-plugin-copilot
+                            </h1>
+                            <p className="home-hero__subtitle">
+                                ESLint rules for GitHub Copilot repository
+                                instructions, prompt files, custom agents,
+                                skills, and repository hooks.
+                            </p>
+                            <div className="site-actions home-hero__actions">
+                                <Link
+                                    className="button button--primary button--lg home-button"
+                                    to="/docs/rules/getting-started"
+                                >
+                                    <span className="home-button__content">
+                                        <OverviewIcon />
+                                        <span>Start with Overview</span>
+                                    </span>
+                                </Link>
+                                <Link
+                                    className="button button--secondary button--lg home-button"
+                                    to="/docs/rules/presets"
+                                >
+                                    <span className="home-button__content">
+                                        <PresetsIcon />
+                                        <span>Compare Presets</span>
+                                    </span>
+                                </Link>
+                            </div>
+                        </div>
+                        <aside
+                            className="home-hero__visual"
+                            aria-label="GitHub Copilot brand mark"
+                        >
+                            <div className="home-hero__art">
+                                <div className="home-hero__artGlow" />
+                                <img
+                                    alt="GitHub Copilot hero mark"
+                                    className="home-hero__artImage home-hero__artImage--light"
+                                    src={copilotLightSource}
+                                />
+                                <img
+                                    alt="GitHub Copilot hero mark"
+                                    className="home-hero__artImage home-hero__artImage--dark"
+                                    src={copilotDarkSource}
+                                />
+                            </div>
+                        </aside>
+                        <div className="site-badge-strip home-hero__badges home-hero__badges--fullwidth">
+                            {liveBadges.map((badge) => (
+                                <Link
+                                    key={badge.alt}
+                                    className="site-badge"
+                                    href={badge.href}
+                                >
+                                    <img
+                                        alt={badge.alt}
+                                        loading="lazy"
+                                        src={badge.src}
+                                    />
+                                </Link>
+                            ))}
                         </div>
                     </div>
                 </section>
-                <section className={`container ${styles.cards}`}>
-                    {featureCards.map((card) => (
-                        <article key={card.title} className={styles.card}>
-                            {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
-                            <h2 className={styles.cardTitle}>{card.title}</h2>
-                            <p className={styles.cardDescription}>
+
+                <section className="container home-card-grid">
+                    {homePrimaryCards.map((card) => (
+                        <article key={card.title} className="home-card">
+                            <div className="home-card__heading">
+                                <span className="home-card__icon" aria-hidden>
+                                    {getHomeIcon(card.icon)}
+                                </span>
+                                {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                                <h2 className="home-card__title">
+                                    {card.title}
+                                </h2>
+                            </div>
+                            <p className="home-card__description">
                                 {card.description}
                             </p>
-                            <Link className={styles.cardLink} to={card.to}>
-                                Open docs →
+                            <Link
+                                className="home-card__link"
+                                {...getSiteLinkProps(card)}
+                            >
+                                <span>{card.cta}</span>
+                                <ArrowRightIcon />
                             </Link>
                         </article>
                     ))}
