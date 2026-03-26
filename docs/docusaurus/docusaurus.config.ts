@@ -204,7 +204,7 @@ const config: Config = {
             logo: {
                 alt: "GitHub Copilot footer logo",
                 href: baseUrl,
-                src: "img/github-copilot-light.png",
+                src: "img/github-copilot-footer-light.png",
             },
             style: "dark",
         },
@@ -229,6 +229,7 @@ const config: Config = {
                 {
                     className: "navbar-link--developer",
                     label: "Developer",
+                    position: "right",
                     to: "/developer",
                 },
                 {
