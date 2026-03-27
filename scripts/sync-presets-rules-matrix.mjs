@@ -74,8 +74,11 @@ const collectPresetRuleNames = (presetConfigName) => {
 };
 
 /**
- * @param {Readonly<Record<string, unknown>>} ruleModule - @returns {"—" | "💡"
- *   | "🔧" | "🔧 💡"}
+ * @param {Readonly<Record<string, unknown>>} ruleModule - The rule module to
+ *   inspect.
+ *
+ * @returns {"—" | "💡" | "🔧" | "🔧 💡"} A symbol indicating the
+ *   autofix/suggestion capability.
  */
 const getRuleFixIndicator = (ruleModule) => {
     const meta = ruleModule["meta"];
@@ -98,7 +101,12 @@ const getRuleFixIndicator = (ruleModule) => {
     return hasSuggestions ? "💡" : "—";
 };
 
-/** @param {string} ruleName - @returns {Readonly<Record<string, unknown>>} */
+/**
+ * @param {string} ruleName - The rule's unprefixed name.
+ *
+ * @returns {Readonly<Record<string, unknown>>} The rule module object from the
+ *   built plugin.
+ */
 const getRuleModuleByName = (ruleName) => {
     const candidate = builtPlugin.rules[ruleName];
 
