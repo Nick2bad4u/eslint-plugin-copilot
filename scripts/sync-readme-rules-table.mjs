@@ -106,9 +106,11 @@ export const syncReadmeRulesTable = async (options = {}) => {
     const readmePath = resolve(process.cwd(), "README.md");
     const currentMarkdown = await readFile(readmePath, "utf8");
     const generatedSection = generateReadmeRulesSectionFromRules(
-        /** @type {Readonly<
-    Record<string, Readonly<Record<string, unknown>>>
->} */ (/** @type {unknown} */ (builtPlugin.rules))
+        /**
+         * @type {Readonly<
+         *     Record<string, Readonly<Record<string, unknown>>>
+         * >}
+         */ (/** @type {unknown} */ (builtPlugin.rules))
     );
     const { endOffset, startOffset } =
         getReadmeRulesSectionBounds(currentMarkdown);

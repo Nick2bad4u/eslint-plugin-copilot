@@ -3011,6 +3011,12 @@ export default defineConfig([
             "jsonc/array-bracket-newline": "off",
         },
     },
+    {
+        files: ["**/*"],
+        rules: {
+            "copilot/require-prompt-file-metadata": "off",
+        },
+    },
     // #endregion
     // #region 📐 @Stylistic Overrides
     // ═══════════════════════════════════════════════════════════════════════════════

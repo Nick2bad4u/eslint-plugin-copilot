@@ -9,7 +9,6 @@
         "allowUnusedLabels": false,
         "alwaysStrict": true,
         "assumeChangesOnlyAffectDirectDependencies": true,
-        "baseUrl": ".",
         "checkJs": false,
         "declaration": true,
         "declarationMap": false,
@@ -67,10 +66,10 @@
         "noUnusedParameters": true,
         "paths": {
             "@assets/*": [
-                "assets/*"
+                "./assets/*"
             ],
             "@plugin/*": [
-                "src/*"
+                "./src/*"
             ]
         },
         "preserveConstEnums": true,

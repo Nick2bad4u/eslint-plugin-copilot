@@ -49,8 +49,8 @@ function getConfigFileName(cliArgs) {
  *
  * @param {string} cwd - Working directory for the TypeDoc process.
  * @param {string} configFile - TypeDoc options file to pass to `--options`.
- * @param {string} [cliPath=typedocCliPath] - TypeDoc CLI path to execute.
- *   Default is `typedocCliPath`
+ * @param {string} [cliPath] - TypeDoc CLI path to execute. Default is
+ *   `typedocCliPath`
  */
 function runTypedoc(cwd, configFile, cliPath = typedocCliPath) {
     execFileSync(
