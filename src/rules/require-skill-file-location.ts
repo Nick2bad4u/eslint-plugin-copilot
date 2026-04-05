@@ -29,7 +29,6 @@ const requireSkillFileLocationRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

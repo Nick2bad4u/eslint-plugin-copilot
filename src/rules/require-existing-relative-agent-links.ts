@@ -65,7 +65,6 @@ const requireExistingRelativeAgentLinksRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

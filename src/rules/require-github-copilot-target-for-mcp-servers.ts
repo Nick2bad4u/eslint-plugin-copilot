@@ -55,7 +55,6 @@ const requireGithubCopilotTargetForMcpServersRule: CopilotRuleModule =
                 });
             });
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

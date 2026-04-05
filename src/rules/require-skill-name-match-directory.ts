@@ -53,7 +53,6 @@ const requireSkillNameMatchDirectoryRule: CopilotRuleModule = createCopilotRule(
                 });
             });
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

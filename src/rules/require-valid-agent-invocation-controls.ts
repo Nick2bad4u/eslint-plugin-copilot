@@ -71,7 +71,6 @@ const requireValidAgentInvocationControlsRule: CopilotRuleModule =
                 }
             });
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

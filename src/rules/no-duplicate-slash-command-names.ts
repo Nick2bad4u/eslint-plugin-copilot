@@ -100,7 +100,6 @@ const noDuplicateSlashCommandNamesRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

@@ -89,7 +89,6 @@ const requireValidAgentSubagentsRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

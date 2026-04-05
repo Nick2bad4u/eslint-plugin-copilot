@@ -60,7 +60,6 @@ const requireAgentToolForSubagentsRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

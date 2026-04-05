@@ -41,7 +41,6 @@ const requireValidSkillLicenseRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

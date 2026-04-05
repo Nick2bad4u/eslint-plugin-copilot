@@ -36,7 +36,6 @@ const noDeprecatedAgentInferRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

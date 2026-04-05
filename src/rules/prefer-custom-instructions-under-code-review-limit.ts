@@ -43,7 +43,6 @@ const preferCustomInstructionsUnderCodeReviewLimitRule: CopilotRuleModule =
                 });
             });
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

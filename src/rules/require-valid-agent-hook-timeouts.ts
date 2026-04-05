@@ -85,7 +85,6 @@ const requireValidAgentHookTimeoutsRule: CopilotRuleModule = createCopilotRule({
             }
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

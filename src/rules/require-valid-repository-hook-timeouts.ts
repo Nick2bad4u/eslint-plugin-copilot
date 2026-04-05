@@ -53,7 +53,6 @@ const requireValidRepositoryHookTimeoutsRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

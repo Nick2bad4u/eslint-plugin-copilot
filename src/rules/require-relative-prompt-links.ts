@@ -80,7 +80,6 @@ const requireRelativePromptLinksRule: CopilotRuleModule = createCopilotRule({
             },
         };
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

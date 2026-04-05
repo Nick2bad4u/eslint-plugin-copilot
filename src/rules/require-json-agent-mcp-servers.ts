@@ -51,7 +51,6 @@ const requireJsonAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

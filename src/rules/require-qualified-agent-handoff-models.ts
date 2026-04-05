@@ -83,7 +83,6 @@ const requireQualifiedAgentHandoffModelsRule: CopilotRuleModule =
                 }
             });
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

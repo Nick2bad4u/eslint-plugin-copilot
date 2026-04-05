@@ -41,7 +41,6 @@ const requireRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
             },
         };
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

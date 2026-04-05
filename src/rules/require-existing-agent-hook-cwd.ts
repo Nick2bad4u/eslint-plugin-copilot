@@ -71,7 +71,6 @@ const requireExistingAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
             }
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

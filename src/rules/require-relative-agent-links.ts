@@ -45,7 +45,6 @@ const requireRelativeAgentLinksRule: CopilotRuleModule = createCopilotRule({
             },
         };
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

@@ -62,7 +62,6 @@ const requireValidAgentHookEventsRule: CopilotRuleModule = createCopilotRule({
             }
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

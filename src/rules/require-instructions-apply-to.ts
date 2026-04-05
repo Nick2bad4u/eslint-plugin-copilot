@@ -47,7 +47,6 @@ const requireInstructionsApplyToRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

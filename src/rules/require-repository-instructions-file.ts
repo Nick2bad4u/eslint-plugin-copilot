@@ -43,7 +43,6 @@ const requireRepositoryInstructionsFileRule: CopilotRuleModule =
                 });
             });
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

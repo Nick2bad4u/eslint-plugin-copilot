@@ -63,7 +63,6 @@ const requireExistingAgentMcpServersRule: CopilotRuleModule = createCopilotRule(
                 });
             });
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

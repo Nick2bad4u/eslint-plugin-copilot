@@ -62,7 +62,6 @@ const requireValidAgentHandoffSendRule: CopilotRuleModule = createCopilotRule({
             }
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

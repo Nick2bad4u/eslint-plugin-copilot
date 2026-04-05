@@ -65,7 +65,6 @@ const requireValidPromptToolsRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

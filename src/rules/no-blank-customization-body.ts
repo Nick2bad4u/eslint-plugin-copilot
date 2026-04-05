@@ -36,7 +36,6 @@ const noBlankCustomizationBodyRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

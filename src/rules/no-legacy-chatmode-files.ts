@@ -23,7 +23,6 @@ const noLegacyChatmodeFilesRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

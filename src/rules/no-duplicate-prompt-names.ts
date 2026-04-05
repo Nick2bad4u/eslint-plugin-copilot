@@ -88,7 +88,6 @@ const noDuplicatePromptNamesRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

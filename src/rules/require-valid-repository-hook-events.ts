@@ -42,7 +42,6 @@ const requireValidRepositoryHookEventsRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

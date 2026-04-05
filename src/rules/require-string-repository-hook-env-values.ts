@@ -54,7 +54,6 @@ const requireStringRepositoryHookEnvValuesRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

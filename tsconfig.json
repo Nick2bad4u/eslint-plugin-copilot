@@ -17,7 +17,6 @@
         "disableSizeLimit": true,
         "disableSolutionSearching": false,
         "disableSourceOfProjectReferenceRedirect": false,
-        "downlevelIteration": true,
         "emitBOM": false,
         "emitDecoratorMetadata": false,
         "erasableSyntaxOnly": true,

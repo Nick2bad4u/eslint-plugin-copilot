@@ -39,7 +39,6 @@ const noBlankRepositoryInstructionsRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

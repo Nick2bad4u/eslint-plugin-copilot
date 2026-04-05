@@ -47,7 +47,6 @@ const requireSkillFileMetadataRule: CopilotRuleModule = createCopilotRule({
             }
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

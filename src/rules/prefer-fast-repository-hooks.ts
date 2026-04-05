@@ -54,7 +54,6 @@ const preferFastRepositoryHooksRule: CopilotRuleModule = createCopilotRule({
             },
         };
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

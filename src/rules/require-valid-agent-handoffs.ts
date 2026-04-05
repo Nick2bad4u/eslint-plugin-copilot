@@ -70,7 +70,6 @@ const requireValidAgentHandoffsRule: CopilotRuleModule = createCopilotRule({
             }
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

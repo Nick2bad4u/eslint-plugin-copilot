@@ -55,7 +55,6 @@ const requireValidAgentTargetRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

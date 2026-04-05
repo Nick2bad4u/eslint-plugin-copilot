@@ -40,7 +40,6 @@ const noEmptyRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
             },
         };
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

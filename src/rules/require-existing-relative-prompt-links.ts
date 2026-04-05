@@ -65,7 +65,6 @@ const requireExistingRelativePromptLinksRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

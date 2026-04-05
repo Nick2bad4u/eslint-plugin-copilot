@@ -86,7 +86,6 @@ const requireValidInstructionsApplyToGlobsRule: CopilotRuleModule =
                 });
             });
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

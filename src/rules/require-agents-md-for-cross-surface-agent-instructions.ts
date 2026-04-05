@@ -40,7 +40,6 @@ const requireAgentsMdForCrossSurfaceAgentInstructionsRule: CopilotRuleModule =
                 });
             });
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

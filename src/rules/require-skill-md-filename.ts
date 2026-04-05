@@ -43,7 +43,6 @@ const requireSkillMdFilenameRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

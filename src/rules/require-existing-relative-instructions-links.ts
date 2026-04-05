@@ -67,7 +67,6 @@ const requireExistingRelativeInstructionsLinksRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

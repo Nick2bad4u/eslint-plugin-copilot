@@ -31,7 +31,6 @@ const noBlankSkillBodyRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

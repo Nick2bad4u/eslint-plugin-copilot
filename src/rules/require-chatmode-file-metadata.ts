@@ -48,7 +48,6 @@ const requireChatmodeFileMetadataRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

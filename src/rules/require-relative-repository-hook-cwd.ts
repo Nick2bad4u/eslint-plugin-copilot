@@ -55,7 +55,6 @@ const requireRelativeRepositoryHookCwdRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

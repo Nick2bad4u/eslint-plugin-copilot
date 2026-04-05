@@ -57,7 +57,6 @@ const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

@@ -45,7 +45,6 @@ const requireValidRepositoryHookEnvRule: CopilotRuleModule = createCopilotRule({
             },
         };
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

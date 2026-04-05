@@ -92,7 +92,6 @@ const noDuplicateSkillNamesRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

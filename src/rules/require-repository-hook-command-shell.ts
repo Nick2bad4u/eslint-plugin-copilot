@@ -47,7 +47,6 @@ const requireRepositoryHookCommandShellRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

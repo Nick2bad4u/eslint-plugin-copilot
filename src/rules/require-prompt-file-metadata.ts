@@ -97,7 +97,6 @@ const requirePromptFileMetadataRule: CopilotRuleModule = createCopilotRule({
             }
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

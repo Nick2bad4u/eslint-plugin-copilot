@@ -66,7 +66,6 @@ const requireRelativeAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
             }
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

@@ -65,7 +65,6 @@ const requireExistingRelativeSkillLinksRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {

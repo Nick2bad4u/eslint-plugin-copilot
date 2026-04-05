@@ -43,7 +43,6 @@ const requireValidAgentArgumentHintRule: CopilotRuleModule = createCopilotRule({
             });
         });
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

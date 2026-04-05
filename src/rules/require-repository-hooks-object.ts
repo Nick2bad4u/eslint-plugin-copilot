@@ -34,7 +34,6 @@ const requireRepositoryHooksObjectRule: CopilotRuleModule = createCopilotRule({
             },
         };
     },
-    defaultOptions: [],
     meta: {
         deprecated: false,
         docs: {

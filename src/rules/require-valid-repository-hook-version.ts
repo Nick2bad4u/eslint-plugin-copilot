@@ -38,7 +38,6 @@ const requireValidRepositoryHookVersionRule: CopilotRuleModule =
                 },
             };
         },
-        defaultOptions: [],
         meta: {
             deprecated: false,
             docs: {
