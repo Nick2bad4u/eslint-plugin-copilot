@@ -1,4 +1,4 @@
-/* stylelint-disable csstools/use-nesting, defensive-css/require-named-grid-lines, plugin/stylelint-group-selectors, scales/font-sizes, scales/line-heights, order/properties-order, no-descending-specificity, property-no-vendor-prefix, prettier/prettier -- The Docusaurus app shell uses shared utility-style selectors, long SVG data-URI icon masks, and cross-browser mask properties that are clearer in explicit top-level rules than nested one-off blocks. */
+/* stylelint-disable csstools/use-nesting, defensive-css/require-named-grid-lines, plugin/stylelint-group-selectors, scales/font-sizes, scales/line-heights, order/properties-order, no-descending-specificity, property-no-vendor-prefix -- The Docusaurus app shell uses shared utility-style selectors, long SVG data-URI icon masks, and cross-browser mask properties that are clearer in explicit top-level rules than nested one-off blocks. */
 
 :root {
     --ifm-color-primary: #4f46e5;
