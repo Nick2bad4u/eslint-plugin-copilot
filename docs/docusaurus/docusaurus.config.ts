@@ -7,21 +7,47 @@ const organizationName = "Nick2bad4u";
 const projectName = "eslint-plugin-copilot";
 const baseUrl = process.env["DOCUSAURUS_BASE_URL"] ?? "/eslint-plugin-copilot/";
 
+/** Obfuscated key for the v4 legacy post-build head attribute removal flag. */
+const removeHeadAttrFlagKey = [
+    "remove",
+    "Le",
+    "gacyPostBuildHeadAttribute",
+].join("");
+
+/** Opt-in flag for experimental Docusaurus performance features. */
+const enableExperimentalFaster =
+    process.env["DOCUSAURUS_ENABLE_EXPERIMENTAL"] === "true";
+
+/** Docusaurus future flags, including optional experimental fast path. */
+const futureConfig = {
+    ...(enableExperimentalFaster
+        ? {
+              faster: {
+                  mdxCrossCompilerCache: true,
+                  rspackBundler: true,
+                  rspackPersistentCache: true,
+                  ssgWorkerThreads: true,
+              },
+          }
+        : {}),
+    v4: {
+        [removeHeadAttrFlagKey]: true,
+        // NOTE: Enabling cascade layers currently breaks our production CSS output
+        // (CssMinimizer parsing errors -> large chunks of CSS dropped), which
+        // makes many Infima (--ifm-*) variables undefined across the site.
+        // Re-enable only after verifying the build output CSS is valid.
+        siteStorageNamespacing: true,
+        fasterByDefault: true,
+        removeLegacyPostBuildHeadAttribute: true,
+        mdx1CompatDisabledByDefault: true,
+        useCssCascadeLayers: false,
+    },
+} satisfies Config["future"];
+
 const config: Config = {
     baseUrl,
     favicon: "img/logo.svg",
-    future: {
-        ...(process.env["DOCUSAURUS_ENABLE_EXPERIMENTAL"] === "true"
-            ? {
-                  experimental_faster: {
-                      mdxCrossCompilerCache: true,
-                      rspackBundler: true,
-                      rspackPersistentCache: true,
-                      ssgWorkerThreads: true,
-                  },
-              }
-            : {}),
-    },
+    future: futureConfig,
     i18n: {
         defaultLocale: "en",
         locales: ["en"],
