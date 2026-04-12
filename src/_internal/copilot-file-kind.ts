@@ -83,6 +83,18 @@ export const isRepositoryHookFilePath = (filePath: string): boolean => {
     );
 };
 
+/** Check whether a path points to a repository-wide Copilot instructions file. */
+export const isRepositoryInstructionsFilePath = (filePath: string): boolean => {
+    const normalizedFilePath = normalizeFilePath(filePath);
+
+    return (
+        normalizedFilePath.endsWith("/.github/copilot-instructions.md") ||
+        normalizedFilePath.endsWith(
+            "/.github/instructions/copilot-instructions.md"
+        )
+    );
+};
+
 /** Check whether a basename is one of the supported agent instruction names. */
 const isAgentInstructionsBasename = (basename: string): boolean =>
     basename === "AGENTS.md" ||
@@ -96,7 +108,7 @@ export const getCopilotFileKind = (
     const normalizedFilePath = normalizeFilePath(filePath);
     const basename = path.posix.basename(normalizedFilePath);
 
-    if (normalizedFilePath.endsWith("/.github/copilot-instructions.md")) {
+    if (isRepositoryInstructionsFilePath(normalizedFilePath)) {
         return "repository-instructions";
     }
 
@@ -175,8 +187,26 @@ export const findRepositoryRoot = (filePath: string): string => {
     }
 };
 
+/** Resolve supported repository custom instructions file paths. */
+export const getRepositoryInstructionsPaths = (
+    filePath: string
+): readonly string[] => {
+    const repositoryRoot = findRepositoryRoot(filePath);
+
+    return [
+        path.join(repositoryRoot, ".github", "copilot-instructions.md"),
+        path.join(
+            repositoryRoot,
+            ".github",
+            "instructions",
+            "copilot-instructions.md"
+        ),
+    ];
+};
+
 /** Resolve the canonical repository custom instructions file path. */
 export const getRepositoryInstructionsPath = (filePath: string): string =>
+    getRepositoryInstructionsPaths(filePath)[0] ??
     path.join(
         findRepositoryRoot(filePath),
         ".github",

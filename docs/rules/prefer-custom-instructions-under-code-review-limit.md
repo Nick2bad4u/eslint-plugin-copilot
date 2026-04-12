@@ -7,6 +7,7 @@ Prefer repository and path-specific Copilot instruction files to stay within the
 ## Targeted pattern scope
 
 - `.github/copilot-instructions.md`
+- `.github/instructions/copilot-instructions.md`
 - `.github/instructions/**/*.instructions.md`
 
 ## What this rule reports

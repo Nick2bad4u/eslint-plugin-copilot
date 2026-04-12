@@ -24,6 +24,9 @@ describe("source plugin config wiring", () => {
             expect(markdownLayer?.files).toContain(
                 ".github/copilot-instructions.md"
             );
+            expect(markdownLayer?.files).toContain(
+                ".github/instructions/copilot-instructions.md"
+            );
             expect(markdownLayer?.files).toContain(".github/skills/**/*.md");
             expect(markdownLayer?.language).toBe("markdown/gfm");
             expect(markdownLayer?.plugins).toHaveProperty("copilot");

@@ -1,6 +1,6 @@
 # require-repository-instructions-file
 
-Require repositories that define Copilot customization assets to also provide `.github/copilot-instructions.md`.
+Require repositories that define Copilot customization assets to also provide repository guidance in `.github/copilot-instructions.md` or `.github/instructions/copilot-instructions.md`.
 
 > **Rule catalog ID:** R005
 
@@ -16,7 +16,7 @@ Require repositories that define Copilot customization assets to also provide `.
 
 ## What this rule reports
 
-- Copilot customization assets in repositories that do not also include `.github/copilot-instructions.md`
+- Copilot customization assets in repositories that do not also include `.github/copilot-instructions.md` or `.github/instructions/copilot-instructions.md`
 
 ## Why this rule exists
 
@@ -28,12 +28,17 @@ Repository-wide instructions provide the broadest Copilot customization surface 
 .github/prompts/review.prompt.md
 ```
 
-with no `.github/copilot-instructions.md` in the repository.
+with neither `.github/copilot-instructions.md` nor `.github/instructions/copilot-instructions.md` in the repository.
 
 ## ✅ Correct
 
 ```text
 .github/copilot-instructions.md
+.github/prompts/review.prompt.md
+```
+
+```text
+.github/instructions/copilot-instructions.md
 .github/prompts/review.prompt.md
 ```
 

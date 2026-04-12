@@ -8,7 +8,7 @@ import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import {
     getCopilotFileKind,
-    getRepositoryInstructionsPath,
+    getRepositoryInstructionsPaths,
 } from "../_internal/copilot-file-kind.js";
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
 import {
@@ -31,10 +31,15 @@ const requireRepositoryInstructionsFileRule: CopilotRuleModule =
                     return;
                 }
 
-                const repositoryInstructionsPath =
-                    getRepositoryInstructionsPath(context.filename);
+                const repositoryInstructionsPaths =
+                    getRepositoryInstructionsPaths(context.filename);
 
-                if (fs.existsSync(repositoryInstructionsPath)) {
+                if (
+                    repositoryInstructionsPaths.some(
+                        (repositoryInstructionsPath) =>
+                            fs.existsSync(repositoryInstructionsPath)
+                    )
+                ) {
                     return;
                 }
 
@@ -51,14 +56,14 @@ const requireRepositoryInstructionsFileRule: CopilotRuleModule =
                     "copilot.configs.all",
                 ],
                 description:
-                    "require repositories that define Copilot customization assets to also provide `.github/copilot-instructions.md`.",
+                    "require repositories that define Copilot customization assets to also provide repository instructions via `.github/copilot-instructions.md` or `.github/instructions/copilot-instructions.md`.",
                 frozen: false,
                 recommended: false,
                 requiresTypeChecking: false,
             },
             messages: {
                 missingRepositoryInstructions:
-                    "Repositories that define Copilot prompts, custom agents, legacy chat modes, agent instructions, or path-specific instructions should also provide `.github/copilot-instructions.md` for baseline repository guidance.",
+                    "Repositories that define Copilot prompts, custom agents, legacy chat modes, agent instructions, or path-specific instructions should also provide baseline repository guidance in `.github/copilot-instructions.md` or `.github/instructions/copilot-instructions.md`.",
             },
             schema: [],
             type: "suggestion",

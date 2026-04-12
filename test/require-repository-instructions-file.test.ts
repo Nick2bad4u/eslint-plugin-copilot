@@ -17,6 +17,20 @@ describe("require-repository-instructions-file", () => {
         expect(messages).toHaveLength(0);
     });
 
+    it("accepts repositories that define .github/instructions/copilot-instructions.md", async () => {
+        const messages = await lintMarkdownRule({
+            additionalFiles: {
+                ".github/instructions/copilot-instructions.md":
+                    "# Repository guidance\n\nKeep prompts concise.\n",
+            },
+            filePath: ".github/prompts/review.prompt.md",
+            ruleId: "require-repository-instructions-file",
+            text: "---\ndescription: Review the repository\nagent: ask\n---\nReview the repository for configuration drift.\n",
+        });
+
+        expect(messages).toHaveLength(0);
+    });
+
     it("reports missing repository-wide instructions when other Copilot assets exist", async () => {
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",

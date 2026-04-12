@@ -139,6 +139,19 @@ describe("prompt and agent metadata backlog rules", () => {
         ]);
     });
 
+    it("prefer-custom-instructions-under-code-review-limit reports oversized repository instructions in .github/instructions/", async () => {
+        const longBody = "a".repeat(4010);
+        const messages = await lintMarkdownRule({
+            filePath: ".github/instructions/copilot-instructions.md",
+            ruleId: "prefer-custom-instructions-under-code-review-limit",
+            text: longBody,
+        });
+
+        expect(messages.map((message) => message.messageId)).toEqual([
+            "exceedsCodeReviewLimit",
+        ]);
+    });
+
     it("require-agents-md-for-cross-surface-agent-instructions reports CLAUDE.md without sibling AGENTS.md", async () => {
         const messages = await lintMarkdownRule({
             filePath: "docs/CLAUDE.md",

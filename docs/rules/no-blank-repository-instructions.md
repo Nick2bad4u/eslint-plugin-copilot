@@ -7,6 +7,7 @@ Disallow empty repository-wide Copilot instructions files.
 ## Targeted pattern scope
 
 - `.github/copilot-instructions.md`
+- `.github/instructions/copilot-instructions.md`
 
 ## What this rule reports
 
@@ -14,7 +15,7 @@ Disallow empty repository-wide Copilot instructions files.
 
 ## Why this rule exists
 
-GitHub Copilot repository instructions are the baseline customization surface for a repository. An empty `.github/copilot-instructions.md` file communicates intent to customize Copilot, but it provides no usable guidance.
+GitHub Copilot repository instructions are the baseline customization surface for a repository. An empty `.github/copilot-instructions.md` or `.github/instructions/copilot-instructions.md` file communicates intent to customize Copilot, but it provides no usable guidance.
 
 ## ❌ Incorrect
 

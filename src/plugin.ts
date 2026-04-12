@@ -22,6 +22,7 @@ const ERROR_SEVERITY = "error" as const;
 /** Markdown files linted by the shipped Copilot presets. */
 const COPILOT_MARKDOWN_FILES = [
     ".github/copilot-instructions.md",
+    ".github/instructions/copilot-instructions.md",
     ".github/instructions/**/*.instructions.md",
     ".github/prompts/**/*.prompt.md",
     ".github/agents/**/*.agent.md",

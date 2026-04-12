@@ -46,4 +46,14 @@ describe("no-blank-customization-body", () => {
 
         expect(messages).toHaveLength(0);
     });
+
+    it("ignores .github/instructions/copilot-instructions.md because it is treated as repository instructions", async () => {
+        const messages = await lintMarkdownRule({
+            filePath: ".github/instructions/copilot-instructions.md",
+            ruleId: "no-blank-customization-body",
+            text: "",
+        });
+
+        expect(messages).toHaveLength(0);
+    });
 });

@@ -699,6 +699,15 @@ export default defineConfig([
     // SECTION: 🤖 Copilot Customization Rules (copilot/*)
     // ═══════════════════════════════════════════════════════════════════════════════
     ...copilot.configs.all,
+    {
+        files: [".github/instructions/copilot-instructions.md"],
+        name: "Copilot repository instructions: local length exception",
+        rules: {
+            // Keep this repository's maintainer-facing instruction spec verbose while
+            // still enforcing the 4k guidance for regular customization files.
+            "copilot/prefer-custom-instructions-under-code-review-limit": "off",
+        },
+    },
     // #endregion
     // #region ⌨ Etc-Misc
     // ═══════════════════════════════════════════════════════════════════════════════

@@ -23,7 +23,7 @@ Disallow blank bodies in Copilot customization files other than repository-wide 
 
 Copilot customization files are instruction surfaces. A prompt, custom agent, or path-specific instructions file that only contains frontmatter does not give Copilot any actual guidance to apply. This rule catches metadata-only files before they silently become ineffective customization points.
 
-Repository-wide `.github/copilot-instructions.md` is intentionally excluded because it already has a dedicated blank-content rule.
+Repository-wide `.github/copilot-instructions.md` and `.github/instructions/copilot-instructions.md` are intentionally excluded because they already have a dedicated blank-content rule.
 
 ## ❌ Incorrect
 

@@ -4,7 +4,7 @@
 
 ## Supported file types
 
-- repository-wide instructions: `.github/copilot-instructions.md`
+- repository-wide instructions: `.github/copilot-instructions.md`, `.github/instructions/copilot-instructions.md`
 - path-specific instructions: `.github/instructions/**/*.instructions.md`
 - reusable prompts: `.github/prompts/**/*.prompt.md`
 - custom agents: `.github/agents/**/*.agent.md`
