@@ -27,12 +27,13 @@ const isUnknownRecord = (value) =>
  *
  * @returns {readonly Readonly<Record<string, unknown>>[]}
  */
-const toConfigArray = (value) =>
-    Array.isArray(value)
-        ? value.filter(isUnknownRecord)
-        : isUnknownRecord(value)
-          ? [value]
-          : [];
+const toConfigArray = (value) => {
+    if (Array.isArray(value)) {
+        return value.filter(isUnknownRecord);
+    }
+
+    return isUnknownRecord(value) ? [value] : [];
+};
 
 /** @param {readonly string[]} values - @returns {readonly string[]} */
 const sortStrings = (values) =>
@@ -198,7 +199,7 @@ const findMatrixSectionBounds = (markdown) => {
 /** @param {string} markdown - @returns {string} */
 const normalizeMarkdownTableSpacing = (markdown) =>
     markdown
-        .replace(/\r\n/gv, "\n")
+        .replaceAll("\r\n", "\n")
         .split("\n")
         .map((line) => {
             const trimmedLine = line.trimEnd();
@@ -218,7 +219,7 @@ const normalizeMarkdownTableSpacing = (markdown) =>
         .trimEnd();
 
 /** @param {string} text - @returns {string} */
-const normalizeLineEndings = (text) => text.replace(/\r\n/gv, "\n");
+const normalizeLineEndings = (text) => text.replaceAll("\r\n", "\n");
 
 /**
  * @param {string} templateText
@@ -230,7 +231,7 @@ const restorePreferredLineEndings = (templateText, outputText) => {
     const normalizedOutputText = normalizeLineEndings(outputText);
 
     return templateText.includes("\r\n")
-        ? normalizedOutputText.replace(/\n/gv, "\r\n")
+        ? normalizedOutputText.replaceAll("\n", "\r\n")
         : normalizedOutputText;
 };
 

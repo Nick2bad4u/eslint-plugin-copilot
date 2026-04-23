@@ -154,48 +154,46 @@ function findInlineLinkClosingParen(input, startIndex) {
 }
 
 /**
- * Splits a Markdown inline link payload into destination + remainder.
+ * Parses an angle-bracket-wrapped destination `<...>` from the start of `core`.
  *
- * The payload is the text inside `(...)` for an inline link.
- *
- * - Destination may be `<...>` or a raw destination.
- * - Remainder (if any) includes the title and its leading whitespace.
- *
- * @param {string} payload
+ * @param {string} core
  *
  * @returns {{ destination: string; remainder: string }}
  */
-function splitInlineLinkDestination(payload) {
-    const core = payload.trim();
-    if (core.length === 0) {
-        return { destination: "", remainder: "" };
-    }
+function parseAngleBracketDestination(core) {
+    let i = 1;
 
-    // Destination in angle brackets: <...>
-    if (core.startsWith("<")) {
-        let i = 1;
-        while (i < core.length) {
-            const ch = core.charAt(i);
+    while (i < core.length) {
+        const ch = core.charAt(i);
 
-            if (ch === "\\") {
-                i += 2;
-            } else if (ch === ">") {
-                return {
-                    destination: core.slice(0, i + 1),
-                    remainder: core.slice(i + 1),
-                };
-            } else {
-                i += 1;
-            }
+        if (ch === "\\") {
+            i += 2;
+        } else if (ch === ">") {
+            return {
+                destination: core.slice(0, i + 1),
+                remainder: core.slice(i + 1),
+            };
+        } else {
+            i += 1;
         }
-
-        // Unclosed `<...`; treat whole thing as destination.
-        return { destination: core, remainder: "" };
     }
 
-    // Raw destination: ends at first whitespace at depth 0.
+    // Unclosed `<...`; treat whole thing as destination.
+    return { destination: core, remainder: "" };
+}
+
+/**
+ * Parses a raw (unquoted) link destination from the start of `core`. A raw
+ * destination ends at the first whitespace at nesting depth 0.
+ *
+ * @param {string} core
+ *
+ * @returns {{ destination: string; remainder: string }}
+ */
+function parseRawDestination(core) {
     let depth = 0;
     let i = 0;
+
     while (i < core.length) {
         const ch = core.charAt(i);
 
@@ -235,6 +233,33 @@ function splitInlineLinkDestination(payload) {
 }
 
 /**
+ * Splits a Markdown inline link payload into destination + remainder.
+ *
+ * The payload is the text inside `(...)` for an inline link.
+ *
+ * - Destination may be `<...>` or a raw destination.
+ * - Remainder (if any) includes the title and its leading whitespace.
+ *
+ * @param {string} payload
+ *
+ * @returns {{ destination: string; remainder: string }}
+ */
+function splitInlineLinkDestination(payload) {
+    const core = payload.trim();
+    if (core.length === 0) {
+        return { destination: "", remainder: "" };
+    }
+
+    // Destination in angle brackets: <...>
+    if (core.startsWith("<")) {
+        return parseAngleBracketDestination(core);
+    }
+
+    // Raw destination: ends at first whitespace at depth 0.
+    return parseRawDestination(core);
+}
+
+/**
  * Applies the `./` prefix rule to an inline-link payload.
  *
  * Preserves any optional title portion unchanged.
@@ -270,6 +295,35 @@ function prefixInlineLinkPayload(payload) {
         : rewrittenInner;
 
     return `${leadingWs}${rewrittenDestination}${remainder}${trailingWs}`;
+}
+
+/**
+ * Attempts to rewrite the inline link starting at `line[i]` (which must be `]`
+ * with `line[i+1]` being `(`). Returns the rewritten text and the new index.
+ *
+ * @param {string} line
+ * @param {number} i
+ *
+ * @returns {{ newIndex: number; text: string }}
+ */
+function tryRewriteInlineLinkAt(line, i) {
+    const labelOpen = findInlineLinkLabelOpenBracket(line, i);
+
+    if (labelOpen === -1) {
+        return { newIndex: i + 1, text: line.charAt(i) };
+    }
+
+    const urlStart = i + 2;
+    const end = findInlineLinkClosingParen(line, urlStart);
+
+    if (end === -1) {
+        return { newIndex: i + 1, text: line.charAt(i) };
+    }
+
+    const payload = line.slice(urlStart, end);
+    const rewrittenPayload = prefixInlineLinkPayload(payload);
+
+    return { newIndex: end + 1, text: `](${rewrittenPayload})` };
 }
 
 /**
@@ -320,26 +374,9 @@ function prefixInlineMarkdownLinksInLine(line) {
             line.charAt(i + 1) === "("
         ) {
             // Ensure this is actually a `[label](` sequence, not random text containing `](`.
-            const labelOpen = findInlineLinkLabelOpenBracket(line, i);
-
-            if (labelOpen === -1) {
-                out += line.charAt(i);
-                i += 1;
-            } else {
-                const urlStart = i + 2;
-                const end = findInlineLinkClosingParen(line, urlStart);
-
-                if (end === -1) {
-                    out += line.charAt(i);
-                    i += 1;
-                } else {
-                    const payload = line.slice(urlStart, end);
-                    const rewrittenPayload = prefixInlineLinkPayload(payload);
-
-                    out += `](${rewrittenPayload})`;
-                    i = end + 1;
-                }
-            }
+            const { newIndex, text } = tryRewriteInlineLinkAt(line, i);
+            out += text;
+            i = newIndex;
         } else {
             out += line.charAt(i);
             i += 1;

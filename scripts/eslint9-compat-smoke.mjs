@@ -167,7 +167,7 @@ const parseExpectedEslintMajor = (argv) => {
     const majorValue = Number.parseInt(majorString, 10);
 
     if (Number.isNaN(majorValue)) {
-        throw new Error(
+        throw new TypeError(
             `Invalid ESLint major value in argument: ${matchingArgument}`
         );
     }
@@ -198,7 +198,7 @@ const assertEslintMajor = (expectedMajor) => {
     const runtimeMajor = Number.parseInt(runtimeMajorText, 10);
 
     if (Number.isNaN(runtimeMajor)) {
-        throw new Error(
+        throw new TypeError(
             `Unable to parse ESLint runtime version: ${runtimeVersion}`
         );
     }
@@ -278,7 +278,7 @@ const normalizeConfigEntryForLegacyFlatConfig = (configEntry) => {
         return configEntry;
     }
 
-    const { language: _language, ...legacyCompatibleConfigEntry } = configEntry;
+    const { language: _, ...legacyCompatibleConfigEntry } = configEntry;
 
     /** @type {import("eslint").Linter.Config} */
     const normalizedConfigEntry = {

@@ -34,8 +34,6 @@ describe("rule metadata integrity", () => {
             const copilotRule = ruleModule as unknown as CopilotRuleModule;
             const docs = copilotRule.meta.docs;
 
-            expect(docs).toBeDefined();
-
             if (docs === undefined) {
                 throw new Error(
                     `Rule ${ruleName} is missing docs metadata at runtime.`

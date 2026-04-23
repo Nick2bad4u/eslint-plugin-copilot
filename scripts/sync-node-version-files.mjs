@@ -58,6 +58,36 @@ const normalizeNodeVersion = (version) => {
 const isRecord = (value) => typeof value === "object" && value !== null;
 
 /**
+ * Parse a `--version` or `--version=x.y.z` argument from the argument list.
+ *
+ * @param {readonly string[]} argumentList
+ * @param {string} argument
+ * @param {number} index
+ *
+ * @returns {{ version: string; advance: boolean } | null}
+ */
+const parseVersionArgument = (argumentList, argument, index) => {
+    if (argument === "--version") {
+        const nextArgument = argumentList[index + 1];
+
+        if (typeof nextArgument !== "string") {
+            throw new TypeError("Expected a version after --version.");
+        }
+
+        return { advance: true, version: normalizeNodeVersion(nextArgument) };
+    }
+
+    if (argument.startsWith("--version=")) {
+        return {
+            advance: false,
+            version: normalizeNodeVersion(argument.slice("--version=".length)),
+        };
+    }
+
+    return null;
+};
+
+/**
  * Parse command-line arguments.
  *
  * Supported options:
@@ -101,22 +131,19 @@ const parseArguments = (argumentList) => {
             continue;
         }
 
-        if (argument === "--version") {
-            const nextArgument = argumentList[index + 1];
+        const versionResult = parseVersionArgument(
+            argumentList,
+            argument,
+            index
+        );
 
-            if (typeof nextArgument !== "string") {
-                throw new TypeError("Expected a version after --version.");
+        if (versionResult !== null) {
+            explicitVersion = versionResult.version;
+
+            if (versionResult.advance) {
+                index += 1;
             }
 
-            explicitVersion = normalizeNodeVersion(nextArgument);
-            index += 1;
-            continue;
-        }
-
-        if (argument.startsWith("--version=")) {
-            explicitVersion = normalizeNodeVersion(
-                argument.slice("--version=".length)
-            );
             continue;
         }
 

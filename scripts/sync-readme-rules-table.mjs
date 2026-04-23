@@ -42,7 +42,7 @@ const getReadmeRulesSectionBounds = (markdown) => {
  */
 export const normalizeRulesSectionMarkdown = (markdown) =>
     markdown
-        .replace(/\r\n/gv, "\n")
+        .replaceAll("\r\n", "\n")
         .split("\n")
         .map((line) => {
             const trimmedLine = line.trimEnd();
@@ -62,7 +62,7 @@ export const normalizeRulesSectionMarkdown = (markdown) =>
         .trimEnd();
 
 /** @param {string} text - @returns {string} */
-const normalizeLineEndings = (text) => text.replace(/\r\n/gv, "\n");
+const normalizeLineEndings = (text) => text.replaceAll("\r\n", "\n");
 
 /**
  * @param {string} templateText
@@ -74,7 +74,7 @@ const restorePreferredLineEndings = (templateText, outputText) => {
     const normalizedOutputText = normalizeLineEndings(outputText);
 
     return templateText.includes("\r\n")
-        ? normalizedOutputText.replace(/\n/gv, "\r\n")
+        ? normalizedOutputText.replaceAll("\n", "\r\n")
         : normalizedOutputText;
 };
 

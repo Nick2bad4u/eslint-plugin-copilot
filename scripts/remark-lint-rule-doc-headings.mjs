@@ -128,6 +128,22 @@ const eslintPluginPackagePrefix = "eslint-plugin-";
 const packageMetadataCache = new Map();
 
 /**
+ * Stores `metadata` in the cache for every directory in `dirs`, then returns
+ * `metadata`.
+ *
+ * @param {string[]} dirs
+ * @param {PackageMetadata | undefined} metadata
+ *
+ * @returns {PackageMetadata | undefined}
+ */
+const setCacheForTraversedDirectories = (dirs, metadata) => {
+    for (const dir of dirs) {
+        packageMetadataCache.set(dir, metadata);
+    }
+    return metadata;
+};
+
+/**
  * @param {string} documentPath
  *
  * @returns {PackageMetadata | undefined}
@@ -140,17 +156,10 @@ const getNearestPackageMetadata = (documentPath) => {
         traversedDirectories.push(currentDirectory);
 
         if (packageMetadataCache.has(currentDirectory)) {
-            const cachedPackageMetadata =
-                packageMetadataCache.get(currentDirectory);
-
-            for (const traversedDirectory of traversedDirectories) {
-                packageMetadataCache.set(
-                    traversedDirectory,
-                    cachedPackageMetadata
-                );
-            }
-
-            return cachedPackageMetadata;
+            return setCacheForTraversedDirectories(
+                traversedDirectories,
+                packageMetadataCache.get(currentDirectory)
+            );
         }
 
         const packageJsonPath = join(currentDirectory, "package.json");
@@ -166,21 +175,19 @@ const getNearestPackageMetadata = (documentPath) => {
                 packageMetadata = undefined;
             }
 
-            for (const traversedDirectory of traversedDirectories) {
-                packageMetadataCache.set(traversedDirectory, packageMetadata);
-            }
-
-            return packageMetadata;
+            return setCacheForTraversedDirectories(
+                traversedDirectories,
+                packageMetadata
+            );
         }
 
         const parentDirectory = dirname(currentDirectory);
 
         if (parentDirectory === currentDirectory) {
-            for (const traversedDirectory of traversedDirectories) {
-                packageMetadataCache.set(traversedDirectory, undefined);
-            }
-
-            return undefined;
+            return setCacheForTraversedDirectories(
+                traversedDirectories,
+                undefined
+            );
         }
 
         currentDirectory = parentDirectory;
@@ -369,6 +376,525 @@ const getHeadingsByDepth = (tree, depth) =>
     );
 
 /**
+ * Validates the H1 heading in a helper doc.
+ *
+ * @param {VFile} file
+ * @param {readonly Heading[]} h1Headings
+ * @param {string | undefined} expectedRuleTitle
+ * @param {readonly string[]} ruleNamespaceAliases
+ */
+const checkH1Heading = (
+    file,
+    h1Headings,
+    expectedRuleTitle,
+    ruleNamespaceAliases
+) => {
+    if (h1Headings.length !== 1) {
+        file.message(
+            "Helper docs must contain exactly one H1 heading.",
+            h1Headings[0],
+            "remark-lint:rule-doc-headings:h1-count"
+        );
+    }
+
+    if (h1Headings.length === 1 && typeof expectedRuleTitle === "string") {
+        const actualTitle = getNodeText(h1Headings[0]).trim();
+        const expectedH1Titles = getExpectedH1Titles(
+            expectedRuleTitle,
+            ruleNamespaceAliases
+        );
+
+        if (!expectedH1Titles.includes(actualTitle)) {
+            const titlesFormatted = expectedH1Titles
+                .map((title) => `\`${title}\``)
+                .join(", ");
+            file.message(
+                `H1 heading must match one of: ${titlesFormatted}.`,
+                h1Headings[0],
+                "remark-lint:rule-doc-headings:h1-title"
+            );
+        }
+    }
+};
+
+/**
+ * Checks for duplicate H2 headings in the document.
+ *
+ * @param {VFile} file
+ * @param {readonly Heading[]} h2Headings
+ * @param {readonly string[]} headingNames
+ * @param {(key: string) => boolean} isHeadingEnabled
+ */
+const checkDuplicateHeadings = (
+    file,
+    h2Headings,
+    headingNames,
+    isHeadingEnabled
+) => {
+    const seenHeadings = new Set();
+
+    for (const [index, headingName] of headingNames.entries()) {
+        const headingDefinition =
+            canonicalHeadingDefinitionsByTitle.get(headingName);
+
+        if (
+            headingDefinition !== undefined &&
+            !isHeadingEnabled(headingDefinition.key)
+        ) {
+            continue;
+        }
+
+        if (seenHeadings.has(headingName)) {
+            file.message(
+                `Duplicate H2 heading \`${headingName}\` is not allowed.`,
+                h2Headings[index],
+                "remark-lint:rule-doc-headings:duplicate-heading"
+            );
+            continue;
+        }
+
+        seenHeadings.add(headingName);
+    }
+};
+
+/**
+ * Checks H3 detail heading placements and returns position indices of `###
+ * Detection boundaries` and `### Matched patterns` in the tree.
+ *
+ * @param {VFile} file
+ * @param {Root} tree
+ * @param {(key: string) => boolean} isHeadingEnabled
+ * @param {Set<string>} optionalDetailHeadings
+ *
+ * @returns {{
+ *     detectionBoundariesHeadingIndex: number;
+ *     matchedPatternsHeadingIndex: number;
+ * }}
+ */
+const checkDetailHeadingNodes = (
+    file,
+    tree,
+    isHeadingEnabled,
+    optionalDetailHeadings
+) => {
+    let currentH2HeadingName;
+    let detectionBoundariesHeadingIndex = -1;
+    let matchedPatternsHeadingIndex = -1;
+
+    for (const [index, node] of tree.children.entries()) {
+        if (!isHeadingNode(node)) {
+            continue;
+        }
+
+        const headingName = getNodeText(node).trim();
+        const detailHeadingDefinition =
+            optionalDetailHeadingDefinitionsByTitle.get(headingName);
+
+        if (node.depth === 2) {
+            currentH2HeadingName = headingName;
+            continue;
+        }
+
+        if (
+            node.depth !== 3 ||
+            detailHeadingDefinition === undefined ||
+            !isHeadingEnabled(detailHeadingDefinition.key) ||
+            !optionalDetailHeadings.has(headingName)
+        ) {
+            continue;
+        }
+
+        if (
+            currentH2HeadingName === undefined ||
+            !optionalDetailAllowedParentHeadings.has(currentH2HeadingName)
+        ) {
+            file.message(
+                `\`### ${headingName}\` must be placed under \`## Targeted pattern scope\` or \`## What this rule reports\`.`,
+                node,
+                "remark-lint:rule-doc-headings:detail-heading-parent"
+            );
+        }
+
+        if (headingName === "Matched patterns") {
+            matchedPatternsHeadingIndex = index;
+        }
+
+        if (headingName === "Detection boundaries") {
+            detectionBoundariesHeadingIndex = index;
+        }
+    }
+
+    if (
+        detectionBoundariesHeadingIndex !== -1 &&
+        matchedPatternsHeadingIndex !== -1 &&
+        detectionBoundariesHeadingIndex < matchedPatternsHeadingIndex
+    ) {
+        const detectionBoundariesHeading =
+            tree.children[detectionBoundariesHeadingIndex];
+
+        file.message(
+            "`### Detection boundaries` must appear after `### Matched patterns` when both are present.",
+            detectionBoundariesHeading,
+            "remark-lint:rule-doc-headings:detail-heading-order"
+        );
+    }
+
+    return { detectionBoundariesHeadingIndex, matchedPatternsHeadingIndex };
+};
+
+/**
+ * Checks that H2 headings appear in the canonical order.
+ *
+ * @param {VFile} file
+ * @param {readonly Heading[]} h2Headings
+ * @param {readonly string[]} headingNames
+ * @param {(key: string) => boolean} isHeadingEnabled
+ * @param {Map<string, number>} headingOrderIndex
+ */
+const checkHeadingOrder = (
+    file,
+    h2Headings,
+    headingNames,
+    isHeadingEnabled,
+    headingOrderIndex
+) => {
+    let lastOrder = -1;
+
+    for (const [index, headingName] of headingNames.entries()) {
+        const headingDefinition =
+            canonicalHeadingDefinitionsByTitle.get(headingName);
+
+        if (
+            headingDefinition !== undefined &&
+            !isHeadingEnabled(headingDefinition.key)
+        ) {
+            continue;
+        }
+
+        const headingOrder = headingOrderIndex.get(headingName);
+        const headingNode = h2Headings[index];
+
+        if (headingOrder === undefined) {
+            file.message(
+                `Unexpected H2 heading \`${headingName}\`. Allowed helper-doc headings: ${canonicalHeadingOrder.join(", ")}.`,
+                headingNode,
+                "remark-lint:rule-doc-headings:unknown-heading"
+            );
+            continue;
+        }
+
+        if (headingOrder < lastOrder) {
+            file.message(
+                `Heading \`${headingName}\` is out of order. Follow the canonical helper-doc sequence.`,
+                headingNode,
+                "remark-lint:rule-doc-headings:order"
+            );
+        }
+
+        lastOrder = headingOrder;
+    }
+};
+
+/**
+ * Reports any required headings that are missing from the document.
+ *
+ * @param {VFile} file
+ * @param {readonly string[]} headingNames
+ * @param {ReadonlyArray<{
+ *     heading: string;
+ *     key: string;
+ *     requiredByDefault: boolean;
+ * }>} requiredCanonicalHeadings
+ */
+const checkRequiredHeadings = (
+    file,
+    headingNames,
+    requiredCanonicalHeadings
+) => {
+    for (const requiredHeading of requiredCanonicalHeadings) {
+        if (!headingNames.includes(requiredHeading.heading)) {
+            file.message(
+                `Missing required H2 heading \`${requiredHeading.heading}\`.`,
+                undefined,
+                "remark-lint:rule-doc-headings:missing-required"
+            );
+        }
+    }
+};
+
+/**
+ * Validates the `## Deprecated` section contains a link to the replacement.
+ * Returns `false` when the deprecated heading node is missing (caller should
+ * bail out).
+ *
+ * @param {VFile} file
+ * @param {readonly Heading[]} h2Headings
+ * @param {number} deprecatedSectionIndex
+ *
+ * @returns {boolean}
+ */
+const checkDeprecatedSectionLink = (
+    file,
+    h2Headings,
+    deprecatedSectionIndex
+) => {
+    const deprecatedSectionHeading = h2Headings[deprecatedSectionIndex];
+
+    if (deprecatedSectionHeading === undefined) {
+        return false;
+    }
+
+    const nextH2Heading = h2Headings[deprecatedSectionIndex + 1];
+    const deprecatedSectionContent = getSectionContent(
+        file,
+        deprecatedSectionHeading,
+        nextH2Heading
+    );
+
+    if (!/\[[^\]]+\]\([^)]+\)/u.test(deprecatedSectionContent)) {
+        file.message(
+            "`## Deprecated` should include a link to the recommended replacement rule or package.",
+            deprecatedSectionHeading,
+            "remark-lint:rule-doc-headings:deprecated-replacement-link"
+        );
+    }
+
+    return true;
+};
+
+/**
+ * Validates the `## Package documentation` section has the required label line.
+ *
+ * @param {VFile} file
+ * @param {readonly Heading[]} h2Headings
+ * @param {number} packageDocumentationIndex
+ * @param {RegExp} packageDocumentationLabelPattern
+ */
+const checkPackageDocumentationLabelLine = (
+    file,
+    h2Headings,
+    packageDocumentationIndex,
+    packageDocumentationLabelPattern
+) => {
+    const packageDocumentationHeading = h2Headings[packageDocumentationIndex];
+
+    if (packageDocumentationHeading !== undefined) {
+        const nextPackageSectionHeading =
+            h2Headings[packageDocumentationIndex + 1];
+        const packageDocumentationContent = getSectionContent(
+            file,
+            packageDocumentationHeading,
+            nextPackageSectionHeading
+        );
+
+        if (
+            !packageDocumentationLabelPattern.test(packageDocumentationContent)
+        ) {
+            file.message(
+                "`## Package documentation` must include at least one `<package> package documentation:` label line.",
+                packageDocumentationHeading,
+                "remark-lint:rule-doc-headings:package-docs-label"
+            );
+        }
+    }
+};
+
+/**
+ * Validates that exactly one `> **Rule catalog ID:** R###` marker line exists.
+ *
+ * @param {VFile} file
+ * @param {string} markdownContent
+ * @param {(index: number) => Heading | undefined} getH2HeadingNodeAt
+ * @param {Heading | undefined} firstH2HeadingNode
+ * @param {RegExp} ruleCatalogIdLinePattern
+ * @param {number} furtherReadingIndex
+ */
+const checkRuleCatalogId = (
+    file,
+    markdownContent,
+    getH2HeadingNodeAt,
+    firstH2HeadingNode,
+    ruleCatalogIdLinePattern,
+    furtherReadingIndex
+) => {
+    const ruleCatalogIdLines = markdownContent
+        .split(/\r?\n/u)
+        .map((line) => line.trimEnd())
+        .filter((line) => ruleCatalogIdLinePattern.test(line));
+
+    if (ruleCatalogIdLines.length === 0) {
+        file.message(
+            "Missing required rule catalog marker line `> **Rule catalog ID:** R###`.",
+            getH2HeadingNodeAt(furtherReadingIndex) ?? firstH2HeadingNode,
+            "remark-lint:rule-doc-headings:missing-rule-catalog-id"
+        );
+    }
+
+    if (ruleCatalogIdLines.length > 1) {
+        file.message(
+            "Rule docs must contain exactly one `> **Rule catalog ID:** R###` marker line.",
+            getH2HeadingNodeAt(furtherReadingIndex) ?? firstH2HeadingNode,
+            "remark-lint:rule-doc-headings:duplicate-rule-catalog-id"
+        );
+    }
+};
+
+/**
+ * Validates section placements, the deprecated link, the package documentation
+ * label, and the rule catalog ID marker. Returns `false` if the deprecated
+ * section heading is undefined (so the caller can bail out early).
+ *
+ * @param {VFile} file
+ * @param {readonly Heading[]} h2Headings
+ * @param {readonly string[]} headingNames
+ * @param {(key: string) => boolean} isHeadingEnabled
+ * @param {{
+ *     requirePackageDocumentation: boolean;
+ *     requirePackageDocumentationLabel: boolean;
+ *     packageDocumentationLabelPattern: RegExp;
+ *     ruleCatalogIdLinePattern: RegExp;
+ * }} config
+ *
+ * @returns {boolean}
+ */
+const checkSectionPlacements = (
+    file,
+    h2Headings,
+    headingNames,
+    isHeadingEnabled,
+    config
+) => {
+    const {
+        requirePackageDocumentation,
+        requirePackageDocumentationLabel,
+        packageDocumentationLabelPattern,
+        ruleCatalogIdLinePattern,
+    } = config;
+
+    const packageDocumentationIndex = headingNames.indexOf(
+        "Package documentation"
+    );
+    const deprecatedSectionIndex = headingNames.indexOf("Deprecated");
+    const furtherReadingIndex = headingNames.indexOf("Further reading");
+    const packageDocumentationEnabled = isHeadingEnabled(
+        "packageDocumentation"
+    );
+    const furtherReadingEnabled = isHeadingEnabled("furtherReading");
+    const deprecatedEnabled = isHeadingEnabled("deprecated");
+    const targetedPatternScopeEnabled = isHeadingEnabled(
+        "targetedPatternScope"
+    );
+    const whatThisRuleReportsEnabled = isHeadingEnabled("whatThisRuleReports");
+    const targetedPatternScopeIndex = headingNames.indexOf(
+        "Targeted pattern scope"
+    );
+    const whatThisRuleReportsIndex = headingNames.indexOf(
+        "What this rule reports"
+    );
+
+    /** @param {number} index */
+    const getH2HeadingNodeAt = (index) =>
+        index >= 0 && index < h2Headings.length ? h2Headings[index] : undefined;
+    const firstH2HeadingNode = h2Headings[0];
+
+    if (targetedPatternScopeEnabled && targetedPatternScopeIndex !== 0) {
+        const node =
+            getH2HeadingNodeAt(targetedPatternScopeIndex) ??
+            getH2HeadingNodeAt(whatThisRuleReportsIndex) ??
+            firstH2HeadingNode;
+
+        file.message(
+            "`## Targeted pattern scope` must be the first H2 section.",
+            node,
+            "remark-lint:rule-doc-headings:targeted-scope-position"
+        );
+    }
+
+    if (
+        targetedPatternScopeEnabled &&
+        whatThisRuleReportsEnabled &&
+        whatThisRuleReportsIndex !== targetedPatternScopeIndex + 1
+    ) {
+        const node =
+            getH2HeadingNodeAt(whatThisRuleReportsIndex) ??
+            getH2HeadingNodeAt(targetedPatternScopeIndex) ??
+            firstH2HeadingNode;
+
+        file.message(
+            "`## What this rule reports` must immediately follow `## Targeted pattern scope`.",
+            node,
+            "remark-lint:rule-doc-headings:targeted-scope-adjacent"
+        );
+    }
+
+    if (
+        packageDocumentationEnabled &&
+        requirePackageDocumentation &&
+        packageDocumentationIndex === -1
+    ) {
+        file.message(
+            "Missing required `## Package documentation` section.",
+            undefined,
+            "remark-lint:rule-doc-headings:missing-package-docs"
+        );
+    }
+
+    if (furtherReadingEnabled && furtherReadingIndex === -1) {
+        file.message(
+            "Missing required `## Further reading` section.",
+            undefined,
+            "remark-lint:rule-doc-headings:missing-further-reading"
+        );
+    }
+
+    if (
+        deprecatedEnabled &&
+        deprecatedSectionIndex !== -1 &&
+        !checkDeprecatedSectionLink(file, h2Headings, deprecatedSectionIndex)
+    ) {
+        return false;
+    }
+
+    if (
+        packageDocumentationEnabled &&
+        furtherReadingEnabled &&
+        packageDocumentationIndex !== -1 &&
+        furtherReadingIndex !== -1 &&
+        packageDocumentationIndex !== furtherReadingIndex - 1
+    ) {
+        file.message(
+            "`## Package documentation` must appear immediately before `## Further reading`.",
+            h2Headings[packageDocumentationIndex],
+            "remark-lint:rule-doc-headings:package-placement"
+        );
+    }
+
+    if (
+        packageDocumentationEnabled &&
+        requirePackageDocumentationLabel &&
+        packageDocumentationIndex !== -1
+    ) {
+        checkPackageDocumentationLabelLine(
+            file,
+            h2Headings,
+            packageDocumentationIndex,
+            packageDocumentationLabelPattern
+        );
+    }
+
+    checkRuleCatalogId(
+        file,
+        String(file),
+        getH2HeadingNodeAt,
+        firstH2HeadingNode,
+        ruleCatalogIdLinePattern,
+        furtherReadingIndex
+    );
+
+    return true;
+};
+
+/**
  * Enforce canonical helper-doc heading schema.
  *
  * @param {RemarkLintRuleDocHeadingsOptions} [options]
@@ -378,7 +904,7 @@ const getHeadingsByDepth = (tree, depth) =>
 export default function remarkLintRuleDocHeadings(options = {}) {
     const headingToggles = {
         ...defaultHeadingToggles,
-        ...(options.headings ?? {}),
+        ...options.headings,
     };
     const helperDocPathPattern =
         options.helperDocPathPattern ?? defaultHelperDocPathPattern;
@@ -447,333 +973,48 @@ export default function remarkLintRuleDocHeadings(options = {}) {
             ]),
         ];
 
-        if (h1Headings.length !== 1) {
-            file.message(
-                "Helper docs must contain exactly one H1 heading.",
-                h1Headings[0],
-                "remark-lint:rule-doc-headings:h1-count"
-            );
-        }
-
-        if (h1Headings.length === 1 && typeof expectedRuleTitle === "string") {
-            const actualTitle = getNodeText(h1Headings[0]).trim();
-            const expectedH1Titles = getExpectedH1Titles(
-                expectedRuleTitle,
-                ruleNamespaceAliases
-            );
-
-            if (!expectedH1Titles.includes(actualTitle)) {
-                file.message(
-                    `H1 heading must match one of: ${expectedH1Titles.map((title) => `\`${title}\``).join(", ")}.`,
-                    h1Headings[0],
-                    "remark-lint:rule-doc-headings:h1-title"
-                );
-            }
-        }
-
-        const seenHeadings = new Set();
-
-        for (const [index, headingName] of headingNames.entries()) {
-            const headingDefinition =
-                canonicalHeadingDefinitionsByTitle.get(headingName);
-
-            if (
-                headingDefinition !== undefined &&
-                !isHeadingEnabled(headingDefinition.key)
-            ) {
-                continue;
-            }
-
-            if (seenHeadings.has(headingName)) {
-                file.message(
-                    `Duplicate H2 heading \`${headingName}\` is not allowed.`,
-                    h2Headings[index],
-                    "remark-lint:rule-doc-headings:duplicate-heading"
-                );
-                continue;
-            }
-
-            seenHeadings.add(headingName);
-        }
-
-        let currentH2HeadingName;
-        let detectionBoundariesHeadingIndex = -1;
-        let matchedPatternsHeadingIndex = -1;
-
-        for (const [index, node] of tree.children.entries()) {
-            if (!isHeadingNode(node)) {
-                continue;
-            }
-
-            const headingName = getNodeText(node).trim();
-            const detailHeadingDefinition =
-                optionalDetailHeadingDefinitionsByTitle.get(headingName);
-
-            if (node.depth === 2) {
-                currentH2HeadingName = headingName;
-                continue;
-            }
-
-            if (
-                node.depth !== 3 ||
-                detailHeadingDefinition === undefined ||
-                !isHeadingEnabled(detailHeadingDefinition.key) ||
-                !optionalDetailHeadings.has(headingName)
-            ) {
-                continue;
-            }
-
-            if (
-                currentH2HeadingName === undefined ||
-                !optionalDetailAllowedParentHeadings.has(currentH2HeadingName)
-            ) {
-                file.message(
-                    `\`### ${headingName}\` must be placed under \`## Targeted pattern scope\` or \`## What this rule reports\`.`,
-                    node,
-                    "remark-lint:rule-doc-headings:detail-heading-parent"
-                );
-            }
-
-            if (headingName === "Matched patterns") {
-                matchedPatternsHeadingIndex = index;
-            }
-
-            if (headingName === "Detection boundaries") {
-                detectionBoundariesHeadingIndex = index;
-            }
-        }
+        checkH1Heading(
+            file,
+            h1Headings,
+            expectedRuleTitle,
+            ruleNamespaceAliases
+        );
+        checkDuplicateHeadings(
+            file,
+            h2Headings,
+            headingNames,
+            isHeadingEnabled
+        );
+        checkDetailHeadingNodes(
+            file,
+            tree,
+            isHeadingEnabled,
+            optionalDetailHeadings
+        );
+        checkHeadingOrder(
+            file,
+            h2Headings,
+            headingNames,
+            isHeadingEnabled,
+            headingOrderIndex
+        );
+        checkRequiredHeadings(file, headingNames, requiredCanonicalHeadings);
 
         if (
-            detectionBoundariesHeadingIndex !== -1 &&
-            matchedPatternsHeadingIndex !== -1 &&
-            detectionBoundariesHeadingIndex < matchedPatternsHeadingIndex
-        ) {
-            const detectionBoundariesHeading =
-                tree.children[detectionBoundariesHeadingIndex];
-
-            file.message(
-                "`### Detection boundaries` must appear after `### Matched patterns` when both are present.",
-                detectionBoundariesHeading,
-                "remark-lint:rule-doc-headings:detail-heading-order"
-            );
-        }
-
-        let lastOrder = -1;
-
-        for (const [index, headingName] of headingNames.entries()) {
-            const headingDefinition =
-                canonicalHeadingDefinitionsByTitle.get(headingName);
-
-            if (
-                headingDefinition !== undefined &&
-                !isHeadingEnabled(headingDefinition.key)
-            ) {
-                continue;
-            }
-
-            const headingOrder = headingOrderIndex.get(headingName);
-            const headingNode = h2Headings[index];
-
-            if (headingOrder === undefined) {
-                file.message(
-                    `Unexpected H2 heading \`${headingName}\`. Allowed helper-doc headings: ${canonicalHeadingOrder.join(", ")}.`,
-                    headingNode,
-                    "remark-lint:rule-doc-headings:unknown-heading"
-                );
-                continue;
-            }
-
-            if (headingOrder < lastOrder) {
-                file.message(
-                    `Heading \`${headingName}\` is out of order. Follow the canonical helper-doc sequence.`,
-                    headingNode,
-                    "remark-lint:rule-doc-headings:order"
-                );
-            }
-
-            lastOrder = headingOrder;
-        }
-
-        const packageDocumentationIndex = headingNames.indexOf(
-            "Package documentation"
-        );
-        const deprecatedSectionIndex = headingNames.indexOf("Deprecated");
-        const furtherReadingIndex = headingNames.indexOf("Further reading");
-        const packageDocumentationEnabled = isHeadingEnabled(
-            "packageDocumentation"
-        );
-        const furtherReadingEnabled = isHeadingEnabled("furtherReading");
-        const deprecatedEnabled = isHeadingEnabled("deprecated");
-        const targetedPatternScopeEnabled = isHeadingEnabled(
-            "targetedPatternScope"
-        );
-        const whatThisRuleReportsEnabled = isHeadingEnabled(
-            "whatThisRuleReports"
-        );
-
-        for (const requiredHeading of requiredCanonicalHeadings) {
-            if (!headingNames.includes(requiredHeading.heading)) {
-                file.message(
-                    `Missing required H2 heading \`${requiredHeading.heading}\`.`,
-                    undefined,
-                    "remark-lint:rule-doc-headings:missing-required"
-                );
-            }
-        }
-
-        const targetedPatternScopeIndex = headingNames.indexOf(
-            "Targeted pattern scope"
-        );
-        const whatThisRuleReportsIndex = headingNames.indexOf(
-            "What this rule reports"
-        );
-        /** @param {number} index */
-        const getH2HeadingNodeAt = (index) =>
-            index >= 0 && index < h2Headings.length
-                ? h2Headings[index]
-                : undefined;
-        const firstH2HeadingNode = h2Headings[0];
-
-        if (targetedPatternScopeEnabled && targetedPatternScopeIndex !== 0) {
-            const targetedPatternScopeHeading =
-                getH2HeadingNodeAt(targetedPatternScopeIndex) ??
-                getH2HeadingNodeAt(whatThisRuleReportsIndex) ??
-                firstH2HeadingNode;
-
-            file.message(
-                "`## Targeted pattern scope` must be the first H2 section.",
-                targetedPatternScopeHeading,
-                "remark-lint:rule-doc-headings:targeted-scope-position"
-            );
-        }
-
-        if (
-            targetedPatternScopeEnabled &&
-            whatThisRuleReportsEnabled &&
-            whatThisRuleReportsIndex !== targetedPatternScopeIndex + 1
-        ) {
-            const targetedPatternScopeHeading =
-                getH2HeadingNodeAt(whatThisRuleReportsIndex) ??
-                getH2HeadingNodeAt(targetedPatternScopeIndex) ??
-                firstH2HeadingNode;
-
-            file.message(
-                "`## What this rule reports` must immediately follow `## Targeted pattern scope`.",
-                targetedPatternScopeHeading,
-                "remark-lint:rule-doc-headings:targeted-scope-adjacent"
-            );
-        }
-
-        if (
-            packageDocumentationEnabled &&
-            requirePackageDocumentation &&
-            packageDocumentationIndex === -1
-        ) {
-            file.message(
-                "Missing required `## Package documentation` section.",
-                undefined,
-                "remark-lint:rule-doc-headings:missing-package-docs"
-            );
-        }
-
-        if (furtherReadingEnabled && furtherReadingIndex === -1) {
-            file.message(
-                "Missing required `## Further reading` section.",
-                undefined,
-                "remark-lint:rule-doc-headings:missing-further-reading"
-            );
-        }
-
-        if (deprecatedEnabled && deprecatedSectionIndex !== -1) {
-            const deprecatedSectionHeading = h2Headings[deprecatedSectionIndex];
-
-            if (deprecatedSectionHeading === undefined) {
-                return;
-            }
-
-            const nextH2Heading = h2Headings[deprecatedSectionIndex + 1];
-            const deprecatedSectionContent = getSectionContent(
+            !checkSectionPlacements(
                 file,
-                deprecatedSectionHeading,
-                nextH2Heading
-            );
-
-            if (!/\[[^\]]+\]\([^\)]+\)/u.test(deprecatedSectionContent)) {
-                file.message(
-                    "`## Deprecated` should include a link to the recommended replacement rule or package.",
-                    deprecatedSectionHeading,
-                    "remark-lint:rule-doc-headings:deprecated-replacement-link"
-                );
-            }
-        }
-
-        if (
-            packageDocumentationEnabled &&
-            furtherReadingEnabled &&
-            packageDocumentationIndex !== -1 &&
-            furtherReadingIndex !== -1 &&
-            packageDocumentationIndex !== furtherReadingIndex - 1
-        ) {
-            const packageHeadingNode = h2Headings[packageDocumentationIndex];
-
-            file.message(
-                "`## Package documentation` must appear immediately before `## Further reading`.",
-                packageHeadingNode,
-                "remark-lint:rule-doc-headings:package-placement"
-            );
-        }
-
-        if (
-            packageDocumentationEnabled &&
-            requirePackageDocumentationLabel &&
-            packageDocumentationIndex !== -1
-        ) {
-            const packageDocumentationHeading =
-                h2Headings[packageDocumentationIndex];
-
-            if (packageDocumentationHeading !== undefined) {
-                const nextPackageSectionHeading =
-                    h2Headings[packageDocumentationIndex + 1];
-                const packageDocumentationContent = getSectionContent(
-                    file,
-                    packageDocumentationHeading,
-                    nextPackageSectionHeading
-                );
-
-                if (
-                    !packageDocumentationLabelPattern.test(
-                        packageDocumentationContent
-                    )
-                ) {
-                    file.message(
-                        "`## Package documentation` must include at least one `<package> package documentation:` label line.",
-                        packageDocumentationHeading,
-                        "remark-lint:rule-doc-headings:package-docs-label"
-                    );
+                h2Headings,
+                headingNames,
+                isHeadingEnabled,
+                {
+                    packageDocumentationLabelPattern,
+                    requirePackageDocumentation,
+                    requirePackageDocumentationLabel,
+                    ruleCatalogIdLinePattern,
                 }
-            }
-        }
-
-        const markdownContent = String(file);
-        const ruleCatalogIdLines = markdownContent
-            .split(/\r?\n/u)
-            .map((line) => line.trimEnd())
-            .filter((line) => ruleCatalogIdLinePattern.test(line));
-
-        if (ruleCatalogIdLines.length === 0) {
-            file.message(
-                "Missing required rule catalog marker line `> **Rule catalog ID:** R###`.",
-                getH2HeadingNodeAt(furtherReadingIndex) ?? firstH2HeadingNode,
-                "remark-lint:rule-doc-headings:missing-rule-catalog-id"
-            );
-        }
-
-        if (ruleCatalogIdLines.length > 1) {
-            file.message(
-                "Rule docs must contain exactly one `> **Rule catalog ID:** R###` marker line.",
-                getH2HeadingNodeAt(furtherReadingIndex) ?? firstH2HeadingNode,
-                "remark-lint:rule-doc-headings:duplicate-rule-catalog-id"
-            );
+            )
+        ) {
+            return;
         }
     };
 }
