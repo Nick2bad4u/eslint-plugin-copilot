@@ -2,6 +2,8 @@
  * @packageDocumentation
  * Shared Markdown link extraction helpers for Copilot customization files.
  */
+import { stringSplit } from "ts-extras";
+
 import {
     isNonRelativeWorkspacePath,
     isRelativeWorkspacePath,
@@ -47,7 +49,8 @@ export const extractMarkdownLinkDestination = (
         return trimmedDestination.slice(1, -1).trim();
     }
 
-    const [destination] = trimmedDestination.split(/\s+/u, 1);
+    const normalizedDestination = trimmedDestination.replaceAll(/\s+/gu, " ");
+    const [destination] = stringSplit(normalizedDestination, " ");
 
     return destination?.trim() ?? "";
 };

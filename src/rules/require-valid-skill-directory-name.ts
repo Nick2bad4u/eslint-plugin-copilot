@@ -14,7 +14,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-skill-directory-name`. */
 const requireValidSkillDirectoryNameRule: CopilotRuleModule = createCopilotRule(
     {
         create(context) {
@@ -50,6 +52,7 @@ const requireValidSkillDirectoryNameRule: CopilotRuleModule = createCopilotRule(
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-valid-skill-directory-name"),
             },
             messages: {
                 invalidSkillDirectoryName:

@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -14,6 +16,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const isNumericTimeoutValue = (value: string): boolean => {
     let decimalPointCount = 0;
@@ -37,6 +40,7 @@ const isNumericTimeoutValue = (value: string): boolean => {
     return value.length > 0 && !value.startsWith(".") && !value.endsWith(".");
 };
 
+/** Rule module for `require-valid-agent-hook-timeouts`. */
 const requireValidAgentHookTimeoutsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -55,7 +59,7 @@ const requireValidAgentHookTimeoutsRule: CopilotRuleModule = createCopilotRule({
                 "hooks"
             );
 
-            if (hookGroups === undefined || hookGroups.size === 0) {
+            if (!isDefined(hookGroups) || hookGroups.size === 0) {
                 return;
             }
 
@@ -64,7 +68,7 @@ const requireValidAgentHookTimeoutsRule: CopilotRuleModule = createCopilotRule({
                     const timeout = hook["timeout"]?.trim();
 
                     if (
-                        timeout === undefined ||
+                        !isDefined(timeout) ||
                         timeout.length === 0 ||
                         isNumericTimeoutValue(timeout)
                     ) {
@@ -98,6 +102,7 @@ const requireValidAgentHookTimeoutsRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-hook-timeouts"),
         },
         messages: {
             invalidHookTimeout:

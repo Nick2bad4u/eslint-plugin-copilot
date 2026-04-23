@@ -1,3 +1,5 @@
+import { isDefined, isEmpty, setHas } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -14,9 +16,11 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const VALID_BOOLEAN_FIELD_VALUES = new Set(["false", "true"]);
 
+/** Rule module for `require-valid-agent-handoff-send`. */
 const requireValidAgentHandoffSendRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -32,20 +36,20 @@ const requireValidAgentHandoffSendRule: CopilotRuleModule = createCopilotRule({
 
             const handoffs = getFrontmatterObjectList(frontmatter, "handoffs");
 
-            if (handoffs === undefined || handoffs.length === 0) {
+            if (!isDefined(handoffs) || isEmpty(handoffs)) {
                 return;
             }
 
             for (const [index, handoff] of handoffs.entries()) {
                 const rawSend = handoff["send"];
 
-                if (rawSend === undefined) {
+                if (!isDefined(rawSend)) {
                     continue;
                 }
 
                 const normalizedSend = rawSend.trim().toLowerCase();
 
-                if (VALID_BOOLEAN_FIELD_VALUES.has(normalizedSend)) {
+                if (setHas(VALID_BOOLEAN_FIELD_VALUES, normalizedSend)) {
                     continue;
                 }
 
@@ -75,6 +79,7 @@ const requireValidAgentHandoffSendRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-handoff-send"),
         },
         messages: {
             invalidHandoffSend:

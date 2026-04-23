@@ -1,3 +1,5 @@
+import { isDefined, setHas } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -15,9 +17,11 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const VALID_AGENT_TARGETS = new Set(["github-copilot", "vscode"]);
 
+/** Rule module for `require-valid-agent-target`. */
 const requireValidAgentTargetRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -37,7 +41,7 @@ const requireValidAgentTargetRule: CopilotRuleModule = createCopilotRule({
 
             const target = getFrontmatterScalar(frontmatter, "target");
 
-            if (target === undefined) {
+            if (!isDefined(target)) {
                 reportAtDocumentStart(context, {
                     messageId: "emptyTarget",
                 });
@@ -45,7 +49,7 @@ const requireValidAgentTargetRule: CopilotRuleModule = createCopilotRule({
                 return;
             }
 
-            if (VALID_AGENT_TARGETS.has(target)) {
+            if (setHas(VALID_AGENT_TARGETS, target)) {
                 return;
             }
 
@@ -68,6 +72,7 @@ const requireValidAgentTargetRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-target"),
         },
         messages: {
             emptyTarget:

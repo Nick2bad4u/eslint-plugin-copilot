@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -15,7 +17,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-agent-name`. */
 const requireValidAgentNameRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -32,7 +36,7 @@ const requireValidAgentNameRule: CopilotRuleModule = createCopilotRule({
                 return;
             }
 
-            if (getFrontmatterScalar(frontmatter, "name") !== undefined) {
+            if (isDefined(getFrontmatterScalar(frontmatter, "name"))) {
                 return;
             }
 
@@ -54,6 +58,7 @@ const requireValidAgentNameRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-name"),
         },
         messages: {
             invalidAgentName:

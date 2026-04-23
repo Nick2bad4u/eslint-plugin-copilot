@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import type { CopilotRuleModule } from "../src/_internal/create-copilot-rule";
 
 import { createRuleDocsUrl } from "../src/_internal/rule-docs-url";
-import copilotPlugin from "../src/plugin";
+import plugin from "../src/plugin";
 
 const getRuleSourceFileNames = (): readonly string[] => {
     const rulesDirectory = path.join(process.cwd(), "src", "rules");
@@ -19,28 +19,33 @@ const getRuleSourceFileNames = (): readonly string[] => {
 
 describe("rule metadata integrity", () => {
     it("registers one runtime rule per source file", () => {
+        expect.hasAssertions();
         expect(
-            Object.keys(copilotPlugin.rules).toSorted((left, right) =>
+            Object.keys(plugin.rules).toSorted((left, right) =>
                 left.localeCompare(right)
             )
-        ).toEqual(getRuleSourceFileNames());
+        ).toStrictEqual(getRuleSourceFileNames());
     });
 
     it("keeps canonical docs metadata on every rule", () => {
-        for (const [ruleName, ruleModule] of Object.entries(
-            copilotPlugin.rules
-        )) {
+        expect.hasAssertions();
+
+        for (const [ruleName, ruleModule] of Object.entries(plugin.rules)) {
             const copilotRule = ruleModule as unknown as CopilotRuleModule;
             const docs = copilotRule.meta.docs;
 
             expect(docs).toBeDefined();
 
-            if (docs !== undefined) {
-                expect(docs.url).toBe(createRuleDocsUrl(ruleName));
-                expect(docs.ruleId).toMatch(/^R\d{3}$/v);
-                expect(docs.ruleNumber).toBeGreaterThan(0);
-                expect(docs.copilotConfigNames.length).toBeGreaterThan(0);
+            if (docs === undefined) {
+                throw new Error(
+                    `Rule ${ruleName} is missing docs metadata at runtime.`
+                );
             }
+
+            expect(docs.url).toBe(createRuleDocsUrl(ruleName));
+            expect(docs.ruleId).toMatch(/^R\d{3}$/v);
+            expect(docs.ruleNumber).toBeGreaterThan(0);
+            expect(docs.copilotConfigNames.length).toBeGreaterThan(0);
         }
     });
 });

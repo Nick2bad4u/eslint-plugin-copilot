@@ -1,3 +1,5 @@
+import { arrayJoin, isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -16,6 +18,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const EMPTY_ARRAY_LITERAL = "[]";
 const WILDCARD_AGENTS_LITERAL = "*";
@@ -34,17 +37,18 @@ const formatAgentsValue = (
     scalarValue: string | undefined,
     listValue: readonly string[] | undefined
 ): string => {
-    if (scalarValue !== undefined) {
+    if (isDefined(scalarValue)) {
         return scalarValue;
     }
 
-    if (listValue !== undefined) {
-        return `[${listValue.join(", ")}]`;
+    if (isDefined(listValue)) {
+        return `[${arrayJoin(listValue, ", ")}]`;
     }
 
     return "(empty)";
 };
 
+/** Rule module for `require-valid-agent-subagents`. */
 const requireValidAgentSubagentsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -72,7 +76,7 @@ const requireValidAgentSubagentsRule: CopilotRuleModule = createCopilotRule({
             }
 
             if (
-                allowedAgents !== undefined &&
+                isDefined(allowedAgents) &&
                 allowedAgents.length > 0 &&
                 allowedAgents.every((agentName) =>
                     isValidExplicitAgentName(agentName)
@@ -102,6 +106,7 @@ const requireValidAgentSubagentsRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-subagents"),
         },
         messages: {
             invalidAgentsField:

@@ -12,7 +12,9 @@ import {
     getRepositoryHooksVersionValue,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-repository-hook-version`. */
 const requireValidRepositoryHookVersionRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -51,6 +53,7 @@ const requireValidRepositoryHookVersionRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-valid-repository-hook-version"),
             },
             messages: {
                 invalidRepositoryHookVersion:

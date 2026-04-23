@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-repository-instructions-file", () => {
     it("accepts repositories that already define .github/copilot-instructions.md", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             additionalFiles: {
                 ".github/copilot-instructions.md":
@@ -18,6 +20,8 @@ describe("require-repository-instructions-file", () => {
     });
 
     it("accepts repositories that define .github/instructions/copilot-instructions.md", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             additionalFiles: {
                 ".github/instructions/copilot-instructions.md":
@@ -32,13 +36,15 @@ describe("require-repository-instructions-file", () => {
     });
 
     it("reports missing repository-wide instructions when other Copilot assets exist", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-repository-instructions-file",
             text: "---\ndescription: Review the repository\nagent: ask\n---\nReview the repository for configuration drift.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingRepositoryInstructions",
         ]);
     });

@@ -3,6 +3,8 @@
  * Stable catalog ids for eslint-plugin-copilot rules.
  */
 
+import { assertDefined } from "ts-extras";
+
 /** Catalog metadata for a single Copilot rule. */
 export type CopilotRuleCatalogEntry = Readonly<{
     ruleId: CopilotRuleCatalogId;
@@ -186,11 +188,7 @@ export const getRuleCatalogEntryForRuleName = (
         ruleName as CopilotRuleNamePattern
     );
 
-    if (entry === undefined) {
-        throw new TypeError(
-            `Rule '${ruleName}' is missing from the stable rule catalog.`
-        );
-    }
+    assertDefined(entry);
 
     return entry;
 };

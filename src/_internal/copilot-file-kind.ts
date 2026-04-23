@@ -4,6 +4,7 @@
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { arrayFirst, arrayJoin, stringSplit } from "ts-extras";
 
 /** Supported GitHub Copilot repository file categories. */
 export type CopilotFileKind =
@@ -147,12 +148,15 @@ export const getCopilotFileKind = (
 /** Discover the repository root for the current file path. */
 export const findRepositoryRoot = (filePath: string): string => {
     const normalizedFilePath = path.resolve(filePath);
-    const pathSegments = normalizeFilePath(normalizedFilePath).split("/");
+    const pathSegments = stringSplit(
+        normalizeFilePath(normalizedFilePath),
+        "/"
+    );
     const githubDirectoryIndex = pathSegments.lastIndexOf(".github");
 
     if (githubDirectoryIndex > 0) {
         const rootSegments = pathSegments.slice(0, githubDirectoryIndex);
-        const candidateRoot = rootSegments.join(path.sep);
+        const candidateRoot = arrayJoin(rootSegments, path.sep);
 
         if (candidateRoot.length > 0) {
             return candidateRoot;
@@ -206,7 +210,7 @@ export const getRepositoryInstructionsPaths = (
 
 /** Resolve the canonical repository custom instructions file path. */
 export const getRepositoryInstructionsPath = (filePath: string): string =>
-    getRepositoryInstructionsPaths(filePath)[0] ??
+    arrayFirst(getRepositoryInstructionsPaths(filePath)) ??
     path.join(
         findRepositoryRoot(filePath),
         ".github",

@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("prefer-qualified-tools", () => {
     it("accepts fully-qualified tool names", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "prefer-qualified-tools",
@@ -14,6 +16,8 @@ describe("prefer-qualified-tools", () => {
     });
 
     it("allows documented built-in subagent tools", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "prefer-qualified-tools",
@@ -24,13 +28,15 @@ describe("prefer-qualified-tools", () => {
     });
 
     it("reports legacy unqualified tool names", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "prefer-qualified-tools",
             text: "---\ndescription: Review the repository\nagent: agent\ntools: [file_search, search/read_file]\n---\nReview the repository for configuration drift.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "preferQualifiedTool",
         ]);
     });

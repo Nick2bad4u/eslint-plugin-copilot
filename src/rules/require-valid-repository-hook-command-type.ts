@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -14,7 +16,9 @@ import {
     isRepositoryHookType,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-repository-hook-command-type`. */
 const requireValidRepositoryHookCommandTypeRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -36,7 +40,7 @@ const requireValidRepositoryHookCommandTypeRule: CopilotRuleModule =
                         }
                     );
 
-                    if (invalidHook === undefined) {
+                    if (!isDefined(invalidHook)) {
                         return;
                     }
 
@@ -63,6 +67,9 @@ const requireValidRepositoryHookCommandTypeRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl(
+                    "require-valid-repository-hook-command-type"
+                ),
             },
             messages: {
                 invalidRepositoryHookType:

@@ -11,6 +11,7 @@ import {
     projectSignals,
 } from "../components/siteData";
 
+/** Render the project-signal page for releases, quality, and package links. */
 export default function ProjectPage(): React.JSX.Element {
     const relatedPages = [
         {

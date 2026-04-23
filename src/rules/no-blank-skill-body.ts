@@ -11,7 +11,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `no-blank-skill-body`. */
 const noBlankSkillBodyRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -43,6 +45,7 @@ const noBlankSkillBodyRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("no-blank-skill-body"),
         },
         messages: {
             blankSkillBody:

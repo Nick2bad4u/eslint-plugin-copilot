@@ -14,7 +14,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `no-blank-customization-body`. */
 const noBlankCustomizationBodyRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -49,6 +51,7 @@ const noBlankCustomizationBodyRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("no-blank-customization-body"),
         },
         messages: {
             blankBody:

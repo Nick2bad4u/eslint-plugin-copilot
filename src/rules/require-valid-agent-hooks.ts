@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -14,6 +16,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const hasAnyHookCommand = (hook: Readonly<Record<string, string>>): boolean =>
     [
@@ -27,6 +30,43 @@ const hasAnyHookCommand = (hook: Readonly<Record<string, string>>): boolean =>
         return typeof value === "string" && value.trim().length > 0;
     });
 
+const getInvalidHookReport = (
+    eventName: string,
+    hook: Readonly<Record<string, string>>,
+    hookNumber: string
+):
+    | Readonly<{
+          data: Readonly<Record<string, string>>;
+          messageId: "invalidHookType" | "missingHookCommand";
+      }>
+    | undefined => {
+    const type = hook["type"]?.trim() ?? "";
+
+    if (type !== "command") {
+        return {
+            data: {
+                eventName,
+                hookNumber,
+                type: type.length === 0 ? "(missing)" : type,
+            },
+            messageId: "invalidHookType",
+        };
+    }
+
+    if (hasAnyHookCommand(hook)) {
+        return undefined;
+    }
+
+    return {
+        data: {
+            eventName,
+            hookNumber,
+        },
+        messageId: "missingHookCommand",
+    };
+};
+
+/** Rule module for `require-valid-agent-hooks`. */
 const requireValidAgentHooksRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -45,39 +85,24 @@ const requireValidAgentHooksRule: CopilotRuleModule = createCopilotRule({
                 "hooks"
             );
 
-            if (hookGroups === undefined || hookGroups.size === 0) {
+            if (!isDefined(hookGroups) || hookGroups.size === 0) {
                 return;
             }
 
             for (const [eventName, hooks] of hookGroups) {
                 for (const [index, hook] of hooks.entries()) {
                     const hookNumber = String(index + 1);
-                    const type = hook["type"]?.trim() ?? "";
+                    const invalidHookReport = getInvalidHookReport(
+                        eventName,
+                        hook,
+                        hookNumber
+                    );
 
-                    if (type !== "command") {
-                        reportAtDocumentStart(context, {
-                            data: {
-                                eventName,
-                                hookNumber,
-                                type: type.length === 0 ? "(missing)" : type,
-                            },
-                            messageId: "invalidHookType",
-                        });
-
-                        return;
-                    }
-
-                    if (hasAnyHookCommand(hook)) {
+                    if (!isDefined(invalidHookReport)) {
                         continue;
                     }
 
-                    reportAtDocumentStart(context, {
-                        data: {
-                            eventName,
-                            hookNumber,
-                        },
-                        messageId: "missingHookCommand",
-                    });
+                    reportAtDocumentStart(context, invalidHookReport);
 
                     return;
                 }
@@ -97,6 +122,7 @@ const requireValidAgentHooksRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-hooks"),
         },
         messages: {
             invalidHookType:

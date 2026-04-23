@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-instructions-apply-to", () => {
     it("accepts a valid instructions file with applyTo metadata", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/instructions/frontend.instructions.md",
             ruleId: "require-instructions-apply-to",
@@ -14,13 +16,15 @@ describe("require-instructions-apply-to", () => {
     });
 
     it("reports missing applyTo metadata", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/instructions/frontend.instructions.md",
             ruleId: "require-instructions-apply-to",
             text: "---\ndescription: Frontend rules\n---\nUse explicit return types for exported helpers.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingApplyTo",
         ]);
     });

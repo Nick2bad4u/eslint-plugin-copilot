@@ -4,6 +4,9 @@
  */
 
 /** Canonical flat-config preset keys exposed through `plugin.configs`. */
+import { objectHasOwn } from "ts-extras";
+
+/** Stable preset names used across docs, README tables, and runtime configs. */
 export const copilotConfigNames = [
     "all",
     "minimal",
@@ -85,4 +88,4 @@ export const isCopilotConfigReference: (
 ) => value is CopilotConfigReference = (
     value
 ): value is CopilotConfigReference =>
-    Object.hasOwn(copilotConfigReferenceToName, value);
+    objectHasOwn(copilotConfigReferenceToName, value);

@@ -14,7 +14,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `no-deprecated-agent-infer`. */
 const noDeprecatedAgentInferRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -49,6 +51,7 @@ const noDeprecatedAgentInferRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("no-deprecated-agent-infer"),
         },
         messages: {
             deprecatedInfer:

@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -21,7 +23,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-existing-agent-mcp-servers`. */
 const requireExistingAgentMcpServersRule: CopilotRuleModule = createCopilotRule(
     {
         create(context) {
@@ -36,7 +40,7 @@ const requireExistingAgentMcpServersRule: CopilotRuleModule = createCopilotRule(
                         ? undefined
                         : getFrontmatterList(frontmatter, "mcp-servers");
 
-                if (mcpServers === undefined) {
+                if (!isDefined(mcpServers)) {
                     return;
                 }
 
@@ -51,7 +55,7 @@ const requireExistingAgentMcpServersRule: CopilotRuleModule = createCopilotRule(
                         )
                 );
 
-                if (missingServer === undefined) {
+                if (!isDefined(missingServer)) {
                     return;
                 }
 
@@ -75,6 +79,7 @@ const requireExistingAgentMcpServersRule: CopilotRuleModule = createCopilotRule(
                 frozen: false,
                 recommended: false,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-existing-agent-mcp-servers"),
             },
             messages: {
                 missingAgentMcpServer:

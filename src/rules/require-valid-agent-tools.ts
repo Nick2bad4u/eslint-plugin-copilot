@@ -1,3 +1,5 @@
+import { arrayJoin, isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -16,22 +18,24 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const formatToolsValue = (
     scalarValue: string | undefined,
     listValue: readonly string[] | undefined
 ): string => {
-    if (scalarValue !== undefined) {
+    if (isDefined(scalarValue)) {
         return scalarValue;
     }
 
-    if (listValue !== undefined) {
-        return `[${listValue.join(", ")}]`;
+    if (isDefined(listValue)) {
+        return `[${arrayJoin(listValue, ", ")}]`;
     }
 
     return "(empty)";
 };
 
+/** Rule module for `require-valid-agent-tools`. */
 const requireValidAgentToolsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -50,7 +54,7 @@ const requireValidAgentToolsRule: CopilotRuleModule = createCopilotRule({
 
             const tools = getFrontmatterList(frontmatter, "tools");
 
-            if (tools !== undefined && tools.length > 0) {
+            if (isDefined(tools) && tools.length > 0) {
                 return;
             }
 
@@ -78,6 +82,7 @@ const requireValidAgentToolsRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-tools"),
         },
         messages: {
             invalidAgentTools:

@@ -1,24 +1,24 @@
 import { describe, expect, it } from "vitest";
 
-import copilotPlugin from "../src/plugin";
+import plugin from "../src/plugin";
 
 describe("source plugin config wiring", () => {
-    const collectRuleKeys = (configName: keyof typeof copilotPlugin.configs) =>
-        copilotPlugin.configs[configName].flatMap((layer) =>
-            Object.keys(layer.rules)
-        );
+    const collectRuleKeys = (configName: keyof typeof plugin.configs) =>
+        plugin.configs[configName].flatMap((layer) => Object.keys(layer.rules));
 
     const compareStrings = (left: string, right: string) =>
         left.localeCompare(right);
 
     it("registers layered markdown and JSON-aware Copilot presets", () => {
-        for (const configName of Object.keys(copilotPlugin.configs).toSorted(
+        expect.hasAssertions();
+
+        const sortedConfigNames = Object.keys(plugin.configs).toSorted(
             compareStrings
-        )) {
+        );
+
+        for (const configName of sortedConfigNames) {
             const configLayers =
-                copilotPlugin.configs[
-                    configName as keyof typeof copilotPlugin.configs
-                ];
+                plugin.configs[configName as keyof typeof plugin.configs];
             const markdownLayer = configLayers[0];
 
             expect(markdownLayer?.files).toContain(
@@ -31,29 +31,41 @@ describe("source plugin config wiring", () => {
             expect(markdownLayer?.language).toBe("markdown/gfm");
             expect(markdownLayer?.plugins).toHaveProperty("copilot");
             expect(markdownLayer?.plugins).toHaveProperty("markdown");
+        }
 
+        const minimalJsonLayer = plugin.configs.minimal.find(
+            (layer) => layer.language === "json/json"
+        );
+
+        expect(minimalJsonLayer).toBeUndefined();
+
+        for (const configName of sortedConfigNames.filter(
+            (name) => name !== "minimal"
+        )) {
+            const configLayers =
+                plugin.configs[configName as keyof typeof plugin.configs];
             const jsonLayer = configLayers.find(
                 (layer) => layer.language === "json/json"
             );
 
-            if (configName === "minimal") {
-                expect(jsonLayer).toBeUndefined();
-            } else {
-                expect(jsonLayer?.files).toContain(".github/hooks/**/*.json");
-                expect(jsonLayer?.plugins).toHaveProperty("copilot");
-                expect(jsonLayer?.plugins).toHaveProperty("json");
-            }
+            expect(jsonLayer?.files).toContain(".github/hooks/**/*.json");
+            expect(jsonLayer?.plugins).toHaveProperty("copilot");
+            expect(jsonLayer?.plugins).toHaveProperty("json");
         }
     });
 
     it("layers rule membership across presets", () => {
-        expect(collectRuleKeys("minimal").toSorted(compareStrings)).toEqual([
+        expect.hasAssertions();
+
+        expect(
+            collectRuleKeys("minimal").toSorted(compareStrings)
+        ).toStrictEqual([
             "copilot/require-chatmode-file-metadata",
             "copilot/require-instructions-apply-to",
             "copilot/require-prompt-file-metadata",
         ]);
 
-        expect(collectRuleKeys("recommended")).toEqual(
+        expect(collectRuleKeys("recommended")).toStrictEqual(
             expect.arrayContaining([
                 "copilot/no-blank-skill-body",
                 "copilot/no-duplicate-agent-names",
@@ -80,7 +92,7 @@ describe("source plugin config wiring", () => {
             ])
         );
 
-        expect(collectRuleKeys("strict")).toEqual(
+        expect(collectRuleKeys("strict")).toStrictEqual(
             expect.arrayContaining([
                 "copilot/no-empty-repository-hook-arrays",
                 "copilot/prefer-custom-instructions-under-code-review-limit",

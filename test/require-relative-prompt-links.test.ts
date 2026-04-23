@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-relative-prompt-links", () => {
     it("accepts relative workspace links in prompt files", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-relative-prompt-links",
@@ -14,6 +16,8 @@ describe("require-relative-prompt-links", () => {
     });
 
     it("ignores external links and heading anchors", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-relative-prompt-links",
@@ -24,25 +28,29 @@ describe("require-relative-prompt-links", () => {
     });
 
     it("reports root-relative workspace links", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-relative-prompt-links",
             text: "---\ndescription: Review changes with repository guidance\nagent: agent\n---\nReview the proposed changes using [security guidance](/.github/instructions/security.instructions.md).\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "nonRelativePromptLink",
         ]);
     });
 
     it("reports file URI links to workspace files", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-relative-prompt-links",
             text: "---\ndescription: Review changes with repository guidance\nagent: agent\n---\nReview the proposed changes using [security guidance](file:///C:/repo/.github/instructions/security.instructions.md).\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "nonRelativePromptLink",
         ]);
     });

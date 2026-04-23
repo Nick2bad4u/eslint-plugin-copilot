@@ -4,6 +4,7 @@
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { isDefined, isEmpty } from "ts-extras";
 
 const WINDOWS_ABSOLUTE_PATH_PATTERN = /^[A-Za-z]:[/\\]/u;
 const URI_SCHEME_PATTERN = /^[A-Za-z][+\-.0-9A-Za-z]*:/u;
@@ -24,7 +25,7 @@ export const stripPathFragmentAndQuery = (value: string): string => {
         (index) => index >= 0
     );
 
-    if (cutIndexCandidates.length === 0) {
+    if (isEmpty(cutIndexCandidates)) {
         return value;
     }
 
@@ -90,6 +91,44 @@ export const resolveRepositoryRelativePath = (
 ): string =>
     path.resolve(repositoryRootPath, stripPathFragmentAndQuery(relativePath));
 
+/** Visit one directory and return discovered child files and subdirectories. */
+const collectDirectoryFiles = (
+    currentDirectory: string,
+    predicate?: (absoluteFilePath: string) => boolean
+): Readonly<{
+    discoveredFiles: readonly string[];
+    pendingDirectories: readonly string[];
+}> => {
+    const discoveredFiles: string[] = [];
+    const pendingDirectories: string[] = [];
+
+    for (const entry of fs.readdirSync(currentDirectory, {
+        withFileTypes: true,
+    })) {
+        const absoluteEntryPath = path.join(currentDirectory, entry.name);
+
+        if (entry.isDirectory()) {
+            pendingDirectories.push(absoluteEntryPath);
+            continue;
+        }
+
+        if (!entry.isFile()) {
+            continue;
+        }
+
+        if (isDefined(predicate) && !predicate(absoluteEntryPath)) {
+            continue;
+        }
+
+        discoveredFiles.push(absoluteEntryPath);
+    }
+
+    return {
+        discoveredFiles,
+        pendingDirectories,
+    };
+};
+
 /** Recursively list files under a directory when it exists. */
 export const listFilesRecursively = (
     directoryPath: string,
@@ -105,30 +144,17 @@ export const listFilesRecursively = (
     while (pendingDirectories.length > 0) {
         const currentDirectory = pendingDirectories.pop();
 
-        if (currentDirectory === undefined) {
+        if (!isDefined(currentDirectory)) {
             continue;
         }
 
-        for (const entry of fs.readdirSync(currentDirectory, {
-            withFileTypes: true,
-        })) {
-            const absoluteEntryPath = path.join(currentDirectory, entry.name);
+        const currentDirectoryContents = collectDirectoryFiles(
+            currentDirectory,
+            predicate
+        );
 
-            if (entry.isDirectory()) {
-                pendingDirectories.push(absoluteEntryPath);
-                continue;
-            }
-
-            if (!entry.isFile()) {
-                continue;
-            }
-
-            if (predicate !== undefined && !predicate(absoluteEntryPath)) {
-                continue;
-            }
-
-            discoveredFiles.push(absoluteEntryPath);
-        }
+        pendingDirectories.push(...currentDirectoryContents.pendingDirectories);
+        discoveredFiles.push(...currentDirectoryContents.discoveredFiles);
     }
 
     return discoveredFiles.toSorted((left, right) => left.localeCompare(right));

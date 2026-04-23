@@ -1,3 +1,5 @@
+import { isDefined, isEmpty } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -14,6 +16,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const isQualifiedModelName = (value: string): boolean => {
     const trimmedValue = value.trim();
@@ -37,6 +40,7 @@ const isQualifiedModelName = (value: string): boolean => {
     );
 };
 
+/** Rule module for `require-qualified-agent-handoff-models`. */
 const requireQualifiedAgentHandoffModelsRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -56,7 +60,7 @@ const requireQualifiedAgentHandoffModelsRule: CopilotRuleModule =
                     "handoffs"
                 );
 
-                if (handoffs === undefined || handoffs.length === 0) {
+                if (!isDefined(handoffs) || isEmpty(handoffs)) {
                     return;
                 }
 
@@ -64,7 +68,7 @@ const requireQualifiedAgentHandoffModelsRule: CopilotRuleModule =
                     const model = handoff["model"]?.trim();
 
                     if (
-                        model === undefined ||
+                        !isDefined(model) ||
                         model.length === 0 ||
                         isQualifiedModelName(model)
                     ) {
@@ -96,6 +100,9 @@ const requireQualifiedAgentHandoffModelsRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl(
+                    "require-qualified-agent-handoff-models"
+                ),
             },
             messages: {
                 unqualifiedHandoffModel:

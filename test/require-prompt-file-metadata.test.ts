@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-prompt-file-metadata", () => {
     it("accepts a valid agent prompt file", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-prompt-file-metadata",
@@ -14,18 +16,22 @@ describe("require-prompt-file-metadata", () => {
     });
 
     it("requires tools when prompt agent is the built-in agent mode", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-prompt-file-metadata",
             text: "---\ndescription: Review the repository\nagent: agent\n---\nReview the repository for stale configuration and docs drift.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingTools",
         ]);
     });
 
     it("accepts a prompt file that targets a named custom agent without tools", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-prompt-file-metadata",

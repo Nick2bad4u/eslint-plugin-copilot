@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-valid-agent-invocation-controls", () => {
     it("accepts documented boolean invocation-control values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-invocation-controls",
@@ -14,6 +16,8 @@ describe("require-valid-agent-invocation-controls", () => {
     });
 
     it("accepts mixed-case boolean tokens", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-invocation-controls",
@@ -24,25 +28,29 @@ describe("require-valid-agent-invocation-controls", () => {
     });
 
     it("reports invalid invocation-control values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-invocation-controls",
             text: "---\ndescription: Plan work before implementation starts\nuser-invocable: sometimes\n---\nPlan the work before implementation starts.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidInvocationControl",
         ]);
     });
 
     it("reports empty invocation-control values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-invocation-controls",
             text: "---\ndescription: Plan work before implementation starts\ndisable-model-invocation:\n---\nPlan the work before implementation starts.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidInvocationControl",
         ]);
     });

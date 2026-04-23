@@ -1,3 +1,5 @@
+import { arrayFirst } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -13,7 +15,9 @@ import {
     isJsonArray,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-repository-hook-arrays`. */
 const requireRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return {
@@ -23,17 +27,18 @@ const requireRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
                 }
 
                 const root = parseJsonText(context.sourceCode.text);
-                const invalidEntry = getRepositoryHookEventEntries(root).find(
-                    ([, eventValue]) => !isJsonArray(eventValue)
-                );
+                const invalidEntry =
+                    getRepositoryHookEventEntries(root).find(
+                        ([, eventValue]) => !isJsonArray(eventValue)
+                    ) ?? null;
 
-                if (invalidEntry === undefined) {
+                if (invalidEntry === null) {
                     return;
                 }
 
                 reportAtDocumentStart(context, {
                     data: {
-                        eventName: invalidEntry[0],
+                        eventName: arrayFirst(invalidEntry),
                         value: formatJsonValue(invalidEntry[1]),
                     },
                     messageId: "invalidRepositoryHookArray",
@@ -54,6 +59,7 @@ const requireRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-repository-hook-arrays"),
         },
         messages: {
             invalidRepositoryHookArray:

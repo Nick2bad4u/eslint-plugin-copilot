@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import {
@@ -19,7 +21,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-skill-name`. */
 const requireValidSkillNameRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -39,7 +43,7 @@ const requireValidSkillNameRule: CopilotRuleModule = createCopilotRule({
             const skillName = getFrontmatterScalar(frontmatter, "name");
 
             if (
-                skillName !== undefined &&
+                isDefined(skillName) &&
                 isValidSkillIdentifier(
                     getSkillName(context.filename, frontmatter)
                 )
@@ -68,6 +72,7 @@ const requireValidSkillNameRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-skill-name"),
         },
         messages: {
             invalidSkillName:

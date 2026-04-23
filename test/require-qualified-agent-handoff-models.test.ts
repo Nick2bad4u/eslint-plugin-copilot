@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-qualified-agent-handoff-models", () => {
     it("accepts qualified handoff model names", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-qualified-agent-handoff-models",
@@ -14,13 +16,15 @@ describe("require-qualified-agent-handoff-models", () => {
     });
 
     it("reports unqualified handoff model names", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-qualified-agent-handoff-models",
             text: "---\ndescription: Plan work carefully\nhandoffs:\n  - label: Start Implementation\n    agent: Implementer\n    model: GPT-5\n---\nPlan the requested change before implementation.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "unqualifiedHandoffModel",
         ]);
     });

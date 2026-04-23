@@ -1,10 +1,12 @@
-import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
-
-import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
 /**
  * @packageDocumentation
  * ESLint rule implementation for `require-valid-prompt-argument-hint`.
  */
+import { isDefined } from "ts-extras";
+
+import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
+
+import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
 import {
     extractFrontmatter,
@@ -15,7 +17,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-prompt-argument-hint`. */
 const requireValidPromptArgumentHintRule: CopilotRuleModule = createCopilotRule(
     {
         create(context) {
@@ -34,8 +38,9 @@ const requireValidPromptArgumentHintRule: CopilotRuleModule = createCopilotRule(
                 }
 
                 if (
-                    getFrontmatterScalar(frontmatter, "argument-hint") !==
-                    undefined
+                    isDefined(
+                        getFrontmatterScalar(frontmatter, "argument-hint")
+                    )
                 ) {
                     return;
                 }
@@ -58,6 +63,7 @@ const requireValidPromptArgumentHintRule: CopilotRuleModule = createCopilotRule(
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-valid-prompt-argument-hint"),
             },
             messages: {
                 invalidPromptArgumentHint:

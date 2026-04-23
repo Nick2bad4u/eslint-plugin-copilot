@@ -11,6 +11,7 @@ import {
     extractMarkdownLinks,
     isInvalidWorkspaceLinkDestination,
 } from "../_internal/markdown-links.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const isInvalidPromptWorkspaceLinkDestination = (
     destination: string
@@ -44,6 +45,7 @@ const isInvalidPromptWorkspaceLinkDestination = (
     return isInvalidWorkspaceLinkDestination(normalizedDestination);
 };
 
+/** Rule module for `require-relative-prompt-links`. */
 const requireRelativePromptLinksRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return {
@@ -93,6 +95,7 @@ const requireRelativePromptLinksRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-relative-prompt-links"),
         },
         messages: {
             nonRelativePromptLink:

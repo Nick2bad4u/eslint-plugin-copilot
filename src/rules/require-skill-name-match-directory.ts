@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import {
@@ -18,7 +20,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-skill-name-match-directory`. */
 const requireSkillNameMatchDirectoryRule: CopilotRuleModule = createCopilotRule(
     {
         create(context) {
@@ -33,7 +37,7 @@ const requireSkillNameMatchDirectoryRule: CopilotRuleModule = createCopilotRule(
                         ? undefined
                         : getFrontmatterScalar(frontmatter, "name");
 
-                if (explicitSkillName === undefined) {
+                if (!isDefined(explicitSkillName)) {
                     return;
                 }
 
@@ -65,6 +69,7 @@ const requireSkillNameMatchDirectoryRule: CopilotRuleModule = createCopilotRule(
                 frozen: false,
                 recommended: false,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-skill-name-match-directory"),
             },
             messages: {
                 skillNameDoesNotMatchDirectory:

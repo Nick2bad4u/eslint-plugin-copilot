@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
@@ -16,7 +18,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-instructions-apply-to`. */
 const requireInstructionsApplyToRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -36,7 +40,7 @@ const requireInstructionsApplyToRule: CopilotRuleModule = createCopilotRule({
             const applyToScalar = getFrontmatterScalar(frontmatter, "applyTo");
             const applyToList = getFrontmatterList(frontmatter, "applyTo");
 
-            if (applyToScalar !== undefined || applyToList !== undefined) {
+            if (isDefined(applyToScalar) || isDefined(applyToList)) {
                 return;
             }
 
@@ -61,6 +65,7 @@ const requireInstructionsApplyToRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-instructions-apply-to"),
         },
         messages: {
             emptyApplyTo:

@@ -1,8 +1,9 @@
 import { themes as prismThemes } from "prism-react-renderer";
+import { createRequire } from "node:module";
 
 import type { Options as DocsPluginOptions } from "@docusaurus/plugin-content-docs";
 import type * as Preset from "@docusaurus/preset-classic";
-import type { Config } from "@docusaurus/types";
+import type { Config, PluginModule } from "@docusaurus/types";
 
 const organizationName = "Nick2bad4u";
 const projectName = "eslint-plugin-copilot";
@@ -16,6 +17,81 @@ const socialCardImageUrl = new URL(socialCardImagePath, siteUrl).toString();
 const pwaThemeColor = "#312E81";
 const pwaTileColor = "#312E81";
 const pwaMaskIconColor = "#312E81";
+
+/** Local require helper rooted at the docs workspace config file location. */
+const requireFromDocsWorkspace = createRequire(import.meta.url);
+
+/** Resolve an optional module specifier without throwing when absent. */
+const resolveOptionalModule = (moduleSpecifier: string): string | undefined => {
+    try {
+        return requireFromDocsWorkspace.resolve(moduleSpecifier);
+    } catch {
+        return undefined;
+    }
+};
+
+/**
+ * Optional ESM entry used to avoid webpack warnings from VS Code CSS language
+ * service packages.
+ */
+const vscodeCssLanguageServiceEsmEntry = resolveOptionalModule(
+    "vscode-css-languageservice/lib/esm/cssLanguageService.js"
+);
+
+/**
+ * Optional ESM entry used to avoid webpack warnings from VS Code language
+ * server type packages.
+ */
+const vscodeLanguageServerTypesEsmEntry = resolveOptionalModule(
+    "vscode-languageserver-types/lib/esm/main.js"
+);
+
+/**
+ * Alias VS Code language-service packages to their ESM entries when they are
+ * present and suppress known third-party webpack warning noise.
+ */
+const suppressKnownWebpackWarningsPlugin: PluginModule = () => {
+    return {
+        configureWebpack() {
+            return {
+                ignoreWarnings: [
+                    (warning: unknown) => {
+                        const warningRecord = warning as
+                            | Readonly<Record<string, unknown>>
+                            | undefined;
+                        const warningMessage = warningRecord?.["message"];
+
+                        return (
+                            typeof warningMessage === "string" &&
+                            warningMessage.includes(
+                                "Critical dependency: require function is used in a way in which dependencies cannot be statically extracted"
+                            )
+                        );
+                    },
+                ],
+                resolve: {
+                    alias: {
+                        ...(vscodeCssLanguageServiceEsmEntry === undefined
+                            ? {}
+                            : {
+                                  "vscode-css-languageservice$":
+                                      vscodeCssLanguageServiceEsmEntry,
+                              }),
+                        ...(vscodeLanguageServerTypesEsmEntry === undefined
+                            ? {}
+                            : {
+                                  "vscode-languageserver-types$":
+                                      vscodeLanguageServerTypesEsmEntry,
+                                  "vscode-languageserver-types/lib/umd/main.js$":
+                                      vscodeLanguageServerTypesEsmEntry,
+                              }),
+                    },
+                },
+            };
+        },
+        name: "suppress-known-webpack-warnings",
+    };
+};
 
 /** Obfuscated key for the v4 legacy post-build head attribute removal flag. */
 const removeHeadAttrFlagKey = [
@@ -54,7 +130,7 @@ const futureConfig = {
     },
 } satisfies Config["future"];
 
-const config: Config = {
+const config = {
     storage: {
         namespace: true,
         type: "localStorage",
@@ -121,6 +197,7 @@ const config: Config = {
     onDuplicateRoutes: "warn",
     organizationName,
     plugins: [
+        suppressKnownWebpackWarningsPlugin,
         "docusaurus-plugin-image-zoom",
         [
             "@docusaurus/plugin-pwa",
@@ -200,6 +277,7 @@ const config: Config = {
                 sidebarPath: "./sidebars.developer.ts",
             } satisfies DocsPluginOptions,
         ],
+        "@docusaurus/theme-live-codeblock",
     ],
     presets: [
         [
@@ -287,8 +365,8 @@ const config: Config = {
                         },
                         {
                             className: "footer-link--reference",
-                            label: "\udb81\udd6e Rule reference",
-                            to: "/docs/rules/overview",
+                            label: "\ud83e\udde9 Customization files",
+                            to: "/docs/rules/guides/copilot-customization-files",
                         },
                     ],
                     title: "Docs",
@@ -399,7 +477,12 @@ const config: Config = {
             title: "eslint-plugin-copilot",
         },
         prism: {
-            additionalLanguages: ["bash", "json", "yaml", "typescript"],
+            additionalLanguages: [
+                "bash",
+                "json",
+                "yaml",
+                "typescript",
+            ],
             defaultLanguage: "typescript",
             darkTheme: prismThemes.vsDark,
             theme: prismThemes.github,
@@ -449,6 +532,6 @@ const config: Config = {
     ],
     trailingSlash: true,
     url: siteOrigin,
-};
+} satisfies Config;
 
 export default config;

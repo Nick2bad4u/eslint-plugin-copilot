@@ -100,6 +100,7 @@ function getHomeIcon(icon: string | undefined): React.JSX.Element {
     }
 }
 
+/** Render the public landing page for eslint-plugin-copilot documentation. */
 export default function Home(): React.JSX.Element {
     const logoSource = useBaseUrl("/img/logo.svg");
     const copilotLightSource = useBaseUrl("/img/github-copilot-light.png");

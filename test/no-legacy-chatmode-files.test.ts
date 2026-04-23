@@ -4,18 +4,22 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("no-legacy-chatmode-files", () => {
     it("reports legacy chatmode files", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/chatmodes/planner.chatmode.md",
             ruleId: "no-legacy-chatmode-files",
             text: "---\ndescription: Plan work carefully\n---\nPlan the requested change before implementation.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "legacyChatmodeFile",
         ]);
     });
 
     it("ignores modern custom agent files", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "no-legacy-chatmode-files",

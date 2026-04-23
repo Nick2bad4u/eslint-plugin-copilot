@@ -1,3 +1,5 @@
+import { isDefined, setHas } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
@@ -16,6 +18,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const VALID_BUILT_IN_PROMPT_AGENTS = new Set([
     "agent",
@@ -23,6 +26,64 @@ const VALID_BUILT_IN_PROMPT_AGENTS = new Set([
     "plan",
 ]);
 
+const getRequiredPromptScalar = (
+    context: Parameters<CopilotRuleModule["create"]>[0],
+    frontmatter: Parameters<typeof getFrontmatterScalar>[0],
+    key: "agent" | "description",
+    emptyMessageId: "emptyAgent" | "emptyDescription",
+    missingMessageId: "missingAgent" | "missingDescription"
+): string | undefined => {
+    const value = getFrontmatterScalar(frontmatter, key);
+
+    if (isDefined(value)) {
+        return value;
+    }
+
+    reportAtDocumentStart(context, {
+        messageId: hasFrontmatterField(frontmatter, key)
+            ? emptyMessageId
+            : missingMessageId,
+    });
+
+    return undefined;
+};
+
+const reportAgentToolsRequirement = (
+    context: Parameters<CopilotRuleModule["create"]>[0],
+    frontmatter: Parameters<typeof getFrontmatterScalar>[0],
+    agent: string,
+    tools: ReturnType<typeof getFrontmatterList>
+): boolean => {
+    if (agent === "agent") {
+        if (isDefined(tools)) {
+            return false;
+        }
+
+        reportAtDocumentStart(context, {
+            messageId: hasFrontmatterField(frontmatter, "tools")
+                ? "emptyTools"
+                : "missingTools",
+        });
+
+        return true;
+    }
+
+    if (
+        setHas(VALID_BUILT_IN_PROMPT_AGENTS, agent) &&
+        hasFrontmatterField(frontmatter, "tools")
+    ) {
+        reportAtDocumentStart(context, {
+            data: { agent },
+            messageId: "unexpectedTools",
+        });
+
+        return true;
+    }
+
+    return false;
+};
+
+/** Rule module for `require-prompt-file-metadata`. */
 const requirePromptFileMetadataRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -39,17 +100,15 @@ const requirePromptFileMetadataRule: CopilotRuleModule = createCopilotRule({
                 return;
             }
 
-            const description = getFrontmatterScalar(
+            const description = getRequiredPromptScalar(
+                context,
                 frontmatter,
-                "description"
+                "description",
+                "emptyDescription",
+                "missingDescription"
             );
 
-            if (description === undefined) {
-                reportAtDocumentStart(context, {
-                    messageId: hasFrontmatterField(frontmatter, "description")
-                        ? "emptyDescription"
-                        : "missingDescription",
-                });
+            if (!isDefined(description)) {
                 return;
             }
 
@@ -60,41 +119,21 @@ const requirePromptFileMetadataRule: CopilotRuleModule = createCopilotRule({
                 return;
             }
 
-            const agent = getFrontmatterScalar(frontmatter, "agent");
+            const agent = getRequiredPromptScalar(
+                context,
+                frontmatter,
+                "agent",
+                "emptyAgent",
+                "missingAgent"
+            );
 
-            if (agent === undefined) {
-                reportAtDocumentStart(context, {
-                    messageId: hasFrontmatterField(frontmatter, "agent")
-                        ? "emptyAgent"
-                        : "missingAgent",
-                });
+            if (!isDefined(agent)) {
                 return;
             }
 
             const tools = getFrontmatterList(frontmatter, "tools");
 
-            if (agent === "agent") {
-                if (tools !== undefined) {
-                    return;
-                }
-
-                reportAtDocumentStart(context, {
-                    messageId: hasFrontmatterField(frontmatter, "tools")
-                        ? "emptyTools"
-                        : "missingTools",
-                });
-                return;
-            }
-
-            if (
-                VALID_BUILT_IN_PROMPT_AGENTS.has(agent) &&
-                hasFrontmatterField(frontmatter, "tools")
-            ) {
-                reportAtDocumentStart(context, {
-                    data: { agent },
-                    messageId: "unexpectedTools",
-                });
-            }
+            reportAgentToolsRequirement(context, frontmatter, agent, tools);
         });
     },
     meta: {
@@ -111,6 +150,7 @@ const requirePromptFileMetadataRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-prompt-file-metadata"),
         },
         messages: {
             deprecatedMode:

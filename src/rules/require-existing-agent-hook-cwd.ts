@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -22,7 +24,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-existing-agent-hook-cwd`. */
 const requireExistingAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -36,7 +40,7 @@ const requireExistingAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
                     ? undefined
                     : getFrontmatterObjectListGroups(frontmatter, "hooks");
 
-            if (hookGroups === undefined || hookGroups.size === 0) {
+            if (!isDefined(hookGroups) || hookGroups.size === 0) {
                 return;
             }
 
@@ -56,7 +60,7 @@ const requireExistingAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
                     );
                 })?.["cwd"];
 
-                if (missingCwd === undefined) {
+                if (!isDefined(missingCwd)) {
                     continue;
                 }
 
@@ -80,6 +84,7 @@ const requireExistingAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: false,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-existing-agent-hook-cwd"),
         },
         messages: {
             missingAgentHookCwd:

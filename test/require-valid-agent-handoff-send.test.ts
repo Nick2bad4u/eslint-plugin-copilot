@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-valid-agent-handoff-send", () => {
     it("accepts boolean handoff send values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-handoff-send",
@@ -14,6 +16,8 @@ describe("require-valid-agent-handoff-send", () => {
     });
 
     it("accepts mixed-case boolean handoff send values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-handoff-send",
@@ -24,13 +28,15 @@ describe("require-valid-agent-handoff-send", () => {
     });
 
     it("reports invalid handoff send values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-handoff-send",
             text: "---\ndescription: Plan implementation work\nhandoffs:\n  - label: Start Implementation\n    agent: implementation\n    send: later\n---\nPlan work before implementation starts.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidHandoffSend",
         ]);
     });

@@ -12,7 +12,9 @@ import {
     isJsonObject,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-repository-hooks-object`. */
 const requireRepositoryHooksObjectRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return {
@@ -47,6 +49,7 @@ const requireRepositoryHooksObjectRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-repository-hooks-object"),
         },
         messages: {
             invalidRepositoryHooksObject:

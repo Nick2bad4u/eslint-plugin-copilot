@@ -1,3 +1,5 @@
+import { arrayFirst, isDefined, isEmpty } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -12,7 +14,9 @@ import {
     isJsonArray,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `no-empty-repository-hook-arrays`. */
 const noEmptyRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return {
@@ -24,16 +28,16 @@ const noEmptyRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
                 const root = parseJsonText(context.sourceCode.text);
                 const emptyEntry = getRepositoryHookEventEntries(root).find(
                     ([, eventValue]) =>
-                        isJsonArray(eventValue) && eventValue.length === 0
+                        isJsonArray(eventValue) && isEmpty(eventValue)
                 );
 
-                if (emptyEntry === undefined) {
+                if (!isDefined(emptyEntry)) {
                     return;
                 }
 
                 reportAtDocumentStart(context, {
                     data: {
-                        eventName: emptyEntry[0],
+                        eventName: arrayFirst(emptyEntry),
                     },
                     messageId: "emptyRepositoryHookArray",
                 });
@@ -49,6 +53,7 @@ const noEmptyRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: false,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("no-empty-repository-hook-arrays"),
         },
         messages: {
             emptyRepositoryHookArray:

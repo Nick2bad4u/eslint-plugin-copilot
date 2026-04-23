@@ -15,7 +15,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-repository-instructions-file`. */
 const requireRepositoryInstructionsFileRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -60,6 +62,7 @@ const requireRepositoryInstructionsFileRule: CopilotRuleModule =
                 frozen: false,
                 recommended: false,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-repository-instructions-file"),
             },
             messages: {
                 missingRepositoryInstructions:

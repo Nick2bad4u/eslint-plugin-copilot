@@ -1,7 +1,7 @@
 import { createRequire } from "node:module";
 import { describe, expect, it } from "vitest";
 
-import copilotPlugin from "../src/plugin";
+import plugin from "../src/plugin";
 
 const requireFromTestModule = createRequire(import.meta.url);
 const packageJson = requireFromTestModule("../package.json") as {
@@ -10,21 +10,23 @@ const packageJson = requireFromTestModule("../package.json") as {
 
 describe("plugin entry module", () => {
     it("exports the expected runtime plugin shape", () => {
-        const exportedRuleNames = Object.keys(copilotPlugin.rules).toSorted(
+        expect.hasAssertions();
+
+        const exportedRuleNames = Object.keys(plugin.rules).toSorted(
             (left, right) => left.localeCompare(right)
         );
 
-        expect(copilotPlugin.meta).toEqual({
+        expect(plugin.meta).toStrictEqual({
             name: "eslint-plugin-copilot",
             namespace: "copilot",
             version: packageJson.version,
         });
 
         expect(
-            Object.keys(copilotPlugin.configs).toSorted((left, right) =>
+            Object.keys(plugin.configs).toSorted((left, right) =>
                 left.localeCompare(right)
             )
-        ).toEqual([
+        ).toStrictEqual([
             "all",
             "minimal",
             "recommended",
@@ -32,7 +34,7 @@ describe("plugin entry module", () => {
         ]);
 
         expect(exportedRuleNames).toHaveLength(69);
-        expect(exportedRuleNames).toEqual(
+        expect(exportedRuleNames).toStrictEqual(
             expect.arrayContaining([
                 "no-blank-customization-body",
                 "no-blank-skill-body",
@@ -83,11 +85,13 @@ describe("plugin entry module", () => {
     });
 
     it("matches the runtime default export exposed through plugin.mjs", async () => {
+        expect.hasAssertions();
+
         const runtimePluginModule = (await import("../plugin.mjs")) as {
             default: unknown;
         };
 
-        expect(runtimePluginModule.default).toEqual(
+        expect(runtimePluginModule.default).toStrictEqual(
             expect.objectContaining({
                 meta: expect.objectContaining({
                     name: "eslint-plugin-copilot",

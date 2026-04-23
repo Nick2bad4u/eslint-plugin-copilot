@@ -11,7 +11,9 @@ import {
     extractMarkdownLinks,
     isInvalidWorkspaceLinkDestination,
 } from "../_internal/markdown-links.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-relative-instructions-links`. */
 const requireRelativeInstructionsLinksRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -65,6 +67,7 @@ const requireRelativeInstructionsLinksRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-relative-instructions-links"),
             },
             messages: {
                 nonRelativeInstructionsLink:

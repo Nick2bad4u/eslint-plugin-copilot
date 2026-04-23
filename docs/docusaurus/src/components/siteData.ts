@@ -1,3 +1,4 @@
+/** Link-card data rendered by the docs site landing and resource pages. */
 export type SiteLinkCard = Readonly<{
     cta: string;
     description: string;
@@ -7,6 +8,7 @@ export type SiteLinkCard = Readonly<{
     to?: string;
 }>;
 
+/** Resolve a Docusaurus `Link` destination from shared site-card data. */
 export function getSiteLinkProps(
     linkCard: SiteLinkCard
 ): { href: string } | { to: string } {
@@ -19,16 +21,18 @@ export function getSiteLinkProps(
     }
 
     throw new TypeError(
-        `Link card \"${linkCard.title}\" is missing a destination.`
+        `Link card "${linkCard.title}" is missing a destination.`
     );
 }
 
+/** Badge metadata displayed in hero and project badge strips. */
 export type SiteBadge = Readonly<{
     alt: string;
     href: string;
     src: string;
 }>;
 
+/** Feature-card content shown on marketing-style docs pages. */
 export type SiteFeatureCard = Readonly<{
     description: string;
     eyebrow: string;
@@ -37,17 +41,20 @@ export type SiteFeatureCard = Readonly<{
     title: string;
 }>;
 
+/** Short numeric or textual stat used by site summary blocks. */
 export type SiteStat = Readonly<{
     detail: string;
     label: string;
     value: string;
 }>;
 
+/** Short explanatory reason shown in project signal lists. */
 export type SiteReason = Readonly<{
     description: string;
     title: string;
 }>;
 
+/** Grouped resource links rendered by the resources page. */
 export type SiteResourceGroup = Readonly<{
     items: readonly SiteLinkCard[];
     title: string;
@@ -55,6 +62,7 @@ export type SiteResourceGroup = Readonly<{
 
 const projectBase = "https://github.com/Nick2bad4u/eslint-plugin-copilot";
 
+/** Live repository and package health badges rendered on public pages. */
 export const liveBadges = [
     {
         alt: "npm license",
@@ -88,6 +96,7 @@ export const liveBadges = [
     },
 ] as const satisfies readonly SiteBadge[];
 
+/** Primary homepage cards that route visitors into the main docs surfaces. */
 export const homePrimaryCards = [
     {
         cta: "Open section",
@@ -115,6 +124,7 @@ export const homePrimaryCards = [
     },
 ] as const satisfies readonly SiteLinkCard[];
 
+/** High-signal entry points surfaced on the public landing pages. */
 export const entryPoints = [
     {
         cta: "Open getting started",
@@ -166,6 +176,7 @@ export const entryPoints = [
     },
 ] as const satisfies readonly SiteLinkCard[];
 
+/** Project-level public links that demonstrate repository health and activity. */
 export const projectHighlights = [
     {
         cta: "Open releases",
@@ -217,6 +228,7 @@ export const projectHighlights = [
     },
 ] as const satisfies readonly SiteLinkCard[];
 
+/** High-level project signals used to explain the plugin's maintenance posture. */
 export const projectSignals = [
     {
         description:
@@ -235,6 +247,7 @@ export const projectSignals = [
     },
 ] as const satisfies readonly SiteReason[];
 
+/** Resource groups for contributor and adopter-oriented reference links. */
 export const resourceGroups = [
     {
         items: [

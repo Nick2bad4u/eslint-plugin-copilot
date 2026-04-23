@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -15,7 +17,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-github-copilot-target-for-mcp-servers`. */
 const requireGithubCopilotTargetForMcpServersRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -39,7 +43,7 @@ const requireGithubCopilotTargetForMcpServersRule: CopilotRuleModule =
                     return;
                 }
 
-                if (target === undefined) {
+                if (!isDefined(target)) {
                     reportAtDocumentStart(context, {
                         messageId: hasFrontmatterField(frontmatter, "target")
                             ? "emptyTarget"
@@ -68,6 +72,9 @@ const requireGithubCopilotTargetForMcpServersRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl(
+                    "require-github-copilot-target-for-mcp-servers"
+                ),
             },
             messages: {
                 emptyTarget:

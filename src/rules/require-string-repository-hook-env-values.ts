@@ -1,3 +1,5 @@
+import { isDefined, objectValues } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -14,7 +16,9 @@ import {
     isJsonString,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-string-repository-hook-env-values`. */
 const requireStringRepositoryHookEnvValuesRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -31,14 +35,14 @@ const requireStringRepositoryHookEnvValuesRule: CopilotRuleModule =
 
                             return (
                                 isJsonObject(env) &&
-                                Object.values(env).some(
+                                objectValues(env).some(
                                     (value) => !isJsonString(value)
                                 )
                             );
                         }
                     );
 
-                    if (invalidHook === undefined) {
+                    if (!isDefined(invalidHook)) {
                         return;
                     }
 
@@ -67,6 +71,9 @@ const requireStringRepositoryHookEnvValuesRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl(
+                    "require-string-repository-hook-env-values"
+                ),
             },
             messages: {
                 nonStringRepositoryHookEnvValue:

@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -15,6 +17,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const isValidRelativeHookCwd = (cwd: string): boolean => {
     const trimmedCwd = cwd.trim();
@@ -22,6 +25,7 @@ const isValidRelativeHookCwd = (cwd: string): boolean => {
     return trimmedCwd.length > 0 && isRelativeWorkspacePath(trimmedCwd);
 };
 
+/** Rule module for `require-relative-agent-hook-cwd`. */
 const requireRelativeAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -40,7 +44,7 @@ const requireRelativeAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
                 "hooks"
             );
 
-            if (hookGroups === undefined || hookGroups.size === 0) {
+            if (!isDefined(hookGroups) || hookGroups.size === 0) {
                 return;
             }
 
@@ -48,7 +52,7 @@ const requireRelativeAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
                 for (const [index, hook] of hooks.entries()) {
                     const cwd = hook["cwd"]?.trim();
 
-                    if (cwd === undefined || isValidRelativeHookCwd(cwd)) {
+                    if (!isDefined(cwd) || isValidRelativeHookCwd(cwd)) {
                         continue;
                     }
 
@@ -79,6 +83,7 @@ const requireRelativeAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-relative-agent-hook-cwd"),
         },
         messages: {
             invalidHookCwd:

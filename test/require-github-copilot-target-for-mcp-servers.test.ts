@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-github-copilot-target-for-mcp-servers", () => {
     it("accepts custom agents that use mcp-servers with the github-copilot target", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-github-copilot-target-for-mcp-servers",
@@ -14,25 +16,29 @@ describe("require-github-copilot-target-for-mcp-servers", () => {
     });
 
     it("reports missing target metadata when mcp-servers is declared", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-github-copilot-target-for-mcp-servers",
             text: "---\ndescription: Coordinate release work with GitHub Copilot MCP servers\nmcp-servers: [release-coordinator.json]\n---\nCoordinate release automation tasks.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingTarget",
         ]);
     });
 
     it("reports invalid non-GitHub-Copilot targets when mcp-servers is declared", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-github-copilot-target-for-mcp-servers",
             text: "---\ndescription: Coordinate release work with GitHub Copilot MCP servers\ntarget: vscode\nmcp-servers: [release-coordinator.json]\n---\nCoordinate release automation tasks.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidTarget",
         ]);
     });

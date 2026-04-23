@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import { isSkillFilePath } from "../_internal/copilot-file-kind.js";
@@ -14,7 +16,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-skill-file-metadata`. */
 const requireSkillFileMetadataRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -31,16 +35,14 @@ const requireSkillFileMetadataRule: CopilotRuleModule = createCopilotRule({
                 return;
             }
 
-            if (getFrontmatterScalar(frontmatter, "name") === undefined) {
+            if (!isDefined(getFrontmatterScalar(frontmatter, "name"))) {
                 reportAtDocumentStart(context, {
                     messageId: "missingSkillName",
                 });
                 return;
             }
 
-            if (
-                getFrontmatterScalar(frontmatter, "description") === undefined
-            ) {
+            if (!isDefined(getFrontmatterScalar(frontmatter, "description"))) {
                 reportAtDocumentStart(context, {
                     messageId: "missingSkillDescription",
                 });
@@ -60,6 +62,7 @@ const requireSkillFileMetadataRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-skill-file-metadata"),
         },
         messages: {
             missingSkillDescription:

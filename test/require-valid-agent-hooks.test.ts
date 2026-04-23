@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-valid-agent-hooks", () => {
     it("accepts command hooks with a default command", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/formatter.agent.md",
             ruleId: "require-valid-agent-hooks",
@@ -14,6 +16,8 @@ describe("require-valid-agent-hooks", () => {
     });
 
     it("accepts command hooks with only OS-specific commands", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/formatter.agent.md",
             ruleId: "require-valid-agent-hooks",
@@ -24,25 +28,29 @@ describe("require-valid-agent-hooks", () => {
     });
 
     it("reports hooks with a non-command type", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/formatter.agent.md",
             ruleId: "require-valid-agent-hooks",
             text: "---\ndescription: Format files after editing\nhooks:\n  PostToolUse:\n    - type: prompt\n      command: ./scripts/format.sh\n---\nFormat edited files after tool usage.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidHookType",
         ]);
     });
 
     it("reports command hooks that omit all command properties", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/formatter.agent.md",
             ruleId: "require-valid-agent-hooks",
             text: "---\ndescription: Format files after editing\nhooks:\n  PostToolUse:\n    - type: command\n      cwd: scripts\n---\nFormat edited files after tool usage.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingHookCommand",
         ]);
     });

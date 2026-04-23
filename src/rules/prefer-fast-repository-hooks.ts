@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -13,7 +15,9 @@ import {
     isJsonNumber,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `prefer-fast-repository-hooks`. */
 const preferFastRepositoryHooksRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return {
@@ -34,7 +38,7 @@ const preferFastRepositoryHooksRule: CopilotRuleModule = createCopilotRule({
                     }
                 );
 
-                if (slowHook === undefined) {
+                if (!isDefined(slowHook)) {
                     return;
                 }
 
@@ -63,6 +67,7 @@ const preferFastRepositoryHooksRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: false,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("prefer-fast-repository-hooks"),
         },
         messages: {
             slowRepositoryHookTimeout:

@@ -11,11 +11,13 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 import {
     getSkillFileBasename,
     looksLikeSkillDefinitionDocument,
 } from "../_internal/skill-files.js";
 
+/** Rule module for `require-skill-md-filename`. */
 const requireSkillMdFilenameRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -56,6 +58,7 @@ const requireSkillMdFilenameRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-skill-md-filename"),
         },
         messages: {
             invalidSkillDefinitionFilename:

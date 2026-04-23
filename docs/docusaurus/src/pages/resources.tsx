@@ -6,6 +6,7 @@ import Layout from "@theme/Layout";
 
 import { getSiteLinkProps, resourceGroups } from "../components/siteData";
 
+/** Render the contributor-facing resources index for the docs site. */
 export default function ResourcesPage(): React.JSX.Element {
     const relatedPages = [
         {

@@ -1,5 +1,4 @@
 /** eslint-disable css/use-baseline */
-/* stylelint-disable csstools/use-nesting, defensive-css/require-named-grid-lines -- Docusaurus page modules need a small exception for theme scoping and auto-fit cards. */
 
 .page {
     padding-block-end: 3rem;

@@ -1,3 +1,5 @@
+import { arrayAt, isDefined, isEmpty, stringSplit } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -16,10 +18,14 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const hasAgentTool = (tools: readonly string[] | undefined): boolean =>
-    tools?.some((toolName) => toolName.split("/").at(-1) === "agent") ?? false;
+    tools?.some(
+        (toolName) => arrayAt(stringSplit(toolName, "/"), -1) === "agent"
+    ) ?? false;
 
+/** Rule module for `require-agent-tool-for-subagents`. */
 const requireAgentToolForSubagentsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -42,7 +48,7 @@ const requireAgentToolForSubagentsRule: CopilotRuleModule = createCopilotRule({
 
             if (
                 agentsScalar !== "*" &&
-                (allowedAgents === undefined || allowedAgents.length === 0)
+                (!isDefined(allowedAgents) || isEmpty(allowedAgents))
             ) {
                 return;
             }
@@ -73,6 +79,7 @@ const requireAgentToolForSubagentsRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-agent-tool-for-subagents"),
         },
         messages: {
             missingAgentTool:

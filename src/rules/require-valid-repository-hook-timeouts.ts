@@ -1,3 +1,5 @@
+import { isDefined, isInteger } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -12,10 +14,12 @@ import {
     getRepositoryHookObjects,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const isValidTimeoutSeconds = (value: unknown): value is number =>
-    typeof value === "number" && Number.isInteger(value) && value > 0;
+    typeof value === "number" && isInteger(value) && value > 0;
 
+/** Rule module for `require-valid-repository-hook-timeouts`. */
 const requireValidRepositoryHookTimeoutsRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -31,13 +35,13 @@ const requireValidRepositoryHookTimeoutsRule: CopilotRuleModule =
                             const timeout = hook["timeoutSec"];
 
                             return (
-                                timeout !== undefined &&
+                                isDefined(timeout) &&
                                 !isValidTimeoutSeconds(timeout)
                             );
                         }
                     );
 
-                    if (invalidHook === undefined) {
+                    if (!isDefined(invalidHook)) {
                         return;
                     }
 
@@ -66,6 +70,9 @@ const requireValidRepositoryHookTimeoutsRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl(
+                    "require-valid-repository-hook-timeouts"
+                ),
             },
             messages: {
                 invalidRepositoryHookTimeout:

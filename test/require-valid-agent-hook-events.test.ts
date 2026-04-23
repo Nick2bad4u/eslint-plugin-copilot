@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-valid-agent-hook-events", () => {
     it("accepts supported agent hook events", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/formatter.agent.md",
             ruleId: "require-valid-agent-hook-events",
@@ -14,13 +16,15 @@ describe("require-valid-agent-hook-events", () => {
     });
 
     it("reports unsupported agent hook event names", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/formatter.agent.md",
             ruleId: "require-valid-agent-hook-events",
             text: "---\ndescription: Format files after editing\nhooks:\n  AfterEdit:\n    - type: command\n      command: ./scripts/format.sh\n---\nFormat edited files after tool usage.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidHookEvent",
         ]);
     });

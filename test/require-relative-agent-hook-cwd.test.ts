@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-relative-agent-hook-cwd", () => {
     it("accepts repository-relative cwd values for agent hooks", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/formatter.agent.md",
             ruleId: "require-relative-agent-hook-cwd",
@@ -14,25 +16,29 @@ describe("require-relative-agent-hook-cwd", () => {
     });
 
     it("reports absolute hook cwd values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/formatter.agent.md",
             ruleId: "require-relative-agent-hook-cwd",
             text: "---\ndescription: Format files after editing\nhooks:\n  PostToolUse:\n    - type: command\n      command: ./scripts/format.sh\n      cwd: C:\\hooks\n---\nFormat edited files after tool usage.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidHookCwd",
         ]);
     });
 
     it("reports empty hook cwd values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/formatter.agent.md",
             ruleId: "require-relative-agent-hook-cwd",
             text: "---\ndescription: Format files after editing\nhooks:\n  PostToolUse:\n    - type: command\n      command: ./scripts/format.sh\n      cwd:\n---\nFormat edited files after tool usage.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidHookCwd",
         ]);
     });

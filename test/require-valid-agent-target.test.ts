@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-valid-agent-target", () => {
     it("accepts documented custom-agent target values", async () => {
+        expect.hasAssertions();
+
         const vscodeMessages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-target",
@@ -20,30 +22,36 @@ describe("require-valid-agent-target", () => {
     });
 
     it("reports invalid custom-agent target values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-target",
             text: "---\ndescription: Plan work inside VS Code\ntarget: github\n---\nPlan work before implementation starts.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidTarget",
         ]);
     });
 
     it("reports empty target values when the field is present", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-target",
             text: "---\ndescription: Plan work inside VS Code\ntarget:\n---\nPlan work before implementation starts.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "emptyTarget",
         ]);
     });
 
     it("defers to the mcp-target rule when mcp-servers are declared", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "require-valid-agent-target",

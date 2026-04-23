@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -12,7 +14,9 @@ import {
     isRepositoryHookEventName,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-repository-hook-events`. */
 const requireValidRepositoryHookEventsRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -29,7 +33,7 @@ const requireValidRepositoryHookEventsRule: CopilotRuleModule =
                             (eventName) => !isRepositoryHookEventName(eventName)
                         );
 
-                    if (invalidEventName === undefined) {
+                    if (!isDefined(invalidEventName)) {
                         return;
                     }
 
@@ -55,6 +59,7 @@ const requireValidRepositoryHookEventsRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-valid-repository-hook-events"),
             },
             messages: {
                 invalidRepositoryHookEvent:

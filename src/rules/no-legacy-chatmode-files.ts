@@ -10,7 +10,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `no-legacy-chatmode-files`. */
 const noLegacyChatmodeFilesRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -36,6 +38,7 @@ const noLegacyChatmodeFilesRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("no-legacy-chatmode-files"),
         },
         messages: {
             legacyChatmodeFile:

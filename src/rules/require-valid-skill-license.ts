@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import { isSkillFilePath } from "../_internal/copilot-file-kind.js";
@@ -15,7 +17,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-skill-license`. */
 const requireValidSkillLicenseRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -32,7 +36,7 @@ const requireValidSkillLicenseRule: CopilotRuleModule = createCopilotRule({
                 return;
             }
 
-            if (getFrontmatterScalar(frontmatter, "license") !== undefined) {
+            if (isDefined(getFrontmatterScalar(frontmatter, "license"))) {
                 return;
             }
 
@@ -50,6 +54,7 @@ const requireValidSkillLicenseRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: false,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-skill-license"),
         },
         messages: {
             invalidSkillLicense:

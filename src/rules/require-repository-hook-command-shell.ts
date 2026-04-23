@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -12,10 +14,12 @@ import {
     isJsonString,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const hasHookShellCommand = (value: unknown): boolean =>
     typeof value === "string" && value.trim().length > 0;
 
+/** Rule module for `require-repository-hook-command-shell`. */
 const requireRepositoryHookCommandShellRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -34,7 +38,7 @@ const requireRepositoryHookCommandShellRule: CopilotRuleModule =
                             !hasHookShellCommand(hook["powershell"])
                     );
 
-                    if (invalidHook === undefined) {
+                    if (!isDefined(invalidHook)) {
                         return;
                     }
 
@@ -60,6 +64,7 @@ const requireRepositoryHookCommandShellRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-repository-hook-command-shell"),
             },
             messages: {
                 missingRepositoryHookShellCommand:

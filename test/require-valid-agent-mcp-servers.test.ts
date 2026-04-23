@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-valid-agent-mcp-servers", () => {
     it("accepts non-empty mcp-servers lists", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-valid-agent-mcp-servers",
@@ -14,37 +16,43 @@ describe("require-valid-agent-mcp-servers", () => {
     });
 
     it("reports empty mcp-servers values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-valid-agent-mcp-servers",
             text: "---\ndescription: Coordinate release automation\nmcp-servers:\n---\nCoordinate release tasks through MCP servers.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidMcpServersField",
         ]);
     });
 
     it("reports scalar mcp-servers values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-valid-agent-mcp-servers",
             text: "---\ndescription: Coordinate release automation\nmcp-servers: release-coordinator.json\n---\nCoordinate release tasks through MCP servers.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidMcpServersField",
         ]);
     });
 
     it("reports empty mcp-servers lists", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-valid-agent-mcp-servers",
             text: "---\ndescription: Coordinate release automation\nmcp-servers: []\n---\nCoordinate release tasks through MCP servers.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidMcpServersField",
         ]);
     });

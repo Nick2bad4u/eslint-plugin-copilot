@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
@@ -20,6 +22,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const isValidApplyToGlob = (value: string): boolean => {
     const trimmedValue = value.trim();
@@ -41,6 +44,7 @@ const isValidApplyToGlob = (value: string): boolean => {
     );
 };
 
+/** Rule module for `require-valid-instructions-apply-to-globs`. */
 const requireValidInstructionsApplyToGlobsRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -66,15 +70,15 @@ const requireValidInstructionsApplyToGlobsRule: CopilotRuleModule =
                     "applyTo"
                 );
 
-                if (applyToScalar !== undefined) {
+                if (isDefined(applyToScalar)) {
                     applyToValues.push(applyToScalar);
                 }
 
-                const invalidValue = applyToValues.find(
-                    (value) => !isValidApplyToGlob(value)
-                );
+                const invalidValue =
+                    applyToValues.find((value) => !isValidApplyToGlob(value)) ??
+                    null;
 
-                if (invalidValue === undefined) {
+                if (invalidValue === null) {
                     return;
                 }
 
@@ -99,6 +103,9 @@ const requireValidInstructionsApplyToGlobsRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl(
+                    "require-valid-instructions-apply-to-globs"
+                ),
             },
             messages: {
                 invalidApplyToGlob:

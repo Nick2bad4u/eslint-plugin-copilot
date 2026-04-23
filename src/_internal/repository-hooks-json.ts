@@ -4,16 +4,24 @@
  */
 
 /** Read-only JSON array value. */
+import type { JsonPrimitive as TypeFestJsonPrimitive } from "type-fest";
+
+import {
+    isDefined,
+    isFinite,
+    objectEntries,
+    safeCastTo,
+    setHas,
+} from "ts-extras";
+
+/** Read-only JSON array value supported by repository-hook helpers. */
 export type JsonArray = readonly JsonValue[];
 /** Read-only JSON object value. */
 export interface JsonObject {
     readonly [key: string]: JsonValue;
 }
-/** JSON primitive scalar value. */
-export type JsonPrimitive = boolean | null | number | string;
 /** Any supported JSON value. */
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
-
 /** Repository hook entry paired with its source event name and array index. */
 export type RepositoryHookEntry = Readonly<{
     eventName: string;
@@ -34,6 +42,9 @@ export type RepositoryHookEventName =
 
 /** Supported repository hook transport types. */
 export type RepositoryHookType = "command" | "prompt";
+
+/** JSON primitive scalar value. */
+type JsonPrimitive = TypeFestJsonPrimitive;
 
 /** Default repository hook timeout used by GitHub Copilot. */
 export const DEFAULT_REPOSITORY_HOOK_TIMEOUT_SECONDS = 30;
@@ -59,13 +70,13 @@ export const VALID_REPOSITORY_HOOK_TYPES: ReadonlySet<RepositoryHookType> =
 export const isRepositoryHookEventName = (
     value: string
 ): value is RepositoryHookEventName =>
-    VALID_REPOSITORY_HOOK_EVENT_NAMES.has(value as RepositoryHookEventName);
+    setHas(VALID_REPOSITORY_HOOK_EVENT_NAMES, value as RepositoryHookEventName);
 
 /** Determine whether a string is a supported repository hook type. */
 export const isRepositoryHookType = (
     value: string
 ): value is RepositoryHookType =>
-    VALID_REPOSITORY_HOOK_TYPES.has(value as RepositoryHookType);
+    setHas(VALID_REPOSITORY_HOOK_TYPES, value as RepositoryHookType);
 
 /** Determine whether a parsed JSON value is an object. */
 export const isJsonObject = (
@@ -83,12 +94,12 @@ export const isJsonString = (value: JsonValue | undefined): value is string =>
 
 /** Determine whether a parsed JSON value is a finite number. */
 export const isJsonNumber = (value: JsonValue | undefined): value is number =>
-    typeof value === "number" && Number.isFinite(value);
+    typeof value === "number" && isFinite(value);
 
 /** Safely parse JSON source text. */
 export const parseJsonText = (text: string): JsonValue | undefined => {
     try {
-        return JSON.parse(text) as JsonValue;
+        return safeCastTo<JsonValue>(JSON.parse(text));
     } catch {
         return undefined;
     }
@@ -110,7 +121,7 @@ export const getRepositoryHookEventEntries = (
 ): readonly (readonly [string, JsonValue])[] => {
     const hooksValue = getRepositoryHooksValue(root);
 
-    return isJsonObject(hooksValue) ? Object.entries(hooksValue) : [];
+    return isJsonObject(hooksValue) ? objectEntries(hooksValue) : [];
 };
 
 /** Collect object-shaped hook entries from hook arrays. */
@@ -142,7 +153,7 @@ export const getRepositoryHookObjects = (
 
 /** Format a parsed JSON value for diagnostic messages. */
 export const formatJsonValue = (value: JsonValue | undefined): string => {
-    if (value === undefined) {
+    if (!isDefined(value)) {
         return "(missing)";
     }
 

@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-valid-prompt-model", () => {
     it("accepts non-empty scalar prompt model names", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-valid-prompt-model",
@@ -14,37 +16,43 @@ describe("require-valid-prompt-model", () => {
     });
 
     it("reports empty prompt model values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-valid-prompt-model",
             text: "---\ndescription: Review changes\nagent: plan\nmodel:\n---\nReview the requested changes.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidPromptModel",
         ]);
     });
 
     it("reports prompt model lists", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-valid-prompt-model",
             text: "---\ndescription: Review changes\nagent: plan\nmodel: ['Claude Haiku 4.5 (copilot)', 'GPT-5 (copilot)']\n---\nReview the requested changes.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidPromptModel",
         ]);
     });
 
     it("reports empty prompt model list literals", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-valid-prompt-model",
             text: "---\ndescription: Review changes\nagent: plan\nmodel: []\n---\nReview the requested changes.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidPromptModel",
         ]);
     });

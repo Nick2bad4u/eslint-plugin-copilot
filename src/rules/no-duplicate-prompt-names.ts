@@ -4,6 +4,7 @@ import * as fs from "node:fs";
  * ESLint rule implementation for `no-duplicate-prompt-names`.
  */
 import * as path from "node:path";
+import { arrayJoin, isDefined } from "ts-extras";
 
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
@@ -20,12 +21,14 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const normalizeRelativeFilePath = (
     repositoryRoot: string,
     filePath: string
 ): string => path.relative(repositoryRoot, filePath).replaceAll("\\", "/");
 
+/** Rule module for `no-duplicate-prompt-names`. */
 const noDuplicatePromptNamesRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -68,20 +71,21 @@ const noDuplicatePromptNamesRule: CopilotRuleModule = createCopilotRule({
                 normalizeNameForComparison(currentPromptName)
             );
 
-            if (duplicateGroup === undefined) {
+            if (!isDefined(duplicateGroup)) {
                 return;
             }
 
             reportAtDocumentStart(context, {
                 data: {
-                    files: duplicateGroup
-                        .map((entry) =>
+                    files: arrayJoin(
+                        duplicateGroup.map((entry) =>
                             normalizeRelativeFilePath(
                                 repositoryRoot,
                                 entry.filePath
                             )
-                        )
-                        .join(", "),
+                        ),
+                        ", "
+                    ),
                     name: currentPromptName,
                 },
                 messageId: "duplicatePromptName",
@@ -101,6 +105,7 @@ const noDuplicatePromptNamesRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("no-duplicate-prompt-names"),
         },
         messages: {
             duplicatePromptName:

@@ -3,6 +3,7 @@
  * Shared rule creator wrapper used by eslint-plugin-copilot rules.
  */
 import type { TSESLint } from "@typescript-eslint/utils";
+import type { UnknownArray } from "type-fest";
 
 import { ESLintUtils } from "@typescript-eslint/utils";
 
@@ -31,7 +32,7 @@ export type CopilotRuleDocs = Readonly<{
 export type CopilotRuleModule = Readonly<{
     name: string;
 }> &
-    TSESLint.RuleModule<string, readonly unknown[], CopilotRuleDocs>;
+    TSESLint.RuleModule<string, Readonly<UnknownArray>, CopilotRuleDocs>;
 
 type BaseRuleCreator = ReturnType<
     typeof ESLintUtils.RuleCreator<CopilotRuleInputDocs>
@@ -44,6 +45,7 @@ type CopilotRuleInputDocs = Readonly<{
     frozen: boolean;
     recommended: boolean;
     requiresTypeChecking: boolean;
+    url: string;
 }>;
 
 const baseRuleCreator: BaseRuleCreator =
@@ -97,7 +99,7 @@ const normalizeCopilotConfigNames: (
  * Shared rule creator that injects canonical docs URLs and stable catalog ids.
  */
 export const createCopilotRule = <
-    Options extends readonly unknown[],
+    Options extends Readonly<UnknownArray>,
     MessageIds extends string,
 >(
     ruleDefinition: Parameters<typeof baseRuleCreator<Options, MessageIds>>[0]

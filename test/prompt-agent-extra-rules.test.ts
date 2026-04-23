@@ -19,114 +19,134 @@ const messageIdsFor = async (
 
 describe("prompt and agent metadata backlog rules", () => {
     it("require-valid-prompt-tools reports scalar tools values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-valid-prompt-tools",
             text: "---\ndescription: Review changes\ntools: fetch\n---\nReview the diff.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidPromptTools",
         ]);
     });
 
     it("require-valid-prompt-name reports blank name values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-valid-prompt-name",
             text: "---\ndescription: Review changes\nname:\n---\nReview the diff.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidPromptName",
         ]);
     });
 
     it("require-valid-prompt-argument-hint reports blank argument-hint values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-valid-prompt-argument-hint",
             text: "---\ndescription: Review changes\nargument-hint:\n---\nReview the diff.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidPromptArgumentHint",
         ]);
     });
 
     it("require-valid-agent-name reports blank agent names", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/reviewer.agent.md",
             ruleId: "require-valid-agent-name",
             text: "---\ndescription: Review code\nname:\n---\nReview code carefully.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidAgentName",
         ]);
     });
 
     it("require-valid-agent-argument-hint reports blank agent argument-hint values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/reviewer.agent.md",
             ruleId: "require-valid-agent-argument-hint",
             text: "---\ndescription: Review code\nargument-hint:\n---\nReview code carefully.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidAgentArgumentHint",
         ]);
     });
 
     it("require-json-agent-mcp-servers reports non-json entries", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-json-agent-mcp-servers",
             text: "---\ndescription: Release coordination\ntarget: github-copilot\nmcp-servers: [release-coordinator]\n---\nCoordinate release work.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "nonJsonAgentMcpServer",
         ]);
     });
 
     it("require-existing-agent-mcp-servers reports missing config files", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-existing-agent-mcp-servers",
             text: "---\ndescription: Release coordination\ntarget: github-copilot\nmcp-servers: [release-coordinator.json]\n---\nCoordinate release work.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingAgentMcpServer",
         ]);
     });
 
     it("require-existing-agent-hook-cwd reports missing hook cwd folders", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/reviewer.agent.md",
             ruleId: "require-existing-agent-hook-cwd",
             text: "---\ndescription: Review code\nhooks:\n  SessionStart:\n    - type: command\n      command: echo ready\n      cwd: scripts/review\n---\nReview code carefully.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingAgentHookCwd",
         ]);
     });
 
     it("require-valid-instructions-apply-to-globs reports non-repository-relative patterns", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/instructions/frontend.instructions.md",
             ruleId: "require-valid-instructions-apply-to-globs",
             text: '---\ndescription: Frontend rules\napplyTo: "./src/**/*.ts"\n---\nUse explicit return types.\n',
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidApplyToGlob",
         ]);
     });
 
     it("prefer-custom-instructions-under-code-review-limit reports oversized repository instructions", async () => {
+        expect.hasAssertions();
+
         const longBody = "a".repeat(4010);
         const messages = await lintMarkdownRule({
             filePath: ".github/copilot-instructions.md",
@@ -134,12 +154,14 @@ describe("prompt and agent metadata backlog rules", () => {
             text: longBody,
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "exceedsCodeReviewLimit",
         ]);
     });
 
     it("prefer-custom-instructions-under-code-review-limit reports oversized repository instructions in .github/instructions/", async () => {
+        expect.hasAssertions();
+
         const longBody = "a".repeat(4010);
         const messages = await lintMarkdownRule({
             filePath: ".github/instructions/copilot-instructions.md",
@@ -147,24 +169,27 @@ describe("prompt and agent metadata backlog rules", () => {
             text: longBody,
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "exceedsCodeReviewLimit",
         ]);
     });
 
     it("require-agents-md-for-cross-surface-agent-instructions reports CLAUDE.md without sibling AGENTS.md", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: "docs/CLAUDE.md",
             ruleId: "require-agents-md-for-cross-surface-agent-instructions",
             text: "Follow the repository workflow.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingAgentsMdSibling",
         ]);
     });
 
     it("no-duplicate-prompt-names reports duplicate effective prompt names", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 {
@@ -176,10 +201,11 @@ describe("prompt and agent metadata backlog rules", () => {
                 "no-duplicate-prompt-names",
                 ".github/prompts/review.prompt.md"
             )
-        ).resolves.toEqual(["duplicatePromptName"]);
+        ).resolves.toStrictEqual(["duplicatePromptName"]);
     });
 
     it("no-duplicate-agent-names reports duplicate effective agent names", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 {
@@ -191,10 +217,11 @@ describe("prompt and agent metadata backlog rules", () => {
                 "no-duplicate-agent-names",
                 ".github/agents/reviewer.agent.md"
             )
-        ).resolves.toEqual(["duplicateAgentName"]);
+        ).resolves.toStrictEqual(["duplicateAgentName"]);
     });
 
     it("no-duplicate-slash-command-names reports prompt-skill name collisions", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 {
@@ -206,6 +233,6 @@ describe("prompt and agent metadata backlog rules", () => {
                 "no-duplicate-slash-command-names",
                 ".github/prompts/review.prompt.md"
             )
-        ).resolves.toEqual(["duplicateSlashCommandName"]);
+        ).resolves.toStrictEqual(["duplicateSlashCommandName"]);
     });
 });

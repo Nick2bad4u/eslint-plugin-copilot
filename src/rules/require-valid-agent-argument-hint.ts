@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -15,7 +17,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-agent-argument-hint`. */
 const requireValidAgentArgumentHintRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -32,9 +36,7 @@ const requireValidAgentArgumentHintRule: CopilotRuleModule = createCopilotRule({
                 return;
             }
 
-            if (
-                getFrontmatterScalar(frontmatter, "argument-hint") !== undefined
-            ) {
+            if (isDefined(getFrontmatterScalar(frontmatter, "argument-hint"))) {
                 return;
             }
 
@@ -56,6 +58,7 @@ const requireValidAgentArgumentHintRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-argument-hint"),
         },
         messages: {
             invalidAgentArgumentHint:

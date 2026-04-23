@@ -3,9 +3,11 @@
  * Public plugin entrypoint for eslint-plugin-copilot.
  */
 import type { ESLint, Linter } from "eslint";
+import type { Except } from "type-fest";
 
 import json from "@eslint/json";
 import markdown from "@eslint/markdown";
+import { not, objectEntries, safeCastTo, setHas } from "ts-extras";
 
 import type { CopilotRuleDocs } from "./_internal/create-copilot-rule.js";
 
@@ -73,7 +75,7 @@ export type CopilotRuleName = keyof typeof copilotRules;
 type CopilotConfigsContract = Record<CopilotConfigName, CopilotPresetConfig>;
 
 /** Fully assembled plugin contract used by the runtime default export. */
-type CopilotPluginContract = Omit<ESLint.Plugin, "configs" | "rules"> & {
+type CopilotPluginContract = Except<ESLint.Plugin, "configs" | "rules"> & {
     configs: CopilotConfigsContract;
     meta: {
         name: string;
@@ -102,12 +104,16 @@ const markdownPlugin = markdown as unknown as ESLint.Plugin;
 const jsonPlugin = json as unknown as ESLint.Plugin;
 
 /** Stable ordered entries used to derive preset membership. */
-const copilotRuleEntries = Object.entries(copilotRules).toSorted(
-    ([left], [right]) => left.localeCompare(right)
-) as readonly (readonly [
-    CopilotRuleName,
-    (typeof copilotRules)[CopilotRuleName],
-])[];
+const copilotRuleEntries = safeCastTo<
+    readonly (readonly [
+        CopilotRuleName,
+        (typeof copilotRules)[CopilotRuleName],
+    ])[]
+>(
+    objectEntries(copilotRules).toSorted(([left], [right]) =>
+        left.localeCompare(right)
+    )
+);
 
 /** Create an empty mutable preset-rule bucket map. */
 const createEmptyPresetRuleMap = (): Record<
@@ -171,10 +177,10 @@ const partitionRuleNamesByPresetLayer = (
     markdownRuleNames: readonly CopilotRuleName[];
 }> => ({
     jsonRuleNames: ruleNames.filter((ruleName) =>
-        REPOSITORY_HOOK_JSON_RULE_NAMES.has(ruleName)
+        setHas(REPOSITORY_HOOK_JSON_RULE_NAMES, ruleName)
     ),
     markdownRuleNames: ruleNames.filter(
-        (ruleName) => !REPOSITORY_HOOK_JSON_RULE_NAMES.has(ruleName)
+        not((ruleName) => setHas(REPOSITORY_HOOK_JSON_RULE_NAMES, ruleName))
     ),
 });
 

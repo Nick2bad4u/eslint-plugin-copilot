@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-valid-agent-tools", () => {
     it("accepts non-empty custom-agent tool lists", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/reviewer.agent.md",
             ruleId: "require-valid-agent-tools",
@@ -14,37 +16,43 @@ describe("require-valid-agent-tools", () => {
     });
 
     it("reports empty custom-agent tools values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/reviewer.agent.md",
             ruleId: "require-valid-agent-tools",
             text: "---\ndescription: Review implementation quality\ntools:\n---\nReview the implementation carefully.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidAgentTools",
         ]);
     });
 
     it("reports scalar custom-agent tools values", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/reviewer.agent.md",
             ruleId: "require-valid-agent-tools",
             text: "---\ndescription: Review implementation quality\ntools: search/codebase\n---\nReview the implementation carefully.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidAgentTools",
         ]);
     });
 
     it("reports empty custom-agent tools lists", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/reviewer.agent.md",
             ruleId: "require-valid-agent-tools",
             text: "---\ndescription: Review implementation quality\ntools: []\n---\nReview the implementation carefully.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidAgentTools",
         ]);
     });

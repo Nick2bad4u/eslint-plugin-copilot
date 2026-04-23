@@ -1,3 +1,5 @@
+import { isDefined, isEmpty } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -14,7 +16,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-agent-handoffs`. */
 const requireValidAgentHandoffsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -30,7 +34,7 @@ const requireValidAgentHandoffsRule: CopilotRuleModule = createCopilotRule({
 
             const handoffs = getFrontmatterObjectList(frontmatter, "handoffs");
 
-            if (handoffs === undefined || handoffs.length === 0) {
+            if (!isDefined(handoffs) || isEmpty(handoffs)) {
                 return;
             }
 
@@ -83,6 +87,7 @@ const requireValidAgentHandoffsRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-handoffs"),
         },
         messages: {
             missingAgent:

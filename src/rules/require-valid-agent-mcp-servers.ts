@@ -1,3 +1,5 @@
+import { arrayJoin, isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -16,22 +18,24 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const formatMcpServersValue = (
     scalarValue: string | undefined,
     listValue: readonly string[] | undefined
 ): string => {
-    if (scalarValue !== undefined) {
+    if (isDefined(scalarValue)) {
         return scalarValue;
     }
 
-    if (listValue !== undefined) {
-        return `[${listValue.join(", ")}]`;
+    if (isDefined(listValue)) {
+        return `[${arrayJoin(listValue, ", ")}]`;
     }
 
     return "(empty)";
 };
 
+/** Rule module for `require-valid-agent-mcp-servers`. */
 const requireValidAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -50,7 +54,7 @@ const requireValidAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
 
             const mcpServers = getFrontmatterList(frontmatter, "mcp-servers");
 
-            if (mcpServers !== undefined && mcpServers.length > 0) {
+            if (isDefined(mcpServers) && mcpServers.length > 0) {
                 return;
             }
 
@@ -78,6 +82,7 @@ const requireValidAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-mcp-servers"),
         },
         messages: {
             invalidMcpServersField:

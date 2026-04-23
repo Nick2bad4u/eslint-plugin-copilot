@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -14,9 +16,11 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const JSON_FILE_EXTENSION_PATTERN = /\.json$/iu;
 
+/** Rule module for `require-json-agent-mcp-servers`. */
 const requireJsonAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -30,7 +34,7 @@ const requireJsonAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
                     ? undefined
                     : getFrontmatterList(frontmatter, "mcp-servers");
 
-            if (mcpServers === undefined) {
+            if (!isDefined(mcpServers)) {
                 return;
             }
 
@@ -39,7 +43,7 @@ const requireJsonAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
                     !JSON_FILE_EXTENSION_PATTERN.test(serverPath.trim())
             );
 
-            if (invalidServer === undefined) {
+            if (!isDefined(invalidServer)) {
                 return;
             }
 
@@ -64,6 +68,7 @@ const requireJsonAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-json-agent-mcp-servers"),
         },
         messages: {
             nonJsonAgentMcpServer:

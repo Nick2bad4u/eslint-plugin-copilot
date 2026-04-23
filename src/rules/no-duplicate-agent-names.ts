@@ -4,6 +4,7 @@
  */
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { arrayJoin, isDefined } from "ts-extras";
 
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
@@ -23,12 +24,14 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const normalizeRelativeFilePath = (
     repositoryRoot: string,
     filePath: string
 ): string => path.relative(repositoryRoot, filePath).replaceAll("\\", "/");
 
+/** Rule module for `no-duplicate-agent-names`. */
 const noDuplicateAgentNamesRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -71,20 +74,21 @@ const noDuplicateAgentNamesRule: CopilotRuleModule = createCopilotRule({
                 normalizeNameForComparison(currentAgentName)
             );
 
-            if (duplicateGroup === undefined) {
+            if (!isDefined(duplicateGroup)) {
                 return;
             }
 
             reportAtDocumentStart(context, {
                 data: {
-                    files: duplicateGroup
-                        .map((entry) =>
+                    files: arrayJoin(
+                        duplicateGroup.map((entry) =>
                             normalizeRelativeFilePath(
                                 repositoryRoot,
                                 entry.filePath
                             )
-                        )
-                        .join(", "),
+                        ),
+                        ", "
+                    ),
                     name: currentAgentName,
                 },
                 messageId: "duplicateAgentName",
@@ -104,6 +108,7 @@ const noDuplicateAgentNamesRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("no-duplicate-agent-names"),
         },
         messages: {
             duplicateAgentName:

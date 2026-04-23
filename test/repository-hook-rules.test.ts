@@ -21,120 +21,134 @@ const messageIdsFor = async (
 
 describe("repository hook backlog rules", () => {
     it("require-valid-repository-hook-version reports non-1 versions", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":2,"hooks":{}}',
                 "require-valid-repository-hook-version"
             )
-        ).resolves.toEqual(["invalidRepositoryHookVersion"]);
+        ).resolves.toStrictEqual(["invalidRepositoryHookVersion"]);
     });
 
     it("require-repository-hooks-object reports missing hooks objects", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor('{"version":1}', "require-repository-hooks-object")
-        ).resolves.toEqual(["invalidRepositoryHooksObject"]);
+        ).resolves.toStrictEqual(["invalidRepositoryHooksObject"]);
     });
 
     it("require-repository-hook-arrays reports non-array hook values", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":{}}}',
                 "require-repository-hook-arrays"
             )
-        ).resolves.toEqual(["invalidRepositoryHookArray"]);
+        ).resolves.toStrictEqual(["invalidRepositoryHookArray"]);
     });
 
     it("require-valid-repository-hook-events reports unsupported events", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"beforeAnything":[]}}',
                 "require-valid-repository-hook-events"
             )
-        ).resolves.toEqual(["invalidRepositoryHookEvent"]);
+        ).resolves.toStrictEqual(["invalidRepositoryHookEvent"]);
     });
 
     it("require-valid-repository-hook-command-type reports missing types", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[{"bash":"echo hi"}]}}',
                 "require-valid-repository-hook-command-type"
             )
-        ).resolves.toEqual(["invalidRepositoryHookType"]);
+        ).resolves.toStrictEqual(["invalidRepositoryHookType"]);
     });
 
     it("require-repository-hook-command-shell reports command hooks without shell commands", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[{"type":"command"}]}}',
                 "require-repository-hook-command-shell"
             )
-        ).resolves.toEqual(["missingRepositoryHookShellCommand"]);
+        ).resolves.toStrictEqual(["missingRepositoryHookShellCommand"]);
     });
 
     it("require-relative-repository-hook-cwd reports absolute cwd values", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[{"type":"command","bash":"echo hi","cwd":"/tmp"}]}}',
                 "require-relative-repository-hook-cwd"
             )
-        ).resolves.toEqual(["nonRelativeRepositoryHookCwd"]);
+        ).resolves.toStrictEqual(["nonRelativeRepositoryHookCwd"]);
     });
 
     it("require-existing-repository-hook-cwd reports missing relative cwd targets", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[{"type":"command","bash":"echo hi","cwd":"scripts/hooks"}]}}',
                 "require-existing-repository-hook-cwd"
             )
-        ).resolves.toEqual(["missingRepositoryHookCwd"]);
+        ).resolves.toStrictEqual(["missingRepositoryHookCwd"]);
     });
 
     it("require-valid-repository-hook-timeouts reports invalid timeoutSec values", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[{"type":"command","bash":"echo hi","timeoutSec":0}]}}',
                 "require-valid-repository-hook-timeouts"
             )
-        ).resolves.toEqual(["invalidRepositoryHookTimeout"]);
+        ).resolves.toStrictEqual(["invalidRepositoryHookTimeout"]);
     });
 
     it("require-valid-repository-hook-env reports non-object env values", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[{"type":"command","bash":"echo hi","env":["A"]}]}}',
                 "require-valid-repository-hook-env"
             )
-        ).resolves.toEqual(["invalidRepositoryHookEnv"]);
+        ).resolves.toStrictEqual(["invalidRepositoryHookEnv"]);
     });
 
     it("require-string-repository-hook-env-values reports non-string env entries", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[{"type":"command","bash":"echo hi","env":{"A":1}}]}}',
                 "require-string-repository-hook-env-values"
             )
-        ).resolves.toEqual(["nonStringRepositoryHookEnvValue"]);
+        ).resolves.toStrictEqual(["nonStringRepositoryHookEnvValue"]);
     });
 
     it("no-empty-repository-hook-arrays reports empty hook arrays", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[]}}',
                 "no-empty-repository-hook-arrays"
             )
-        ).resolves.toEqual(["emptyRepositoryHookArray"]);
+        ).resolves.toStrictEqual(["emptyRepositoryHookArray"]);
     });
 
     it("prefer-fast-repository-hooks reports large timeout budgets", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[{"type":"command","bash":"echo hi","timeoutSec":120}]}}',
                 "prefer-fast-repository-hooks"
             )
-        ).resolves.toEqual(["slowRepositoryHookTimeout"]);
+        ).resolves.toStrictEqual(["slowRepositoryHookTimeout"]);
     });
 
     it("accepts a valid repository hook configuration", async () => {
+        expect.hasAssertions();
         await expect(
             messageIdsFor(
                 '{"version":1,"hooks":{"sessionStart":[{"type":"command","bash":"echo hi","cwd":"scripts","timeoutSec":10,"env":{"LOG_LEVEL":"info"}}],"postToolUse":[{"type":"prompt","prompt":"/review"}]}}',
@@ -143,6 +157,6 @@ describe("repository hook backlog rules", () => {
                     "scripts/.gitkeep": "",
                 }
             )
-        ).resolves.toEqual([]);
+        ).resolves.toStrictEqual([]);
     });
 });

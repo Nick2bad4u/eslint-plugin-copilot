@@ -11,7 +11,9 @@ import {
     extractMarkdownLinks,
     isInvalidWorkspaceLinkDestination,
 } from "../_internal/markdown-links.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-relative-agent-links`. */
 const requireRelativeAgentLinksRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return {
@@ -58,6 +60,7 @@ const requireRelativeAgentLinksRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-relative-agent-links"),
         },
         messages: {
             nonRelativeAgentLink:

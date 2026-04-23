@@ -1,3 +1,5 @@
+import { isDefined, setHas } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -14,6 +16,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const VALID_HOOK_EVENT_NAMES = new Set([
     "PostToolUse",
@@ -26,6 +29,7 @@ const VALID_HOOK_EVENT_NAMES = new Set([
     "UserPromptSubmit",
 ]);
 
+/** Rule module for `require-valid-agent-hook-events`. */
 const requireValidAgentHookEventsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -44,12 +48,12 @@ const requireValidAgentHookEventsRule: CopilotRuleModule = createCopilotRule({
                 "hooks"
             );
 
-            if (hookGroups === undefined || hookGroups.size === 0) {
+            if (!isDefined(hookGroups) || hookGroups.size === 0) {
                 return;
             }
 
             for (const eventName of hookGroups.keys()) {
-                if (VALID_HOOK_EVENT_NAMES.has(eventName)) {
+                if (setHas(VALID_HOOK_EVENT_NAMES, eventName)) {
                     continue;
                 }
 
@@ -75,6 +79,7 @@ const requireValidAgentHookEventsRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-agent-hook-events"),
         },
         messages: {
             invalidHookEvent:

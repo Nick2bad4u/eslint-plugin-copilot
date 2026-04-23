@@ -10,9 +10,11 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const CODE_REVIEW_CUSTOM_INSTRUCTIONS_LIMIT = 4000;
 
+/** Rule module for `prefer-custom-instructions-under-code-review-limit`. */
 const preferCustomInstructionsUnderCodeReviewLimitRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -55,6 +57,9 @@ const preferCustomInstructionsUnderCodeReviewLimitRule: CopilotRuleModule =
                 frozen: false,
                 recommended: false,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl(
+                    "prefer-custom-instructions-under-code-review-limit"
+                ),
             },
             messages: {
                 exceedsCodeReviewLimit:

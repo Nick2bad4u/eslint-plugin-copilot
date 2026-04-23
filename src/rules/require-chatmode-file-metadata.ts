@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
@@ -15,7 +17,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-chatmode-file-metadata`. */
 const requireChatmodeFileMetadataRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -37,7 +41,7 @@ const requireChatmodeFileMetadataRule: CopilotRuleModule = createCopilotRule({
                 "description"
             );
 
-            if (description !== undefined) {
+            if (isDefined(description)) {
                 return;
             }
 
@@ -62,6 +66,7 @@ const requireChatmodeFileMetadataRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-chatmode-file-metadata"),
         },
         messages: {
             emptyDescription:

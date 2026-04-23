@@ -1,3 +1,5 @@
+import { isDefined, setHas } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -15,6 +17,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const VALID_BOOLEAN_FIELD_VALUES = new Set(["false", "true"]);
 
@@ -23,6 +26,7 @@ const INVOCATION_CONTROL_FIELDS = [
     "user-invocable",
 ] as const;
 
+/** Rule module for `require-valid-agent-invocation-controls`. */
 const requireValidAgentInvocationControlsRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -49,8 +53,8 @@ const requireValidAgentInvocationControlsRule: CopilotRuleModule =
                     const normalizedValue = fieldValue?.trim().toLowerCase();
 
                     if (
-                        normalizedValue !== undefined &&
-                        VALID_BOOLEAN_FIELD_VALUES.has(normalizedValue)
+                        isDefined(normalizedValue) &&
+                        setHas(VALID_BOOLEAN_FIELD_VALUES, normalizedValue)
                     ) {
                         continue;
                     }
@@ -58,7 +62,7 @@ const requireValidAgentInvocationControlsRule: CopilotRuleModule =
                     reportAtDocumentStart(context, {
                         data: {
                             currentValue:
-                                fieldValue === undefined ||
+                                !isDefined(fieldValue) ||
                                 fieldValue.trim().length === 0
                                     ? "(empty)"
                                     : fieldValue,
@@ -84,6 +88,9 @@ const requireValidAgentInvocationControlsRule: CopilotRuleModule =
                 frozen: false,
                 recommended: true,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl(
+                    "require-valid-agent-invocation-controls"
+                ),
             },
             messages: {
                 invalidInvocationControl:

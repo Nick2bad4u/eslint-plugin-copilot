@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-valid-agent-subagents", () => {
     it("accepts explicit lists of allowed subagents", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/feature-builder.agent.md",
             ruleId: "require-valid-agent-subagents",
@@ -14,6 +16,8 @@ describe("require-valid-agent-subagents", () => {
     });
 
     it("accepts the wildcard and explicit empty-array forms", async () => {
+        expect.hasAssertions();
+
         const wildcardMessages = await lintMarkdownRule({
             filePath: ".github/agents/feature-builder.agent.md",
             ruleId: "require-valid-agent-subagents",
@@ -30,25 +34,29 @@ describe("require-valid-agent-subagents", () => {
     });
 
     it("reports scalar agents values that are not the wildcard", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/feature-builder.agent.md",
             ruleId: "require-valid-agent-subagents",
             text: "---\ndescription: Build features by delegating to specialist agents\nagents: Researcher\n---\nResearch first, then delegate implementation.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidAgentsField",
         ]);
     });
 
     it("reports wildcard entries embedded inside an agents list", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/feature-builder.agent.md",
             ruleId: "require-valid-agent-subagents",
             text: "---\ndescription: Build features by delegating to specialist agents\nagents: ['*', Researcher]\n---\nResearch first, then delegate implementation.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "invalidAgentsField",
         ]);
     });

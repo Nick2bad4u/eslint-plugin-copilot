@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -13,7 +15,9 @@ import {
     isJsonObject,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-valid-repository-hook-env`. */
 const requireValidRepositoryHookEnvRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return {
@@ -27,11 +31,11 @@ const requireValidRepositoryHookEnvRule: CopilotRuleModule = createCopilotRule({
                     ({ hook }) => {
                         const env = hook["env"];
 
-                        return env !== undefined && !isJsonObject(env);
+                        return isDefined(env) && !isJsonObject(env);
                     }
                 );
 
-                if (invalidHook === undefined) {
+                if (!isDefined(invalidHook)) {
                     return;
                 }
 
@@ -58,6 +62,7 @@ const requireValidRepositoryHookEnvRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-repository-hook-env"),
         },
         messages: {
             invalidRepositoryHookEnv:

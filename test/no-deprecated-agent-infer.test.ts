@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("no-deprecated-agent-infer", () => {
     it("accepts a custom agent file without deprecated infer metadata", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "no-deprecated-agent-infer",
@@ -14,18 +16,22 @@ describe("no-deprecated-agent-infer", () => {
     });
 
     it("reports deprecated infer metadata in custom agent files", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/planner.agent.md",
             ruleId: "no-deprecated-agent-infer",
             text: "---\ndescription: Plan multi-step implementation work\ninfer: false\n---\nPlan the work before implementation starts.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "deprecatedInfer",
         ]);
     });
 
     it("ignores deprecated infer metadata outside custom agent files", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "no-deprecated-agent-infer",

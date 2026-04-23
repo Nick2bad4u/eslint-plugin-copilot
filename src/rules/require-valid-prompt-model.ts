@@ -1,3 +1,5 @@
+import { arrayJoin, isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -16,6 +18,7 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const INLINE_LIST_LITERAL_PATTERN = /^\s*\[.*\]\s*$/u;
 
@@ -23,17 +26,18 @@ const formatPromptModelValue = (
     scalarValue: string | undefined,
     listValue: readonly string[] | undefined
 ): string => {
-    if (scalarValue !== undefined) {
+    if (isDefined(scalarValue)) {
         return scalarValue;
     }
 
-    if (listValue !== undefined) {
-        return `[${listValue.join(", ")}]`;
+    if (isDefined(listValue)) {
+        return `[${arrayJoin(listValue, ", ")}]`;
     }
 
     return "(empty)";
 };
 
+/** Rule module for `require-valid-prompt-model`. */
 const requireValidPromptModelRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -52,7 +56,7 @@ const requireValidPromptModelRule: CopilotRuleModule = createCopilotRule({
 
             const modelList = getFrontmatterList(frontmatter, "model");
 
-            if (modelList !== undefined) {
+            if (isDefined(modelList)) {
                 reportAtDocumentStart(context, {
                     data: {
                         modelValue: formatPromptModelValue(
@@ -68,7 +72,7 @@ const requireValidPromptModelRule: CopilotRuleModule = createCopilotRule({
             const model = getFrontmatterScalar(frontmatter, "model");
 
             if (
-                model !== undefined &&
+                isDefined(model) &&
                 model.length > 0 &&
                 !INLINE_LIST_LITERAL_PATTERN.test(model)
             ) {
@@ -96,6 +100,7 @@ const requireValidPromptModelRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-valid-prompt-model"),
         },
         messages: {
             invalidPromptModel:

@@ -4,6 +4,8 @@ import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("require-agent-tool-for-subagents", () => {
     it("accepts a custom agent that declares subagents and includes the agent tool", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/feature-builder.agent.md",
             ruleId: "require-agent-tool-for-subagents",
@@ -14,30 +16,36 @@ describe("require-agent-tool-for-subagents", () => {
     });
 
     it("reports missing tools metadata when subagents are declared", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/feature-builder.agent.md",
             ruleId: "require-agent-tool-for-subagents",
             text: "---\ndescription: Build features by delegating to specialist agents\nagents: [Researcher, Implementer]\n---\nResearch first, then delegate implementation.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingTools",
         ]);
     });
 
     it("reports tools lists that omit the agent tool when subagents are declared", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/feature-builder.agent.md",
             ruleId: "require-agent-tool-for-subagents",
             text: "---\ndescription: Build features by delegating to specialist agents\ntools: [search/codebase, fetch/fetch]\nagents: [Researcher, Implementer]\n---\nResearch first, then delegate implementation.\n",
         });
 
-        expect(messages.map((message) => message.messageId)).toEqual([
+        expect(messages.map((message) => message.messageId)).toStrictEqual([
             "missingAgentTool",
         ]);
     });
 
     it("does not require the agent tool when subagent use is explicitly disabled", async () => {
+        expect.hasAssertions();
+
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/feature-builder.agent.md",
             ruleId: "require-agent-tool-for-subagents",

@@ -11,8 +11,10 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 import { isValidSkillDefinitionLocation } from "../_internal/skill-files.js";
 
+/** Rule module for `require-skill-file-location`. */
 const requireSkillFileLocationRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -42,6 +44,7 @@ const requireSkillFileLocationRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: true,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("require-skill-file-location"),
         },
         messages: {
             invalidSkillLocation:

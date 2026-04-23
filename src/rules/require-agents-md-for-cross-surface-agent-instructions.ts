@@ -12,7 +12,9 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-agents-md-for-cross-surface-agent-instructions`. */
 const requireAgentsMdForCrossSurfaceAgentInstructionsRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -52,6 +54,9 @@ const requireAgentsMdForCrossSurfaceAgentInstructionsRule: CopilotRuleModule =
                 frozen: false,
                 recommended: false,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl(
+                    "require-agents-md-for-cross-surface-agent-instructions"
+                ),
             },
             messages: {
                 missingAgentsMdSibling:

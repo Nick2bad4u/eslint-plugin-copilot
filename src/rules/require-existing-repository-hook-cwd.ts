@@ -1,3 +1,5 @@
+import { isDefined } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 /**
@@ -20,7 +22,9 @@ import {
     isJsonString,
     parseJsonText,
 } from "../_internal/repository-hooks-json.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
+/** Rule module for `require-existing-repository-hook-cwd`. */
 const requireExistingRepositoryHookCwdRule: CopilotRuleModule =
     createCopilotRule({
         create(context) {
@@ -50,7 +54,7 @@ const requireExistingRepositoryHookCwdRule: CopilotRuleModule =
                         }
                     );
 
-                    if (invalidHook === undefined) {
+                    if (!isDefined(invalidHook)) {
                         return;
                     }
 
@@ -82,6 +86,7 @@ const requireExistingRepositoryHookCwdRule: CopilotRuleModule =
                 frozen: false,
                 recommended: false,
                 requiresTypeChecking: false,
+                url: createRuleDocsUrl("require-existing-repository-hook-cwd"),
             },
             messages: {
                 missingRepositoryHookCwd:

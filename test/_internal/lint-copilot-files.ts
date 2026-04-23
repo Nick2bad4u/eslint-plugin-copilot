@@ -1,11 +1,11 @@
-import json from "@eslint/json";
-import markdown from "@eslint/markdown";
+import * as jsonModule from "@eslint/json";
+import * as markdownModule from "@eslint/markdown";
 import { ESLint, type Linter } from "eslint";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
 
-import copilotPlugin from "../../src/plugin";
+import plugin from "../../src/plugin";
 
 export type CopilotFixtureFileMap = Readonly<Record<string, string>>;
 
@@ -20,9 +20,9 @@ type LintCopilotFilesInput = Readonly<{
     targetFiles?: readonly string[];
 }>;
 
-const copilotEslintPlugin = copilotPlugin as ESLint.Plugin;
-const markdownPlugin = markdown as unknown as ESLint.Plugin;
-const jsonPlugin = json as unknown as ESLint.Plugin;
+const copilotEslintPlugin = plugin as ESLint.Plugin;
+const markdownPlugin = markdownModule.default as unknown as ESLint.Plugin;
+const jsonPlugin = jsonModule.default as unknown as ESLint.Plugin;
 
 const writeFixtureFile = async (
     rootDirectoryPath: string,

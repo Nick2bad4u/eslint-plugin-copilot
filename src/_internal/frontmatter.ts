@@ -4,6 +4,9 @@
  */
 
 /** Parsed frontmatter bundle extracted from the start of a Markdown document. */
+import { isDefined, stringSplit } from "ts-extras";
+
+/** Parsed frontmatter document extracted from the top of a Markdown file. */
 export type FrontmatterDocument = Readonly<{
     body: string;
     content: string;
@@ -220,17 +223,20 @@ function normalizeScalarValue(value: string): string {
 }
 
 /** Assign a parsed YAML `key: value` pair into an object-list entry. */
-const setObjectEntryField = (
-    target: Record<string, string>,
+const withObjectEntryField = (
+    target: Readonly<Record<string, string>>,
     source: string
-): void => {
+): Record<string, string> => {
     const property = parseFieldLine(source.trim());
 
     if (property === null) {
-        return;
+        return { ...target };
     }
 
-    target[property.key] = normalizeScalarValue(property.value);
+    return {
+        ...target,
+        [property.key]: normalizeScalarValue(property.value),
+    };
 };
 
 /** Parse a one-line YAML flow sequence such as `["a", "b"]`. */
@@ -247,8 +253,7 @@ const parseInlineList = (value: string): readonly string[] => {
         return [];
     }
 
-    return innerValue
-        .split(",")
+    return stringSplit(innerValue, ",")
         .map((item) => normalizeScalarValue(item))
         .filter((item) => item.length > 0);
 };
@@ -271,7 +276,7 @@ const parseBlockList = (lines: readonly string[]): readonly string[] =>
 const parseFrontmatterFields = (
     content: string
 ): ReadonlyMap<string, FrontmatterField> => {
-    const lines = content.replaceAll("\r\n", "\n").split("\n");
+    const lines = stringSplit(content.replaceAll("\r\n", "\n"), "\n");
     const fields = new Map<string, FrontmatterField>();
     let index = 0;
 
@@ -406,82 +411,243 @@ export const hasFrontmatterField = (
     key: string
 ): boolean => document.fields.has(key);
 
-/** Read a supported YAML object-list block such as `handoffs:` entries. */
-export const getFrontmatterObjectList = (
+/** Read normalized frontmatter content lines from a parsed document. */
+const getFrontmatterContentLines = (
+    document: FrontmatterDocument
+): readonly string[] =>
+    stringSplit(document.content.replaceAll("\r\n", "\n"), "\n");
+
+/**
+ * Find a top-level frontmatter field block and return its scalar text plus
+ * lines.
+ */
+const getTopLevelFrontmatterFieldBlock = (
     document: FrontmatterDocument,
     key: string
-): readonly FrontmatterObjectListEntry[] | undefined => {
-    const lines = document.content.replaceAll("\r\n", "\n").split("\n");
-    let index = 0;
+):
+    | Readonly<{ blockLines: readonly string[]; rawValue: string }>
+    | undefined => {
+    const lines = getFrontmatterContentLines(document);
 
-    while (index < lines.length) {
-        const currentLine = lines[index] ?? "";
-
+    for (const [index, currentLine] of lines.entries()) {
         if (currentLine.startsWith(" ") || currentLine.startsWith("\t")) {
-            index += 1;
             continue;
         }
 
         const field = parseFieldLine(currentLine.trimEnd());
 
-        if (field === null) {
-            index += 1;
+        if (field?.key !== key) {
             continue;
         }
 
-        if (field.key !== key) {
-            index += 1;
-            continue;
-        }
-
-        const rawValue = field.value.trim();
-
-        if (rawValue === "[]") {
-            return [];
-        }
-
-        if (rawValue.length > 0) {
-            return undefined;
-        }
-
-        const { blockLines } = collectIndentedBlockLines(lines, index + 1);
-
-        const entries: Record<string, string>[] = [];
-        let currentEntry: null | Record<string, string> = null;
-
-        for (const blockLine of blockLines) {
-            const trimmedLine = blockLine.trim();
-
-            if (trimmedLine.startsWith("-")) {
-                if (currentEntry !== null) {
-                    entries.push(currentEntry);
-                }
-
-                currentEntry = {};
-                const inlineProperty = trimmedLine.slice(1).trim();
-
-                if (inlineProperty.length > 0) {
-                    setObjectEntryField(currentEntry, inlineProperty);
-                }
-
-                continue;
-            }
-
-            if (currentEntry === null) {
-                continue;
-            }
-
-            setObjectEntryField(currentEntry, trimmedLine);
-        }
-
-        if (currentEntry !== null) {
-            entries.push(currentEntry);
-        }
-
-        return entries;
+        return {
+            blockLines: collectIndentedBlockLines(lines, index + 1).blockLines,
+            rawValue: field.value.trim(),
+        };
     }
 
     return undefined;
+};
+
+/** Parse a YAML object-list block such as `handoffs:` into entry objects. */
+const parseFrontmatterObjectListEntries = (
+    blockLines: readonly string[]
+): readonly FrontmatterObjectListEntry[] => {
+    const entries: Record<string, string>[] = [];
+    let currentEntry: null | Record<string, string> = null;
+
+    for (const blockLine of blockLines) {
+        const trimmedLine = blockLine.trim();
+
+        if (trimmedLine.startsWith("-")) {
+            if (currentEntry !== null) {
+                entries.push(currentEntry);
+            }
+
+            const inlineProperty = trimmedLine.slice(1).trim();
+            currentEntry =
+                inlineProperty.length === 0
+                    ? {}
+                    : withObjectEntryField({}, inlineProperty);
+            continue;
+        }
+
+        if (currentEntry === null) {
+            continue;
+        }
+
+        currentEntry = withObjectEntryField(currentEntry, trimmedLine);
+    }
+
+    if (currentEntry !== null) {
+        entries.push(currentEntry);
+    }
+
+    return entries;
+};
+
+type GroupedObjectListParseState = Readonly<{
+    currentEntry: null | Record<string, string>;
+    currentGroupName: null | string;
+}>;
+
+/** Flush the current grouped entry into its active group when present. */
+const flushGroupedObjectListEntry = (
+    groups: Map<string, FrontmatterObjectListEntry[]>,
+    state: GroupedObjectListParseState
+): GroupedObjectListParseState => {
+    if (state.currentGroupName === null || state.currentEntry === null) {
+        return state;
+    }
+
+    const groupEntries = groups.get(state.currentGroupName) ?? [];
+    groupEntries.push(state.currentEntry);
+    groups.set(state.currentGroupName, groupEntries);
+
+    return {
+        ...state,
+        currentEntry: null,
+    };
+};
+
+/** Determine whether a line starts a named grouped object-list section. */
+const isGroupedObjectListHeaderLine = (
+    indentationWidth: number,
+    trimmedLine: string
+): boolean => !trimmedLine.startsWith("-") && indentationWidth <= 4;
+
+/** Build a new grouped object-list entry from one `- key: value` line. */
+const createGroupedObjectListEntry = (
+    trimmedLine: string
+): Record<string, string> => {
+    const inlineProperty = trimmedLine.slice(1).trim();
+
+    return inlineProperty.length === 0
+        ? {}
+        : withObjectEntryField({}, inlineProperty);
+};
+
+/** Switch the parser state to a new grouped object-list section. */
+const handleGroupedObjectListHeaderLine = (
+    groups: Map<string, FrontmatterObjectListEntry[]>,
+    state: GroupedObjectListParseState,
+    trimmedLine: string
+): GroupedObjectListParseState => {
+    const flushedState = flushGroupedObjectListEntry(groups, state);
+    const groupField = parseFieldLine(trimmedLine);
+
+    if (groupField === null) {
+        return {
+            ...flushedState,
+            currentGroupName: null,
+        };
+    }
+
+    groups.set(groupField.key, groups.get(groupField.key) ?? []);
+
+    return {
+        ...flushedState,
+        currentGroupName: groupField.key,
+    };
+};
+
+/** Start a new entry within the current grouped object-list section. */
+const handleGroupedObjectListEntryStartLine = (
+    groups: Map<string, FrontmatterObjectListEntry[]>,
+    state: GroupedObjectListParseState,
+    trimmedLine: string
+): GroupedObjectListParseState => {
+    const flushedState = flushGroupedObjectListEntry(groups, state);
+
+    if (flushedState.currentGroupName === null) {
+        return flushedState;
+    }
+
+    return {
+        ...flushedState,
+        currentEntry: createGroupedObjectListEntry(trimmedLine),
+    };
+};
+
+/** Append one property line to the current grouped object-list entry. */
+const handleGroupedObjectListPropertyLine = (
+    state: GroupedObjectListParseState,
+    trimmedLine: string
+): GroupedObjectListParseState => {
+    if (state.currentEntry === null) {
+        return state;
+    }
+
+    return {
+        ...state,
+        currentEntry: withObjectEntryField(state.currentEntry, trimmedLine),
+    };
+};
+
+/** Parse grouped YAML object-list mappings such as `hooks: event: - ...`. */
+const parseFrontmatterObjectListGroups = (
+    blockLines: readonly string[]
+): FrontmatterObjectListGroupMap => {
+    const groups = new Map<string, FrontmatterObjectListEntry[]>();
+    let state: GroupedObjectListParseState = {
+        currentEntry: null,
+        currentGroupName: null,
+    };
+
+    for (const blockLine of blockLines) {
+        const indentationWidth = getIndentationWidth(blockLine);
+        const trimmedLine = blockLine.trim();
+
+        if (trimmedLine.length === 0) {
+            continue;
+        }
+
+        if (isGroupedObjectListHeaderLine(indentationWidth, trimmedLine)) {
+            state = handleGroupedObjectListHeaderLine(
+                groups,
+                state,
+                trimmedLine
+            );
+            continue;
+        }
+
+        if (trimmedLine.startsWith("-")) {
+            state = handleGroupedObjectListEntryStartLine(
+                groups,
+                state,
+                trimmedLine
+            );
+            continue;
+        }
+
+        state = handleGroupedObjectListPropertyLine(state, trimmedLine);
+    }
+
+    flushGroupedObjectListEntry(groups, state);
+
+    return groups;
+};
+
+/** Read a supported YAML object-list block such as `handoffs:` entries. */
+export const getFrontmatterObjectList = (
+    document: FrontmatterDocument,
+    key: string
+): readonly FrontmatterObjectListEntry[] | undefined => {
+    const fieldBlock = getTopLevelFrontmatterFieldBlock(document, key);
+
+    if (!isDefined(fieldBlock)) {
+        return undefined;
+    }
+
+    if (fieldBlock.rawValue === "[]") {
+        return [];
+    }
+
+    if (fieldBlock.rawValue.length > 0) {
+        return undefined;
+    }
+
+    return parseFrontmatterObjectListEntries(fieldBlock.blockLines);
 };
 
 /** Read nested YAML mappings of object lists such as `hooks: Event: - ...`. */
@@ -489,112 +655,17 @@ export const getFrontmatterObjectListGroups = (
     document: FrontmatterDocument,
     key: string
 ): FrontmatterObjectListGroupMap | undefined => {
-    const lines = document.content.replaceAll("\r\n", "\n").split("\n");
-    let index = 0;
+    const fieldBlock = getTopLevelFrontmatterFieldBlock(document, key);
 
-    while (index < lines.length) {
-        const currentLine = lines[index] ?? "";
-
-        if (currentLine.startsWith(" ") || currentLine.startsWith("\t")) {
-            index += 1;
-            continue;
-        }
-
-        const field = parseFieldLine(currentLine.trimEnd());
-
-        if (field === null) {
-            index += 1;
-            continue;
-        }
-
-        if (field.key !== key) {
-            index += 1;
-            continue;
-        }
-
-        const rawValue = field.value.trim();
-
-        if (rawValue.length > 0) {
-            return undefined;
-        }
-
-        const { blockLines } = collectIndentedBlockLines(lines, index + 1);
-
-        const groups = new Map<string, FrontmatterObjectListEntry[]>();
-        let currentGroupName: null | string = null;
-        let currentEntry: null | Record<string, string> = null;
-
-        const flushCurrentEntry = (): void => {
-            if (currentGroupName === null || currentEntry === null) {
-                return;
-            }
-
-            const groupEntries = groups.get(currentGroupName) ?? [];
-            groupEntries.push(currentEntry);
-            groups.set(currentGroupName, groupEntries);
-            currentEntry = null;
-        };
-
-        for (const blockLine of blockLines) {
-            const indentationWidth = getIndentationWidth(blockLine);
-            const trimmedLine = blockLine.trim();
-
-            if (trimmedLine.length === 0) {
-                continue;
-            }
-
-            if (!trimmedLine.startsWith("-") && indentationWidth <= 4) {
-                flushCurrentEntry();
-
-                const groupField = parseFieldLine(trimmedLine);
-
-                if (groupField === null) {
-                    currentGroupName = null;
-                    continue;
-                }
-
-                currentGroupName = groupField.key;
-
-                if (
-                    currentGroupName !== null &&
-                    !groups.has(currentGroupName)
-                ) {
-                    groups.set(currentGroupName, []);
-                }
-
-                continue;
-            }
-
-            if (trimmedLine.startsWith("-")) {
-                flushCurrentEntry();
-
-                if (currentGroupName === null) {
-                    continue;
-                }
-
-                currentEntry = {};
-                const inlineProperty = trimmedLine.slice(1).trim();
-
-                if (inlineProperty.length > 0) {
-                    setObjectEntryField(currentEntry, inlineProperty);
-                }
-
-                continue;
-            }
-
-            if (currentEntry === null) {
-                continue;
-            }
-
-            setObjectEntryField(currentEntry, trimmedLine);
-        }
-
-        flushCurrentEntry();
-
-        return groups;
+    if (!isDefined(fieldBlock)) {
+        return undefined;
     }
 
-    return undefined;
+    if (fieldBlock.rawValue.length > 0) {
+        return undefined;
+    }
+
+    return parseFrontmatterObjectListGroups(fieldBlock.blockLines);
 };
 
 /** Remove HTML comments before checking whether Markdown body content exists. */

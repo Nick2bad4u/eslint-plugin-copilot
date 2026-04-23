@@ -1,3 +1,5 @@
+import { isDefined, setHas } from "ts-extras";
+
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import { getCopilotFileKind } from "../_internal/copilot-file-kind.js";
@@ -14,12 +16,17 @@ import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
 } from "../_internal/markdown-rule.js";
+import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 const isQualifiedToolName = (toolName: string): boolean =>
     toolName.includes("/");
 
 const allowedUnqualifiedToolNames = new Set(["agent", "runSubagent"]);
 
+const isAllowedUnqualifiedToolName = (toolName: string): boolean =>
+    setHas(allowedUnqualifiedToolNames, toolName);
+
+/** Rule module for `prefer-qualified-tools`. */
 const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
     create(context) {
         return createMarkdownDocumentListener(() => {
@@ -37,17 +44,18 @@ const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
 
             const tools = getFrontmatterList(frontmatter, "tools");
 
-            if (tools === undefined) {
+            if (!isDefined(tools)) {
                 return;
             }
 
-            const firstUnqualifiedTool = tools.find(
-                (toolName) =>
-                    !isQualifiedToolName(toolName) &&
-                    !allowedUnqualifiedToolNames.has(toolName)
-            );
+            const firstUnqualifiedTool =
+                tools.find(
+                    (toolName) =>
+                        !isQualifiedToolName(toolName) &&
+                        !isAllowedUnqualifiedToolName(toolName)
+                ) ?? null;
 
-            if (firstUnqualifiedTool === undefined) {
+            if (firstUnqualifiedTool === null) {
                 return;
             }
 
@@ -66,6 +74,7 @@ const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
             frozen: false,
             recommended: false,
             requiresTypeChecking: false,
+            url: createRuleDocsUrl("prefer-qualified-tools"),
         },
         messages: {
             preferQualifiedTool:
