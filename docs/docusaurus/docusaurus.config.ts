@@ -1,11 +1,21 @@
 import { themes as prismThemes } from "prism-react-renderer";
 
 import type { Options as DocsPluginOptions } from "@docusaurus/plugin-content-docs";
+import type * as Preset from "@docusaurus/preset-classic";
 import type { Config } from "@docusaurus/types";
 
 const organizationName = "Nick2bad4u";
 const projectName = "eslint-plugin-copilot";
 const baseUrl = process.env["DOCUSAURUS_BASE_URL"] ?? "/eslint-plugin-copilot/";
+const siteOrigin = "https://nick2bad4u.github.io";
+const siteUrl = `${siteOrigin}${baseUrl}`;
+const siteDescription =
+    "ESLint plugin for linting GitHub Copilot repository customization files.";
+const socialCardImagePath = "img/logo.png";
+const socialCardImageUrl = new URL(socialCardImagePath, siteUrl).toString();
+const pwaThemeColor = "#312E81";
+const pwaTileColor = "#312E81";
+const pwaMaskIconColor = "#312E81";
 
 /** Obfuscated key for the v4 legacy post-build head attribute removal flag. */
 const removeHeadAttrFlagKey = [
@@ -45,9 +55,50 @@ const futureConfig = {
 } satisfies Config["future"];
 
 const config: Config = {
+    storage: {
+        namespace: true,
+        type: "localStorage",
+    },
     baseUrl,
-    favicon: "img/logo.svg",
+    baseUrlIssueBanner: true,
+    deploymentBranch: "gh-pages",
+    favicon: "img/favicon.ico",
     future: futureConfig,
+    headTags: [
+        {
+            attributes: {
+                href: siteOrigin,
+                rel: "preconnect",
+            },
+            tagName: "link",
+        },
+        {
+            attributes: {
+                href: "https://github.com",
+                rel: "preconnect",
+            },
+            tagName: "link",
+        },
+        {
+            attributes: {
+                type: "application/ld+json",
+            },
+            innerHTML: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                description: siteDescription,
+                image: socialCardImageUrl,
+                name: "eslint-plugin-copilot",
+                publisher: {
+                    "@type": "Person",
+                    name: "Nick2bad4u",
+                    url: "https://github.com/Nick2bad4u",
+                },
+                url: siteUrl,
+            }),
+            tagName: "script",
+        },
+    ],
     i18n: {
         defaultLocale: "en",
         locales: ["en"],
@@ -58,11 +109,73 @@ const config: Config = {
         },
         emoji: true,
         format: "detect",
+        hooks: {
+            onBrokenMarkdownImages: "warn",
+            onBrokenMarkdownLinks: "warn",
+        },
+        mermaid: true,
     },
+    noIndex: false,
+    onBrokenAnchors: "warn",
     onBrokenLinks: "warn",
     onDuplicateRoutes: "warn",
     organizationName,
     plugins: [
+        "docusaurus-plugin-image-zoom",
+        [
+            "@docusaurus/plugin-pwa",
+            {
+                debug: process.env["DOCUSAURUS_PWA_DEBUG"] === "true",
+                offlineModeActivationStrategies: [
+                    "appInstalled",
+                    "standalone",
+                    "queryString",
+                ],
+                pwaHead: [
+                    {
+                        href: `${baseUrl}manifest.json`,
+                        rel: "manifest",
+                        tagName: "link",
+                    },
+                    {
+                        content: pwaThemeColor,
+                        name: "theme-color",
+                        tagName: "meta",
+                    },
+                    {
+                        content: "yes",
+                        name: "apple-mobile-web-app-capable",
+                        tagName: "meta",
+                    },
+                    {
+                        content: "default",
+                        name: "apple-mobile-web-app-status-bar-style",
+                        tagName: "meta",
+                    },
+                    {
+                        href: `${baseUrl}img/logo_192x192.png`,
+                        rel: "apple-touch-icon",
+                        tagName: "link",
+                    },
+                    {
+                        color: pwaMaskIconColor,
+                        href: `${baseUrl}img/logo.svg`,
+                        rel: "mask-icon",
+                        tagName: "link",
+                    },
+                    {
+                        content: `${baseUrl}img/logo_192x192.png`,
+                        name: "msapplication-TileImage",
+                        tagName: "meta",
+                    },
+                    {
+                        content: pwaTileColor,
+                        name: "msapplication-TileColor",
+                        tagName: "meta",
+                    },
+                ],
+            },
+        ],
         [
             "@docusaurus/plugin-content-docs",
             {
@@ -102,40 +215,54 @@ const config: Config = {
                 },
                 pages: {
                     editUrl: `https://github.com/${organizationName}/${projectName}/blob/main/docs/docusaurus/`,
-                    exclude: ["**/*.d.ts", "**/*.d.tsx"],
+                    exclude: [
+                        "**/*.d.ts",
+                        "**/*.d.tsx",
+                        "**/__tests__/**",
+                        "**/*.test.{js,jsx,ts,tsx}",
+                        "**/*.spec.{js,jsx,ts,tsx}",
+                    ],
+                    include: ["**/*.{js,jsx,ts,tsx,md,mdx}"],
+                    mdxPageComponent: "@theme/MDXPage",
+                },
+                sitemap: {
+                    filename: "sitemap.xml",
+                    ignorePatterns: ["/tests/**"],
+                    lastmod: "datetime",
                 },
                 theme: {
                     customCss: "./src/css/custom.css",
                 },
-            },
+            } satisfies Preset.Options,
         ],
     ],
     projectName,
     tagline:
         "Lint GitHub Copilot repository instructions, prompt files, custom agents, legacy chat modes, and related customization assets.",
-    themes: [
-        [
-            "@easyops-cn/docusaurus-search-local",
-            {
-                docsDir: ["../rules", "./site-docs/developer"],
-                docsPluginIdForPreferredVersion: "rules",
-                docsRouteBasePath: ["docs/rules", "developer"],
-                explicitSearchResultPath: true,
-                hashed: true,
-                highlightSearchTermsOnTargetPage: true,
-                indexBlog: false,
-                indexDocs: true,
-                indexPages: true,
-                language: ["en"],
-                searchBarPosition: "right",
-                searchResultLimits: 10,
-            },
-        ],
-    ],
     themeConfig: {
         colorMode: {
+            defaultMode: "dark",
+            disableSwitch: false,
             respectPrefersColorScheme: true,
         },
+        liveCodeBlock: {
+            playgroundPosition: "bottom",
+        },
+        metadata: [
+            {
+                content:
+                    "eslint, eslint-plugin, github-copilot, repository-instructions, prompts, agent-metadata, static-analysis",
+                name: "keywords",
+            },
+            {
+                content: "summary_large_image",
+                name: "twitter:card",
+            },
+            {
+                content: "eslint-plugin-copilot",
+                property: "og:site_name",
+            },
+        ],
         footer: {
             copyright:
                 `© ${new Date().getFullYear()} ` +
@@ -226,6 +353,8 @@ const config: Config = {
         },
         image: "img/logo.png",
         navbar: {
+            hideOnScroll: true,
+            style: "dark",
             items: [
                 {
                     className: "navbar-link--overview",
@@ -262,18 +391,64 @@ const config: Config = {
             ],
             logo: {
                 alt: "eslint-plugin-copilot logo",
+                height: 32,
+                href: baseUrl,
                 src: "img/logo.svg",
+                width: 32,
             },
             title: "eslint-plugin-copilot",
         },
         prism: {
+            additionalLanguages: ["bash", "json", "yaml", "typescript"],
+            defaultLanguage: "typescript",
             darkTheme: prismThemes.vsDark,
             theme: prismThemes.github,
         },
-    },
+        tableOfContents: {
+            maxHeadingLevel: 4,
+            minHeadingLevel: 2,
+        },
+        zoom: {
+            background: {
+                dark: "rgb(50, 50, 50)",
+                light: "rgb(255, 255, 255)",
+            },
+            config: {},
+            selector: ".markdown > img",
+        },
+    } satisfies Preset.ThemeConfig,
     title: "eslint-plugin-copilot",
-    trailingSlash: false,
-    url: "https://nick2bad4u.github.io",
+    themes: [
+        "@docusaurus/theme-mermaid",
+        [
+            "@easyops-cn/docusaurus-search-local",
+            {
+                docsDir: ["../rules", "./site-docs/developer"],
+                docsPluginIdForPreferredVersion: "rules",
+                docsRouteBasePath: ["docs/rules", "developer"],
+                explicitSearchResultPath: true,
+                forceIgnoreNoIndex: true,
+                hashed: true,
+                hideSearchBarWithNoSearchContext: false,
+                highlightSearchTermsOnTargetPage: true,
+                indexBlog: false,
+                indexDocs: true,
+                indexPages: true,
+                language: ["en"],
+                removeDefaultStemmer: true,
+                removeDefaultStopWordFilter: false,
+                searchBarPosition: "right",
+                searchBarShortcut: true,
+                searchBarShortcutHint: true,
+                searchBarShortcutKeymap: "ctrl+k",
+                searchResultContextMaxLength: 96,
+                searchResultLimits: 10,
+                useAllContextsWithNoSearchContext: false,
+            },
+        ],
+    ],
+    trailingSlash: true,
+    url: siteOrigin,
 };
 
 export default config;

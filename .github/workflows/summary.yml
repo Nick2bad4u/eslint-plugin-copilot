@@ -1,32 +1,38 @@
 # yaml-language-server: $schema=https://www.schemastore.org/github-workflow.json
-name: Summarize new issues and pull requests
+name: Summarize New Issues And Pull Requests
+run-name: ${{ format('Summarize {0}', github.event_name) }}
 
 on:
     issues:
         types: [opened, edited]
     pull_request:
         types: [opened, edited, synchronize]
+    merge_group:
+        types: [checks_requested]
 
-permissions:
-    models: read
-    contents: read
+concurrency:
+    group: summary-${{ github.ref }}
+    cancel-in-progress: true
+
+defaults:
+    run:
+        shell: bash
 
 jobs:
     inference:
+        name: Summarize issue or pull request
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         if: github.event_name == 'issues' || (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]')
         permissions:
             issues: write
             pull-requests: write
             contents: read
             models: read
-        concurrency:
-            group: summary-${{ github.ref }}
-            cancel-in-progress: false
 
         steps:
             - name: Harden the runner (Audit all outbound calls)
-              uses: step-security/harden-runner@5ef0c079ce82195b2a36a210272d6b661572d83e # v2.14.2
+              uses: step-security/harden-runner@58077d3c7e43986b6b15fba718e8ea69e387dfcc # v2.15.1
               with:
                   egress-policy: audit
 
@@ -36,7 +42,7 @@ jobs:
             - name: Run AI inference
               id: inference
               if: github.event.pull_request.head.repo.full_name == github.repository
-              uses: actions/ai-inference@a380166897b5408b8fb7dddd148142794cb5624a # v2.0.6
+              uses: actions/ai-inference@e09e65981758de8b2fdab13c2bfb7c7d5493b0b6 # v2.0.7
               with:
                   prompt: |
                       Summarize the following GitHub ${{ github.event_name == 'pull_request' && 'pull request' || 'issue' }} in order to explain it to the project owner:
@@ -59,7 +65,8 @@ jobs:
                   ISSUE_NUMBER: ${{ github.event.issue.number }}
                   PR_NUMBER: ${{ github.event.pull_request.number }}
                   RESPONSE: ${{ steps.inference.outputs.response }}
-                  system-prompt-file: ".github/instructions/copilot-instructions.md"
+                  prompt-file: ".github/prompts/PR-Review.prompt.md"
+                  system-prompt-file: ".github/prompts/BeastMode.prompt.md"
                   endpoint: "https://models.github.ai/inference"
                   max-tokens: 2000
 
