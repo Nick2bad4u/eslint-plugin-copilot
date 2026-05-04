@@ -2,6 +2,10 @@
 
 .page {
     padding-block-end: 3rem;
+
+    --index-kicker-color: var(--ifm-color-primary);
+    --index-card-border-color: var(--ifm-color-emphasis-200);
+    --index-card-background-color: var(--ifm-background-surface-color);
 }
 
 .hero {
@@ -27,7 +31,7 @@
 
 .kicker {
     margin: 0 0 0.75rem;
-    color: var(--ifm-color-primary);
+    color: var(--index-kicker-color);
     font-size: 0.875rem;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -64,9 +68,9 @@
 
 .card {
     padding: 1.25rem;
-    border: 1px solid var(--ifm-color-emphasis-200);
+    border: 1px solid var(--index-card-border-color);
     border-radius: 1rem;
-    background: var(--ifm-background-surface-color);
+    background: var(--index-card-background-color);
 }
 
 .cardTitle {
