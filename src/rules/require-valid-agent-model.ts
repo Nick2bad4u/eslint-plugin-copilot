@@ -20,7 +20,7 @@ import {
 } from "../_internal/markdown-rule.js";
 import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
-const INLINE_LIST_LITERAL_PATTERN = /^\s*\[.*\]\s*$/u;
+const INLINE_LIST_LITERAL_PATTERN = /^\s*\[.*\]\s*$/v;
 
 /** Rule module for `require-valid-agent-model`. */
 const requireValidAgentModelRule: CopilotRuleModule = createCopilotRule({

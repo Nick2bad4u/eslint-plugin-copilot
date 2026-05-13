@@ -2,8 +2,7 @@
  * @packageDocumentation
  * ESLint rule implementation for `no-duplicate-agent-names`.
  */
-import * as fs from "node:fs";
-import * as path from "node:path";
+import path from "node:path";
 import { arrayJoin, isDefined } from "ts-extras";
 
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
@@ -18,7 +17,10 @@ import {
 } from "../_internal/copilot-file-kind.js";
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
 import { collectDuplicateNameGroups } from "../_internal/duplicate-names.js";
-import { listFilesRecursively } from "../_internal/file-system.js";
+import {
+    listFilesRecursively,
+    readUtf8File,
+} from "../_internal/file-system.js";
 import { extractFrontmatter } from "../_internal/frontmatter.js";
 import {
     createMarkdownDocumentListener,
@@ -54,7 +56,7 @@ const noDuplicateAgentNamesRule: CopilotRuleModule = createCopilotRule({
                     const sourceText =
                         context.filename === filePath
                             ? context.sourceCode.text
-                            : fs.readFileSync(filePath, "utf8");
+                            : readUtf8File(filePath);
 
                     return {
                         filePath,

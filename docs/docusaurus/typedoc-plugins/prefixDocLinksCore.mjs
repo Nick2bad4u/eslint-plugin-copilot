@@ -154,7 +154,8 @@ function findInlineLinkClosingParen(input, startIndex) {
 }
 
 /**
- * Parses an angle-bracket-wrapped destination `<...>` from the start of `core`.
+ * Parses an angle-bracket-wrapped destination `&lt;...>` from the start of
+ * `core`.
  *
  * @param {string} core
  *
@@ -237,7 +238,7 @@ function parseRawDestination(core) {
  *
  * The payload is the text inside `(...)` for an inline link.
  *
- * - Destination may be `<...>` or a raw destination.
+ * - Destination may be `&lt;...>` or a raw destination.
  * - Remainder (if any) includes the title and its leading whitespace.
  *
  * @param {string} payload
@@ -389,10 +390,9 @@ function prefixInlineMarkdownLinksInLine(line) {
 /**
  * Prefixes bare intra-doc Markdown file links with `./`.
  *
- * @remarks
- * This function is designed to operate on TypeDoc's markdown renderer output,
- * where links are mostly simple inline links. It intentionally avoids parsing
- * inside fenced code blocks and inline code spans.
+ * This function is designed to operate on TypeDoc markdown-renderer output. It
+ * intentionally avoids parsing inside fenced code blocks and inline code
+ * spans.
  *
  * @param {string} input
  *

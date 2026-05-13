@@ -2,7 +2,7 @@
  * @packageDocumentation
  * Shared naming helpers for prompt, agent, and skill customization files.
  */
-import * as path from "node:path";
+import path from "node:path";
 
 import type { FrontmatterDocument } from "./frontmatter.js";
 
@@ -59,7 +59,7 @@ export const isValidSkillIdentifier = (value: string): boolean => {
 
 /** Get the default prompt name derived from a `.prompt.md` file name. */
 export const getDefaultPromptName = (filePath: string): string =>
-    path.basename(filePath).replace(/\.prompt\.md$/u, "");
+    path.basename(filePath).replace(/\.prompt\.md$/v, "");
 
 /** Get the effective prompt slash-command name. */
 export const getPromptName = (
@@ -75,8 +75,8 @@ export const getPromptName = (
 export const getDefaultAgentName = (filePath: string): string =>
     path
         .basename(filePath)
-        .replace(/\.agent\.md$/u, "")
-        .replace(/\.md$/u, "");
+        .replace(/\.agent\.md$/v, "")
+        .replace(/\.md$/v, "");
 
 /** Get the effective custom-agent name. */
 export const getAgentName = (

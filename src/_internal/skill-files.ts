@@ -2,7 +2,7 @@
  * @packageDocumentation
  * Shared skill-file helpers for Copilot skill rules.
  */
-import * as path from "node:path";
+import path from "node:path";
 
 import type { FrontmatterDocument } from "./frontmatter.js";
 
@@ -10,7 +10,7 @@ import { normalizeAbsolutePath } from "./file-system.js";
 import { hasFrontmatterField } from "./frontmatter.js";
 
 const VALID_SKILL_FILE_LOCATION_PATTERN =
-    /\/(?:\.github|\.claude)\/skills\/[^/]+\/SKILL\.md$/u;
+    /\/(?:\.github|\.claude)\/skills\/[^\/]+\/SKILL\.md$/v;
 
 /** Determine whether a file path is at a documented project-skill location. */
 export const isValidSkillDefinitionLocation = (filePath: string): boolean =>

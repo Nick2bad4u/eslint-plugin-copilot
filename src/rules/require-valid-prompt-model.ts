@@ -20,7 +20,7 @@ import {
 } from "../_internal/markdown-rule.js";
 import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
-const INLINE_LIST_LITERAL_PATTERN = /^\s*\[.*\]\s*$/u;
+const INLINE_LIST_LITERAL_PATTERN = /^\s*\[.*\]\s*$/v;
 
 const formatPromptModelValue = (
     scalarValue: string | undefined,

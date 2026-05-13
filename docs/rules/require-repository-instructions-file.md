@@ -1,6 +1,6 @@
 # require-repository-instructions-file
 
-Require repositories that define Copilot customization assets to also provide repository guidance in `.github/copilot-instructions.md` or `.github/instructions/copilot-instructions.md`.
+Require repositories that define Copilot customization assets to also provide repository-level AI guidance in `.github/copilot-instructions.md`, `.github/instructions/copilot-instructions.md`, or a root `AGENTS.md`/`CLAUDE.md`/`GEMINI.md` file.
 
 > **Rule catalog ID:** R005
 
@@ -16,11 +16,11 @@ Require repositories that define Copilot customization assets to also provide re
 
 ## What this rule reports
 
-- Copilot customization assets in repositories that do not also include `.github/copilot-instructions.md` or `.github/instructions/copilot-instructions.md`
+- Copilot customization assets in repositories that do not include `.github/copilot-instructions.md`, `.github/instructions/copilot-instructions.md`, or a root `AGENTS.md`/`CLAUDE.md`/`GEMINI.md`
 
 ## Why this rule exists
 
-Repository-wide instructions provide the broadest Copilot customization surface and are widely supported. When a repository already defines prompts, custom agents, legacy chat modes, agent instructions, or path-specific instructions, a baseline repository instructions file keeps the overall guidance coherent.
+Repository-level AI instructions provide the broadest customization surface and are widely supported. When a repository already defines prompts, custom agents, legacy chat modes, agent instructions, or path-specific instructions, a baseline top-level instructions file keeps overall guidance coherent across tools.
 
 ## ❌ Incorrect
 
@@ -28,7 +28,13 @@ Repository-wide instructions provide the broadest Copilot customization surface 
 .github/prompts/review.prompt.md
 ```
 
-with neither `.github/copilot-instructions.md` nor `.github/instructions/copilot-instructions.md` in the repository.
+with none of these files in the repository:
+
+- `.github/copilot-instructions.md`
+- `.github/instructions/copilot-instructions.md`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `GEMINI.md`
 
 ## ✅ Correct
 
@@ -39,6 +45,11 @@ with neither `.github/copilot-instructions.md` nor `.github/instructions/copilot
 
 ```text
 .github/instructions/copilot-instructions.md
+.github/prompts/review.prompt.md
+```
+
+```text
+AGENTS.md
 .github/prompts/review.prompt.md
 ```
 

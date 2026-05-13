@@ -2,7 +2,7 @@
  * @packageDocumentation
  * ESLint rule implementation for `require-skill-file-location`.
  */
-import * as path from "node:path";
+import path from "node:path";
 
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 

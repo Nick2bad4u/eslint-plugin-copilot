@@ -10,9 +10,9 @@ import {
     resolveRelativeWorkspacePath,
 } from "./file-system.js";
 
-const FENCED_BACKTICK_CODE_BLOCK_PATTERN = /```[\s\S]*?```/gu;
-const FENCED_TILDE_CODE_BLOCK_PATTERN = /~~~[\s\S]*?~~~/gu;
-const INLINE_CODE_PATTERN = /`[^\n\r`]+`/gu;
+const FENCED_BACKTICK_CODE_BLOCK_PATTERN = /```[\s\S]*?```/gv;
+const FENCED_TILDE_CODE_BLOCK_PATTERN = /~~~[\s\S]*?~~~/gv;
+const INLINE_CODE_PATTERN = /`[^\n\r`]+`/gv;
 
 /** Extracted Markdown link plus its source range. */
 export type MarkdownLinkMatch = Readonly<{
@@ -27,13 +27,13 @@ export type MarkdownLinkMatch = Readonly<{
 export const maskMarkdownCode = (text: string): string =>
     text
         .replaceAll(FENCED_BACKTICK_CODE_BLOCK_PATTERN, (match) =>
-            match.replaceAll(/[^\n\r]/gu, " ")
+            match.replaceAll(/[^\n\r]/gv, " ")
         )
         .replaceAll(FENCED_TILDE_CODE_BLOCK_PATTERN, (match) =>
-            match.replaceAll(/[^\n\r]/gu, " ")
+            match.replaceAll(/[^\n\r]/gv, " ")
         )
         .replaceAll(INLINE_CODE_PATTERN, (match) =>
-            match.replaceAll(/[^\n\r]/gu, " ")
+            match.replaceAll(/[^\n\r]/gv, " ")
         );
 
 /** Normalize a raw Markdown link destination by removing wrappers and titles. */
@@ -49,7 +49,7 @@ export const extractMarkdownLinkDestination = (
         return trimmedDestination.slice(1, -1).trim();
     }
 
-    const normalizedDestination = trimmedDestination.replaceAll(/\s+/gu, " ");
+    const normalizedDestination = trimmedDestination.replaceAll(/\s+/gv, " ");
     const [destination] = stringSplit(normalizedDestination, " ");
 
     return destination?.trim() ?? "";

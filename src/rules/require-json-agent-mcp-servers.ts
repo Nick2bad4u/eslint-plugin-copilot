@@ -18,7 +18,7 @@ import {
 } from "../_internal/markdown-rule.js";
 import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
-const JSON_FILE_EXTENSION_PATTERN = /\.json$/iu;
+const JSON_FILE_EXTENSION_PATTERN = /\.json$/iv;
 
 /** Rule module for `require-json-agent-mcp-servers`. */
 const requireJsonAgentMcpServersRule: CopilotRuleModule = createCopilotRule({

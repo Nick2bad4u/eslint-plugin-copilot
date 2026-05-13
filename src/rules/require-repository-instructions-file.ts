@@ -2,8 +2,6 @@
  * @packageDocumentation
  * ESLint rule implementation for `require-repository-instructions-file`.
  */
-import * as fs from "node:fs";
-
 import type { CopilotRuleModule } from "../_internal/create-copilot-rule.js";
 
 import {
@@ -11,6 +9,7 @@ import {
     getRepositoryInstructionsPaths,
 } from "../_internal/copilot-file-kind.js";
 import { createCopilotRule } from "../_internal/create-copilot-rule.js";
+import { pathExists } from "../_internal/file-system.js";
 import {
     createMarkdownDocumentListener,
     reportAtDocumentStart,
@@ -39,7 +38,7 @@ const requireRepositoryInstructionsFileRule: CopilotRuleModule =
                 if (
                     repositoryInstructionsPaths.some(
                         (repositoryInstructionsPath) =>
-                            fs.existsSync(repositoryInstructionsPath)
+                            pathExists(repositoryInstructionsPath)
                     )
                 ) {
                     return;
@@ -58,7 +57,7 @@ const requireRepositoryInstructionsFileRule: CopilotRuleModule =
                     "copilot.configs.all",
                 ],
                 description:
-                    "require repositories that define Copilot customization assets to also provide repository instructions via `.github/copilot-instructions.md` or `.github/instructions/copilot-instructions.md`.",
+                    "require repositories that define Copilot customization assets to also provide baseline repository-level AI instructions via `.github/copilot-instructions.md`, `.github/instructions/copilot-instructions.md`, or a root `AGENTS.md`/`CLAUDE.md`/`GEMINI.md` file.",
                 frozen: false,
                 recommended: false,
                 requiresTypeChecking: false,
@@ -66,7 +65,7 @@ const requireRepositoryInstructionsFileRule: CopilotRuleModule =
             },
             messages: {
                 missingRepositoryInstructions:
-                    "Repositories that define Copilot prompts, custom agents, legacy chat modes, agent instructions, or path-specific instructions should also provide baseline repository guidance in `.github/copilot-instructions.md` or `.github/instructions/copilot-instructions.md`.",
+                    "Repositories that define Copilot prompts, custom agents, legacy chat modes, agent instructions, or path-specific instructions should also provide baseline repository-level AI guidance in `.github/copilot-instructions.md`, `.github/instructions/copilot-instructions.md`, or a root `AGENTS.md`/`CLAUDE.md`/`GEMINI.md` file.",
             },
             schema: [],
             type: "suggestion",

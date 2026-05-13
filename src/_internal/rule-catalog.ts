@@ -3,7 +3,7 @@
  * Stable catalog ids for eslint-plugin-copilot rules.
  */
 
-import { assertDefined } from "ts-extras";
+import { assertDefined, setHas } from "ts-extras";
 
 /** Catalog metadata for a single Copilot rule. */
 export type CopilotRuleCatalogEntry = Readonly<{
@@ -89,75 +89,75 @@ type CopilotRuleNamePattern =
 
 /** Stable global ordering used for rule catalog ids. */
 const orderedRuleNames = [
-    "require-instructions-apply-to",
-    "require-prompt-file-metadata",
-    "require-chatmode-file-metadata",
-    "no-blank-repository-instructions",
-    "require-repository-instructions-file",
-    "prefer-qualified-tools",
-    "no-deprecated-agent-infer",
-    "require-agent-tool-for-subagents",
     "no-blank-customization-body",
-    "require-github-copilot-target-for-mcp-servers",
+    "no-blank-repository-instructions",
+    "no-blank-skill-body",
+    "no-deprecated-agent-infer",
+    "no-duplicate-agent-names",
+    "no-duplicate-prompt-names",
+    "no-duplicate-skill-names",
+    "no-duplicate-slash-command-names",
+    "no-empty-repository-hook-arrays",
     "no-legacy-chatmode-files",
-    "require-valid-agent-handoffs",
-    "require-qualified-agent-handoff-models",
-    "require-valid-agent-hook-events",
-    "require-valid-agent-hooks",
-    "require-valid-agent-hook-timeouts",
-    "require-valid-agent-subagents",
-    "require-relative-agent-hook-cwd",
-    "require-valid-agent-target",
-    "require-valid-agent-invocation-controls",
-    "require-valid-agent-handoff-send",
-    "require-valid-agent-model",
-    "require-valid-agent-mcp-servers",
-    "require-relative-prompt-links",
-    "require-valid-agent-tools",
-    "require-valid-prompt-model",
-    "require-valid-prompt-tools",
-    "require-relative-agent-links",
-    "require-relative-instructions-links",
-    "require-existing-relative-prompt-links",
+    "prefer-custom-instructions-under-code-review-limit",
+    "prefer-fast-repository-hooks",
+    "prefer-qualified-tools",
+    "require-agent-tool-for-subagents",
+    "require-agents-md-for-cross-surface-agent-instructions",
+    "require-chatmode-file-metadata",
+    "require-existing-agent-hook-cwd",
+    "require-existing-agent-mcp-servers",
     "require-existing-relative-agent-links",
     "require-existing-relative-instructions-links",
-    "require-existing-agent-mcp-servers",
+    "require-existing-relative-prompt-links",
+    "require-existing-relative-skill-links",
+    "require-existing-repository-hook-cwd",
+    "require-github-copilot-target-for-mcp-servers",
+    "require-instructions-apply-to",
     "require-json-agent-mcp-servers",
-    "require-existing-agent-hook-cwd",
-    "prefer-custom-instructions-under-code-review-limit",
-    "require-agents-md-for-cross-surface-agent-instructions",
-    "no-duplicate-prompt-names",
-    "no-duplicate-agent-names",
-    "require-valid-prompt-name",
-    "require-valid-prompt-argument-hint",
-    "require-valid-agent-name",
-    "require-valid-agent-argument-hint",
-    "require-valid-instructions-apply-to-globs",
+    "require-prompt-file-metadata",
+    "require-qualified-agent-handoff-models",
+    "require-relative-agent-hook-cwd",
+    "require-relative-agent-links",
+    "require-relative-instructions-links",
+    "require-relative-prompt-links",
+    "require-relative-repository-hook-cwd",
+    "require-relative-skill-links",
+    "require-repository-hook-arrays",
+    "require-repository-hook-command-shell",
+    "require-repository-hooks-object",
+    "require-repository-instructions-file",
     "require-skill-file-location",
     "require-skill-file-metadata",
-    "no-blank-skill-body",
-    "require-valid-skill-name",
-    "require-valid-skill-directory-name",
-    "require-skill-name-match-directory",
-    "require-valid-skill-license",
-    "require-relative-skill-links",
-    "require-existing-relative-skill-links",
-    "no-duplicate-skill-names",
     "require-skill-md-filename",
-    "require-valid-repository-hook-version",
-    "require-repository-hooks-object",
-    "require-repository-hook-arrays",
-    "require-valid-repository-hook-events",
-    "require-valid-repository-hook-command-type",
-    "require-repository-hook-command-shell",
-    "require-relative-repository-hook-cwd",
-    "require-existing-repository-hook-cwd",
-    "require-valid-repository-hook-timeouts",
-    "require-valid-repository-hook-env",
+    "require-skill-name-match-directory",
     "require-string-repository-hook-env-values",
-    "no-empty-repository-hook-arrays",
-    "prefer-fast-repository-hooks",
-    "no-duplicate-slash-command-names",
+    "require-valid-agent-argument-hint",
+    "require-valid-agent-handoff-send",
+    "require-valid-agent-handoffs",
+    "require-valid-agent-hook-events",
+    "require-valid-agent-hook-timeouts",
+    "require-valid-agent-hooks",
+    "require-valid-agent-invocation-controls",
+    "require-valid-agent-mcp-servers",
+    "require-valid-agent-model",
+    "require-valid-agent-name",
+    "require-valid-agent-subagents",
+    "require-valid-agent-target",
+    "require-valid-agent-tools",
+    "require-valid-instructions-apply-to-globs",
+    "require-valid-prompt-argument-hint",
+    "require-valid-prompt-model",
+    "require-valid-prompt-name",
+    "require-valid-prompt-tools",
+    "require-valid-repository-hook-command-type",
+    "require-valid-repository-hook-env",
+    "require-valid-repository-hook-events",
+    "require-valid-repository-hook-timeouts",
+    "require-valid-repository-hook-version",
+    "require-valid-skill-directory-name",
+    "require-valid-skill-license",
+    "require-valid-skill-name",
 ] as const satisfies readonly CopilotRuleNamePattern[];
 
 const toRuleCatalogId = (ruleNumber: number): CopilotRuleCatalogId =>
@@ -180,13 +180,21 @@ const copilotRuleCatalogByRuleName = new Map(
     copilotRuleCatalogEntries.map((entry) => [entry.ruleName, entry])
 );
 
+const copilotRuleNameSet: ReadonlySet<string> = new Set(orderedRuleNames);
+
+const isCopilotRuleNamePattern = (
+    value: string
+): value is CopilotRuleNamePattern => setHas(copilotRuleNameSet, value);
+
 /** Resolve stable catalog metadata for a rule name. */
 export const getRuleCatalogEntryForRuleName = (
     ruleName: string
 ): CopilotRuleCatalogEntry => {
-    const entry = copilotRuleCatalogByRuleName.get(
-        ruleName as CopilotRuleNamePattern
-    );
+    if (!isCopilotRuleNamePattern(ruleName)) {
+        throw new TypeError(`Unknown Copilot rule name: ${ruleName}`);
+    }
+
+    const entry = copilotRuleCatalogByRuleName.get(ruleName);
 
     assertDefined(entry);
 

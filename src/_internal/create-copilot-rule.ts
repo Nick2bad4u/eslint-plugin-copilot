@@ -48,8 +48,16 @@ type CopilotRuleInputDocs = Readonly<{
     url: string;
 }>;
 
+const createTypedRuleCreator = ESLintUtils.RuleCreator<CopilotRuleInputDocs>;
+
 const baseRuleCreator: BaseRuleCreator =
-    ESLintUtils.RuleCreator<CopilotRuleInputDocs>(createRuleDocsUrl);
+    createTypedRuleCreator(createRuleDocsUrl);
+
+const assertNever = (value: never): never => {
+    throw new TypeError(
+        `Unsupported Copilot config reference: ${String(value)}`
+    );
+};
 
 const getCopilotConfigNameFromReference = (
     reference: CopilotConfigReference
@@ -72,9 +80,7 @@ const getCopilotConfigNameFromReference = (
         }
 
         default: {
-            throw new TypeError(
-                `Unsupported Copilot config reference: ${reference}`
-            );
+            return assertNever(reference);
         }
     }
 };
@@ -85,7 +91,9 @@ const normalizeCopilotConfigNames: (
 ) => readonly CopilotConfigName[] = (
     value: CopilotConfigReference | readonly CopilotConfigReference[]
 ) => {
-    const references = Array.isArray(value) ? value : [value];
+    const references: readonly CopilotConfigReference[] = Array.isArray(value)
+        ? value
+        : [value];
     const normalizedNames = new Set<CopilotConfigName>();
 
     for (const reference of references) {
@@ -106,7 +114,7 @@ export const createCopilotRule = <
 ): CopilotRuleModule => {
     const createdRule = baseRuleCreator(ruleDefinition);
     const catalogEntry = getRuleCatalogEntryForRuleName(ruleDefinition.name);
-    const authoredDocs = ruleDefinition.meta.docs;
+    const authoredDocs: CopilotRuleInputDocs = ruleDefinition.meta.docs;
     const docs: CopilotRuleDocs = {
         ...authoredDocs,
         copilotConfigNames: normalizeCopilotConfigNames(

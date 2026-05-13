@@ -35,6 +35,54 @@ describe("require-repository-instructions-file", () => {
         expect(messages).toHaveLength(0);
     });
 
+    it("accepts repositories that define a root AGENTS.md", async () => {
+        expect.hasAssertions();
+
+        const messages = await lintMarkdownRule({
+            additionalFiles: {
+                "AGENTS.md":
+                    "# Workspace guidance\n\nPrefer scoped prompts for multi-folder repos.\n",
+            },
+            filePath: ".github/prompts/review.prompt.md",
+            ruleId: "require-repository-instructions-file",
+            text: "---\ndescription: Review the repository\nagent: ask\n---\nReview the repository for configuration drift.\n",
+        });
+
+        expect(messages).toHaveLength(0);
+    });
+
+    it("accepts repositories that define a root CLAUDE.md", async () => {
+        expect.hasAssertions();
+
+        const messages = await lintMarkdownRule({
+            additionalFiles: {
+                "CLAUDE.md":
+                    "# Workspace guidance\n\nPrefer scoped prompts for multi-folder repos.\n",
+            },
+            filePath: ".github/prompts/review.prompt.md",
+            ruleId: "require-repository-instructions-file",
+            text: "---\ndescription: Review the repository\nagent: ask\n---\nReview the repository for configuration drift.\n",
+        });
+
+        expect(messages).toHaveLength(0);
+    });
+
+    it("accepts repositories that define a root GEMINI.md", async () => {
+        expect.hasAssertions();
+
+        const messages = await lintMarkdownRule({
+            additionalFiles: {
+                "GEMINI.md":
+                    "# Workspace guidance\n\nPrefer scoped prompts for multi-folder repos.\n",
+            },
+            filePath: ".github/prompts/review.prompt.md",
+            ruleId: "require-repository-instructions-file",
+            text: "---\ndescription: Review the repository\nagent: ask\n---\nReview the repository for configuration drift.\n",
+        });
+
+        expect(messages).toHaveLength(0);
+    });
+
     it("reports missing repository-wide instructions when other Copilot assets exist", async () => {
         expect.hasAssertions();
 

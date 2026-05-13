@@ -2,9 +2,10 @@
  * @packageDocumentation
  * Path classification helpers for GitHub Copilot repository customization files.
  */
-import * as fs from "node:fs";
-import * as path from "node:path";
+import path from "node:path";
 import { arrayFirst, arrayJoin, stringSplit } from "ts-extras";
+
+import { pathExists } from "./file-system.js";
 
 /** Supported GitHub Copilot repository file categories. */
 export type CopilotFileKind =
@@ -174,9 +175,9 @@ export const findRepositoryRoot = (filePath: string): string => {
         const gitDirectoryPath = path.join(currentDirectory, ".git");
 
         if (
-            fs.existsSync(packageJsonPath) ||
-            fs.existsSync(eslintConfigPath) ||
-            fs.existsSync(gitDirectoryPath)
+            pathExists(packageJsonPath) ||
+            pathExists(eslintConfigPath) ||
+            pathExists(gitDirectoryPath)
         ) {
             return currentDirectory;
         }
@@ -191,7 +192,7 @@ export const findRepositoryRoot = (filePath: string): string => {
     }
 };
 
-/** Resolve supported repository custom instructions file paths. */
+/** Resolve supported repository-level AI instructions file paths. */
 export const getRepositoryInstructionsPaths = (
     filePath: string
 ): readonly string[] => {
@@ -205,6 +206,9 @@ export const getRepositoryInstructionsPaths = (
             "instructions",
             "copilot-instructions.md"
         ),
+        path.join(repositoryRoot, "AGENTS.md"),
+        path.join(repositoryRoot, "CLAUDE.md"),
+        path.join(repositoryRoot, "GEMINI.md"),
     ];
 };
 

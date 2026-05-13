@@ -3,11 +3,11 @@
  * Shared filesystem helpers for Copilot repository rule implementations.
  */
 import * as fs from "node:fs";
-import * as path from "node:path";
+import path from "node:path";
 import { isDefined, isEmpty } from "ts-extras";
 
-const WINDOWS_ABSOLUTE_PATH_PATTERN = /^[A-Za-z]:[/\\]/u;
-const URI_SCHEME_PATTERN = /^[A-Za-z][+\-.0-9A-Za-z]*:/u;
+const WINDOWS_ABSOLUTE_PATH_PATTERN = /^[A-Za-z]:(?:\/|\\\\)/v;
+const URI_SCHEME_PATTERN = /^[A-Za-z][+\-.0-9A-Za-z]*:/v;
 
 /** Normalize a path to absolute slash-separated form. */
 export const normalizeAbsolutePath = (filePath: string): string =>
@@ -15,7 +15,13 @@ export const normalizeAbsolutePath = (filePath: string): string =>
 
 /** Determine whether an absolute or relative path currently exists on disk. */
 export const pathExists = (filePath: string): boolean =>
+    // eslint-disable-next-line n/no-sync, security/detect-non-literal-fs-filename -- ESLint rule evaluation is synchronous and requires deterministic local filesystem reads.
     fs.existsSync(filePath);
+
+/** Read a UTF-8 text file for rule evaluation. */
+export const readUtf8File = (filePath: string): string =>
+    // eslint-disable-next-line n/no-sync, security/detect-non-literal-fs-filename -- ESLint rule evaluation is synchronous and requires deterministic local filesystem reads.
+    fs.readFileSync(filePath, "utf8");
 
 /** Remove `#fragment` and `?query` suffixes from a Markdown-style path target. */
 export const stripPathFragmentAndQuery = (value: string): string => {
@@ -101,10 +107,12 @@ const collectDirectoryFiles = (
 }> => {
     const discoveredFiles: string[] = [];
     const pendingDirectories: string[] = [];
-
-    for (const entry of fs.readdirSync(currentDirectory, {
+    // eslint-disable-next-line n/no-sync, security/detect-non-literal-fs-filename -- ESLint rule evaluation is synchronous and requires deterministic local filesystem reads.
+    const directoryEntries = fs.readdirSync(currentDirectory, {
         withFileTypes: true,
-    })) {
+    });
+
+    for (const entry of directoryEntries) {
         const absoluteEntryPath = path.join(currentDirectory, entry.name);
 
         if (entry.isDirectory()) {

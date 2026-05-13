@@ -10,7 +10,7 @@ import {
     isDefined,
     isFinite,
     objectEntries,
-    safeCastTo,
+    objectValues,
     setHas,
 } from "ts-extras";
 
@@ -66,17 +66,48 @@ export const VALID_REPOSITORY_HOOK_EVENT_NAMES: ReadonlySet<RepositoryHookEventN
 export const VALID_REPOSITORY_HOOK_TYPES: ReadonlySet<RepositoryHookType> =
     new Set(["command", "prompt"]);
 
+const VALID_REPOSITORY_HOOK_EVENT_NAME_VALUES: ReadonlySet<string> = new Set(
+    VALID_REPOSITORY_HOOK_EVENT_NAMES
+);
+
+const VALID_REPOSITORY_HOOK_TYPE_VALUES: ReadonlySet<string> = new Set(
+    VALID_REPOSITORY_HOOK_TYPES
+);
+
 /** Determine whether a string is a supported repository hook event name. */
 export const isRepositoryHookEventName = (
     value: string
 ): value is RepositoryHookEventName =>
-    setHas(VALID_REPOSITORY_HOOK_EVENT_NAMES, value as RepositoryHookEventName);
+    setHas(VALID_REPOSITORY_HOOK_EVENT_NAME_VALUES, value);
 
 /** Determine whether a string is a supported repository hook type. */
 export const isRepositoryHookType = (
     value: string
 ): value is RepositoryHookType =>
-    setHas(VALID_REPOSITORY_HOOK_TYPES, value as RepositoryHookType);
+    setHas(VALID_REPOSITORY_HOOK_TYPE_VALUES, value);
+
+const isJsonPrimitive = (value: unknown): value is JsonPrimitive =>
+    value === null ||
+    typeof value === "boolean" ||
+    typeof value === "number" ||
+    typeof value === "string";
+
+/** Determine whether an unknown value is JSON-compatible. */
+const isJsonValue = (value: unknown): value is JsonValue => {
+    if (isJsonPrimitive(value)) {
+        return true;
+    }
+
+    if (Array.isArray(value)) {
+        return value.every((entry) => isJsonValue(entry));
+    }
+
+    if (typeof value !== "object") {
+        return false;
+    }
+
+    return objectValues(value).every((entry) => isJsonValue(entry));
+};
 
 /** Determine whether a parsed JSON value is an object. */
 export const isJsonObject = (
@@ -99,7 +130,9 @@ export const isJsonNumber = (value: JsonValue | undefined): value is number =>
 /** Safely parse JSON source text. */
 export const parseJsonText = (text: string): JsonValue | undefined => {
     try {
-        return safeCastTo<JsonValue>(JSON.parse(text));
+        const parsedValue: unknown = JSON.parse(text);
+
+        return isJsonValue(parsedValue) ? parsedValue : undefined;
     } catch {
         return undefined;
     }

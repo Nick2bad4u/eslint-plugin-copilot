@@ -8,7 +8,11 @@ export type SiteLinkCard = Readonly<{
     to?: string;
 }>;
 
-/** Resolve a Docusaurus `Link` destination from shared site-card data. */
+/**
+ * Resolve a Docusaurus `Link` destination from shared site-card data.
+ *
+ * @throws TypeError When the link card is missing both `href` and `to`.
+ */
 export function getSiteLinkProps(
     linkCard: SiteLinkCard
 ): { href: string } | { to: string } {

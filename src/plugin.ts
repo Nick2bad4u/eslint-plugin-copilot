@@ -5,8 +5,8 @@
 import type { ESLint, Linter } from "eslint";
 import type { Except } from "type-fest";
 
-import json from "@eslint/json";
-import markdown from "@eslint/markdown";
+import * as jsonPluginModule from "@eslint/json";
+import * as markdownPluginModule from "@eslint/markdown";
 import { not, objectEntries, safeCastTo, setHas } from "ts-extras";
 
 import type { CopilotRuleDocs } from "./_internal/create-copilot-rule.js";
@@ -23,18 +23,18 @@ const ERROR_SEVERITY = "error" as const;
 
 /** Markdown files linted by the shipped Copilot presets. */
 const COPILOT_MARKDOWN_FILES = [
-    ".github/copilot-instructions.md",
-    ".github/instructions/copilot-instructions.md",
-    ".github/instructions/**/*.instructions.md",
-    ".github/prompts/**/*.prompt.md",
-    ".github/agents/**/*.agent.md",
-    ".github/chatmodes/**/*.chatmode.md",
-    ".github/skills/**/*.md",
-    ".claude/skills/**/*.md",
-    "**/SKILL.md",
     "**/AGENTS.md",
     "**/CLAUDE.md",
     "**/GEMINI.md",
+    "**/SKILL.md",
+    ".claude/skills/**/*.md",
+    ".github/agents/**/*.agent.md",
+    ".github/chatmodes/**/*.chatmode.md",
+    ".github/copilot-instructions.md",
+    ".github/instructions/**/*.instructions.md",
+    ".github/instructions/copilot-instructions.md",
+    ".github/prompts/**/*.prompt.md",
+    ".github/skills/**/*.md",
 ] as const;
 
 /** Repository hook JSON files linted by the shipped Copilot presets. */
@@ -100,8 +100,8 @@ const getPackageVersion = (pkg: unknown): string => {
 /** Strongly typed ESLint rule map view of the runtime registry. */
 const eslintRules: NonNullable<ESLint.Plugin["rules"]> & typeof copilotRules =
     copilotRules as NonNullable<ESLint.Plugin["rules"]> & typeof copilotRules;
-const markdownPlugin = markdown as unknown as ESLint.Plugin;
-const jsonPlugin = json as unknown as ESLint.Plugin;
+const markdownPlugin: ESLint.Plugin = markdownPluginModule.default;
+const jsonPlugin: ESLint.Plugin = jsonPluginModule.default;
 
 /** Stable ordered entries used to derive preset membership. */
 const copilotRuleEntries = safeCastTo<
