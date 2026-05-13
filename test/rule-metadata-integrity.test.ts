@@ -2,9 +2,8 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { describe, expect, it } from "vitest";
 
-import type { CopilotRuleModule } from "../src/_internal/create-copilot-rule";
-
 import { createRuleDocsUrl } from "../src/_internal/rule-docs-url";
+import { copilotRules } from "../src/_internal/rules-registry";
 import plugin from "../src/plugin";
 
 const getRuleSourceFileNames = (): readonly string[] => {
@@ -30,9 +29,8 @@ describe("rule metadata integrity", () => {
     it("keeps canonical docs metadata on every rule", () => {
         expect.hasAssertions();
 
-        for (const [ruleName, ruleModule] of Object.entries(plugin.rules)) {
-            const copilotRule = ruleModule as unknown as CopilotRuleModule;
-            const docs = copilotRule.meta.docs;
+        for (const [ruleName, ruleModule] of Object.entries(copilotRules)) {
+            const docs = ruleModule.meta.docs;
 
             if (docs === undefined) {
                 throw new Error(

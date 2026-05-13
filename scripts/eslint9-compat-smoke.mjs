@@ -278,7 +278,11 @@ const normalizeConfigEntryForLegacyFlatConfig = (configEntry) => {
         return configEntry;
     }
 
-    const { language: _, ...legacyCompatibleConfigEntry } = configEntry;
+    const legacyCompatibleConfigEntry = {
+        ...configEntry,
+    };
+
+    Reflect.deleteProperty(legacyCompatibleConfigEntry, "language");
 
     /** @type {import("eslint").Linter.Config} */
     const normalizedConfigEntry = {

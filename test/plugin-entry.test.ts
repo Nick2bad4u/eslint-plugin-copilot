@@ -87,9 +87,7 @@ describe("plugin entry module", () => {
     it("matches the runtime default export exposed through plugin.mjs", async () => {
         expect.hasAssertions();
 
-        const runtimePluginModule = (await import("../plugin.mjs")) as {
-            default: unknown;
-        };
+        const runtimePluginModule = await import("../plugin.mjs");
 
         expect(runtimePluginModule.default).toStrictEqual(
             expect.objectContaining({
