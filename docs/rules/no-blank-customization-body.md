@@ -32,6 +32,7 @@ Repository-wide `.github/copilot-instructions.md` and `.github/instructions/copi
 description: Review the repository
 agent: ask
 ---
+
 <!-- no actual prompt body -->
 ```
 
@@ -42,6 +43,7 @@ agent: ask
 description: Review the repository
 agent: ask
 ---
+
 Review the repository for configuration drift and summarize the biggest risks first.
 ```
 

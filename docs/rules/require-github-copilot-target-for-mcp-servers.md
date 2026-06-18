@@ -26,6 +26,7 @@ description: Coordinate release automation through MCP servers
 target: vscode
 mcp-servers: [release-coordinator.json]
 ---
+
 Coordinate release automation tasks.
 ```
 
@@ -37,6 +38,7 @@ description: Coordinate release automation through MCP servers
 target: github-copilot
 mcp-servers: [release-coordinator.json]
 ---
+
 Coordinate release automation tasks.
 ```
 

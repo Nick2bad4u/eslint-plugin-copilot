@@ -23,6 +23,7 @@ Path-specific instructions commonly link to package-specific conventions or loca
 description: Frontend guidance
 applyTo: src/**/*.ts
 ---
+
 See [frontend standards](../../docs/frontend.md).
 ```
 
@@ -35,6 +36,7 @@ when `../../docs/frontend.md` does not exist from the instructions file.
 description: Frontend guidance
 applyTo: src/**/*.ts
 ---
+
 See [frontend standards](../../docs/standards/frontend.md).
 ```
 

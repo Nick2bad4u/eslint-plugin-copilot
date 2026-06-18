@@ -26,9 +26,10 @@ When `send: true` is set, the prompt is auto-submitted as the next step. Requiri
 ---
 description: Plan work carefully
 handoffs:
-  - label: Start Implementation
-    send: true
+ - label: Start Implementation
+   send: true
 ---
+
 Plan the requested change before implementation.
 ```
 
@@ -38,11 +39,12 @@ Plan the requested change before implementation.
 ---
 description: Plan work carefully
 handoffs:
-  - label: Start Implementation
-    agent: Implementer
-    prompt: Implement the approved plan.
-    send: true
+ - label: Start Implementation
+   agent: Implementer
+   prompt: Implement the approved plan.
+   send: true
 ---
+
 Plan the requested change before implementation.
 ```
 

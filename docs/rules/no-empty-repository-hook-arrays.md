@@ -32,10 +32,10 @@ or:
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready" }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [{ "type": "command", "bash": "echo ready" }]
+ }
 }
 ```
 

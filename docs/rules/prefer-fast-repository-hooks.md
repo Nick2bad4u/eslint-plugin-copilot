@@ -20,10 +20,12 @@ Long-running hooks slow down agent workflows and increase the chance of timeouts
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "timeoutSec": 120 }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "timeoutSec": 120 }
+  ]
+ }
 }
 ```
 
@@ -31,10 +33,12 @@ Long-running hooks slow down agent workflows and increase the chance of timeouts
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "timeoutSec": 10 }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "timeoutSec": 10 }
+  ]
+ }
 }
 ```
 

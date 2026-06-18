@@ -26,6 +26,7 @@ This rule intentionally defers to the more specific `require-github-copilot-targ
 description: Plan work inside VS Code
 target: github
 ---
+
 Plan work before implementation starts.
 ```
 
@@ -36,6 +37,7 @@ Plan work before implementation starts.
 description: Plan work inside VS Code
 target: vscode
 ---
+
 Plan work before implementation starts.
 ```
 

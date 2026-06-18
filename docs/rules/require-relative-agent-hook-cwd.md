@@ -23,11 +23,12 @@ VS Code documents hook `cwd` as a working directory path relative to the reposit
 ---
 description: Format files after editing
 hooks:
-  PostToolUse:
-    - type: command
-      command: ./scripts/format.sh
-      cwd: C:\hooks
+ PostToolUse:
+  - type: command
+    command: ./scripts/format.sh
+    cwd: C:\hooks
 ---
+
 Format edited files after tool usage.
 ```
 
@@ -37,11 +38,12 @@ Format edited files after tool usage.
 ---
 description: Format files after editing
 hooks:
-  PostToolUse:
-    - type: command
-      command: ./scripts/format.sh
-      cwd: scripts/hooks
+ PostToolUse:
+  - type: command
+    command: ./scripts/format.sh
+    cwd: scripts/hooks
 ---
+
 Format edited files after tool usage.
 ```
 

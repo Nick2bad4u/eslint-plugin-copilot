@@ -20,10 +20,10 @@ Repository hooks are meant to run against the checked-out repository. Repository
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "cwd": "/tmp" }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [{ "type": "command", "bash": "echo ready", "cwd": "/tmp" }]
+ }
 }
 ```
 
@@ -31,10 +31,12 @@ Repository hooks are meant to run against the checked-out repository. Repository
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "cwd": "scripts" }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "cwd": "scripts" }
+  ]
+ }
 }
 ```
 

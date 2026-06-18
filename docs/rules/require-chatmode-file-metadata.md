@@ -23,6 +23,7 @@ The stable rule name is historical, but the rule now covers both modern custom a
 ---
 tools: [search/codebase]
 ---
+
 Plan the next implementation step.
 ```
 
@@ -33,6 +34,7 @@ Plan the next implementation step.
 description: Plan and validate a repository-wide refactor
 tools: [search/codebase]
 ---
+
 Plan the next implementation step.
 ```
 

@@ -29,6 +29,7 @@ description: Release notes helper
 agent: agent
 tools: [file_search, fetch]
 ---
+
 Generate release notes for the latest changes.
 ```
 
@@ -40,6 +41,7 @@ description: Release notes helper
 agent: agent
 tools: [search/file_search, fetch/fetch]
 ---
+
 Generate release notes for the latest changes.
 ```
 

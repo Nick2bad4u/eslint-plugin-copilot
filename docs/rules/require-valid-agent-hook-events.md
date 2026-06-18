@@ -22,10 +22,11 @@ VS Code agent hooks only support a defined set of lifecycle event names: `Sessio
 ---
 description: Format files after editing
 hooks:
-  AfterEdit:
-    - type: command
-      command: ./scripts/format.sh
+ AfterEdit:
+  - type: command
+    command: ./scripts/format.sh
 ---
+
 Format edited files after tool usage.
 ```
 
@@ -35,10 +36,11 @@ Format edited files after tool usage.
 ---
 description: Format files after editing
 hooks:
-  PostToolUse:
-    - type: command
-      command: ./scripts/format.sh
+ PostToolUse:
+  - type: command
+    command: ./scripts/format.sh
 ---
+
 Format edited files after tool usage.
 ```
 

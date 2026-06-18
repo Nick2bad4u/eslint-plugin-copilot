@@ -24,6 +24,7 @@ Skills often depend on linked guides, examples, and scripts stored alongside the
 name: review
 description: Review code changes.
 ---
+
 See [guide](guide.md).
 ```
 
@@ -36,6 +37,7 @@ when `guide.md` does not exist next to the skill definition.
 name: review
 description: Review code changes.
 ---
+
 See [guide](reference/guide.md).
 ```
 

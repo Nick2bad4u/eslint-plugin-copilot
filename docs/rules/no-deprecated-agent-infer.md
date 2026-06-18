@@ -23,6 +23,7 @@ VS Code custom agents now use `user-invocable` and `disable-model-invocation` fo
 description: Hidden implementation helper
 infer: false
 ---
+
 Implement changes based on the approved plan.
 ```
 
@@ -34,6 +35,7 @@ description: Hidden implementation helper
 user-invocable: false
 disable-model-invocation: false
 ---
+
 Implement changes based on the approved plan.
 ```
 

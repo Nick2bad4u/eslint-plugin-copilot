@@ -22,6 +22,7 @@ Custom agents often depend on linked checklists, architecture notes, and scripts
 ---
 description: Release coordinator
 ---
+
 See [release runbook](../../docs/release-runbook.md).
 ```
 
@@ -33,6 +34,7 @@ when `../../docs/release-runbook.md` does not exist from the agent file.
 ---
 description: Release coordinator
 ---
+
 See [release runbook](../../docs/runbooks/release-runbook.md).
 ```
 

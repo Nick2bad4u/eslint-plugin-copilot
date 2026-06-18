@@ -24,6 +24,7 @@ Path-specific instructions often link to coding standards, examples, or package 
 description: Frontend guidance
 applyTo: src/**/*.ts
 ---
+
 See [frontend standards](/docs/frontend.md).
 ```
 
@@ -34,6 +35,7 @@ See [frontend standards](/docs/frontend.md).
 description: Frontend guidance
 applyTo: src/**/*.ts
 ---
+
 See [frontend standards](../../docs/frontend.md).
 ```
 

@@ -25,6 +25,7 @@ GitHub documents lowercase, hyphen-separated skill identifiers. Following that c
 name: Review Skill
 description: Review code changes.
 ---
+
 Review code carefully.
 ```
 
@@ -35,6 +36,7 @@ Review code carefully.
 name: review-skill
 description: Review code changes.
 ---
+
 Review code carefully.
 ```
 

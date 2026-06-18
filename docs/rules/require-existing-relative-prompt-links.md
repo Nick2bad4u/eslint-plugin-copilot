@@ -22,6 +22,7 @@ Relative links are only useful when they actually resolve. Broken prompt links c
 ---
 description: Review a pull request
 ---
+
 See [review guide](../docs/review-guide.md).
 ```
 
@@ -33,6 +34,7 @@ when `../docs/review-guide.md` does not exist from the prompt file.
 ---
 description: Review a pull request
 ---
+
 See [review guide](../../docs/review-guide.md).
 ```
 

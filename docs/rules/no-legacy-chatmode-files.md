@@ -24,6 +24,7 @@ Keeping legacy chat mode files around makes repository customization harder to s
 ---
 description: Plan work carefully
 ---
+
 Plan the requested change before implementation.
 ```
 
@@ -39,6 +40,7 @@ Saved as:
 ---
 description: Plan work carefully
 ---
+
 Plan the requested change before implementation.
 ```
 

@@ -20,10 +20,12 @@ Hook environment variables are documented as key/value mappings. Requiring an ob
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "env": ["LOG_LEVEL"] }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "env": ["LOG_LEVEL"] }
+  ]
+ }
 }
 ```
 
@@ -31,10 +33,12 @@ Hook environment variables are documented as key/value mappings. Requiring an ob
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "env": { "LOG_LEVEL": "info" } }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "env": { "LOG_LEVEL": "info" } }
+  ]
+ }
 }
 ```
 

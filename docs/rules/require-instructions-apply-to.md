@@ -22,6 +22,7 @@ Path-specific instructions are only useful when Copilot can tell which files the
 ---
 description: TypeScript style guidance
 ---
+
 Use `satisfies` for stable object literals.
 ```
 
@@ -32,6 +33,7 @@ Use `satisfies` for stable object literals.
 description: TypeScript style guidance
 applyTo: "src/**/*.ts"
 ---
+
 Use `satisfies` for stable object literals.
 ```
 

@@ -21,8 +21,9 @@ In practice, custom-agent `mcp-servers` entries are repository file references t
 ```md
 ---
 description: Release coordinator
-mcp-servers: ['release-server']
+mcp-servers: ["release-server"]
 ---
+
 Coordinate the release.
 ```
 
@@ -31,8 +32,9 @@ Coordinate the release.
 ```md
 ---
 description: Release coordinator
-mcp-servers: ['release-server.json']
+mcp-servers: ["release-server.json"]
 ---
+
 Coordinate the release.
 ```
 

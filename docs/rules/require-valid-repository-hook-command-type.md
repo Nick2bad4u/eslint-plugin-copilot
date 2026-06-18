@@ -21,10 +21,10 @@ Each hook definition needs an explicit type so Copilot knows how to interpret it
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "bash": "echo ready" }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [{ "bash": "echo ready" }]
+ }
 }
 ```
 
@@ -32,10 +32,10 @@ Each hook definition needs an explicit type so Copilot knows how to interpret it
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready" }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [{ "type": "command", "bash": "echo ready" }]
+ }
 }
 ```
 

@@ -20,10 +20,12 @@ A repository-relative working directory still needs to point somewhere real. Val
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "cwd": "scripts/hooks" }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "cwd": "scripts/hooks" }
+  ]
+ }
 }
 ```
 
@@ -33,10 +35,12 @@ when `scripts/hooks` does not exist in the repository.
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "cwd": "scripts" }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "cwd": "scripts" }
+  ]
+ }
 }
 ```
 

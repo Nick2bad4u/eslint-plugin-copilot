@@ -22,11 +22,12 @@ A hook working directory should point at a real location in the repository. If i
 ---
 description: Review coordinator
 hooks:
-  SessionStart:
-    - type: command
-      command: echo ready
-      cwd: scripts/review
+ SessionStart:
+  - type: command
+    command: echo ready
+    cwd: scripts/review
 ---
+
 Review the implementation.
 ```
 
@@ -38,11 +39,12 @@ when `scripts/review` does not exist in the repository.
 ---
 description: Review coordinator
 hooks:
-  SessionStart:
-    - type: command
-      command: echo ready
-      cwd: scripts
+ SessionStart:
+  - type: command
+    command: echo ready
+    cwd: scripts
 ---
+
 Review the implementation.
 ```
 

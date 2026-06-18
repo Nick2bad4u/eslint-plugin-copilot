@@ -24,6 +24,7 @@ Prompt files can expose a slash-command name through frontmatter. When `name` is
 description: Review a pull request
 name:
 ---
+
 Review the proposed changes.
 ```
 
@@ -34,6 +35,7 @@ Review the proposed changes.
 description: Review a pull request
 name: review-pr
 ---
+
 Review the proposed changes.
 ```
 

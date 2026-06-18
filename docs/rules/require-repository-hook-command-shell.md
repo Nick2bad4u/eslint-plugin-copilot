@@ -21,10 +21,10 @@ A command hook without an executable shell command cannot do anything useful. Re
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command" }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [{ "type": "command" }]
+ }
 }
 ```
 
@@ -32,10 +32,10 @@ A command hook without an executable shell command cannot do anything useful. Re
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready" }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [{ "type": "command", "bash": "echo ready" }]
+ }
 }
 ```
 

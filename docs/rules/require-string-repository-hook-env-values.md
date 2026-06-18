@@ -20,10 +20,12 @@ Environment variables are string-based in practice. Requiring string values avoi
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "env": { "RETRIES": 3 } }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "env": { "RETRIES": 3 } }
+  ]
+ }
 }
 ```
 
@@ -31,10 +33,12 @@ Environment variables are string-based in practice. Requiring string values avoi
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "env": { "RETRIES": "3" } }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "env": { "RETRIES": "3" } }
+  ]
+ }
 }
 ```
 

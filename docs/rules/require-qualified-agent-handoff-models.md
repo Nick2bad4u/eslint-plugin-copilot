@@ -22,10 +22,11 @@ VS Code custom-agent docs specify that `handoffs.model` should use a qualified m
 ---
 description: Plan work carefully
 handoffs:
-  - label: Start Implementation
-    agent: Implementer
-    model: GPT-5
+ - label: Start Implementation
+   agent: Implementer
+   model: GPT-5
 ---
+
 Plan the requested change before implementation.
 ```
 
@@ -35,10 +36,11 @@ Plan the requested change before implementation.
 ---
 description: Plan work carefully
 handoffs:
-  - label: Start Implementation
-    agent: Implementer
-    model: GPT-5 (copilot)
+ - label: Start Implementation
+   agent: Implementer
+   model: GPT-5 (copilot)
 ---
+
 Plan the requested change before implementation.
 ```
 

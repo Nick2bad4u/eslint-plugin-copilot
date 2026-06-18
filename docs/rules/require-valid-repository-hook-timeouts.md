@@ -20,10 +20,10 @@ Hook timeouts are numeric execution budgets. Requiring a positive integer keeps 
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "timeoutSec": 0 }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [{ "type": "command", "bash": "echo ready", "timeoutSec": 0 }]
+ }
 }
 ```
 
@@ -31,10 +31,12 @@ Hook timeouts are numeric execution budgets. Requiring a positive integer keeps 
 
 ```json
 {
-  "version": 1,
-  "hooks": {
-    "sessionStart": [{ "type": "command", "bash": "echo ready", "timeoutSec": 10 }]
-  }
+ "version": 1,
+ "hooks": {
+  "sessionStart": [
+   { "type": "command", "bash": "echo ready", "timeoutSec": 10 }
+  ]
+ }
 }
 ```
 

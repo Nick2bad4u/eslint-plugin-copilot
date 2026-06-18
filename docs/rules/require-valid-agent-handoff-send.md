@@ -23,10 +23,11 @@ VS Code documents `handoffs.send` as an optional boolean flag that controls whet
 ---
 description: Generate an implementation plan
 handoffs:
-  - label: Start Implementation
-    agent: implementation
-    send: later
+ - label: Start Implementation
+   agent: implementation
+   send: later
 ---
+
 Create a reviewable implementation plan.
 ```
 
@@ -36,11 +37,12 @@ Create a reviewable implementation plan.
 ---
 description: Generate an implementation plan
 handoffs:
-  - label: Start Implementation
-    agent: implementation
-    prompt: Implement the approved plan.
-    send: true
+ - label: Start Implementation
+   agent: implementation
+   prompt: Implement the approved plan.
+   send: true
 ---
+
 Create a reviewable implementation plan.
 ```
 

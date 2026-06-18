@@ -24,6 +24,7 @@ Custom agents can declare a friendly `name` in frontmatter. When present, that f
 description: Review implementation quality
 name:
 ---
+
 Review the implementation carefully.
 ```
 
@@ -34,6 +35,7 @@ Review the implementation carefully.
 description: Review implementation quality
 name: reviewer
 ---
+
 Review the implementation carefully.
 ```
 

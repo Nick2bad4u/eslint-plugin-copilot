@@ -3,8 +3,8 @@ name: Feature request
 about: Suggest a new rule or improvement for eslint-plugin-copilot
 title: "Feature: "
 labels:
-    - enhancement
-    - triage
+ - enhancement
+ - triage
 assignees: []
 ---
 

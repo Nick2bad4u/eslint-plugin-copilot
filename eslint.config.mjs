@@ -62,6 +62,13 @@ const config = [
             "jsdoc/require-throws": "off",
         },
     },
+    {
+        files: [".github/workflows/auto-merge-dependabot-caller.yml"],
+        name: "Reusable Dependabot Workflow Caller",
+        rules: {
+            "github-actions/no-external-job": "off",
+        },
+    },
     // Add repository-specific config entries below as needed.
 ];
 

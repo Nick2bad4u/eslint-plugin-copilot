@@ -25,6 +25,7 @@ VS Code documents the `agents` field as accepting one of three shapes: a list of
 description: Coordinate feature work
 agents: Planner
 ---
+
 Use subagents when helpful.
 ```
 
@@ -33,8 +34,9 @@ Use subagents when helpful.
 ```md
 ---
 description: Coordinate feature work
-agents: ['Planner', 'Reviewer']
+agents: ["Planner", "Reviewer"]
 ---
+
 Use subagents when helpful.
 ```
 
@@ -43,6 +45,7 @@ Use subagents when helpful.
 description: Stay in the current agent only
 agents: []
 ---
+
 Do not use subagents for this workflow.
 ```
 

@@ -24,6 +24,7 @@ A custom agent's `argument-hint` is supposed to help callers understand what to 
 description: Investigate a bug
 argument-hint:
 ---
+
 Investigate the supplied issue.
 ```
 
@@ -34,6 +35,7 @@ Investigate the supplied issue.
 description: Investigate a bug
 argument-hint: <issue-url-or-stack-trace>
 ---
+
 Investigate the supplied issue.
 ```
 

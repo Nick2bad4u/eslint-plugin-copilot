@@ -25,6 +25,7 @@ VS Code documents reusable prompt-file `tools` metadata as a list. Keeping promp
 description: Review a pull request
 tools: fetch
 ---
+
 Review the proposed changes.
 ```
 
@@ -33,8 +34,9 @@ Review the proposed changes.
 ```md
 ---
 description: Review a pull request
-tools: ['search/codebase', 'fetch/web']
+tools: ["search/codebase", "fetch/web"]
 ---
+
 Review the proposed changes.
 ```
 

@@ -25,6 +25,7 @@ VS Code documents `user-invocable` and `disable-model-invocation` as boolean con
 description: Internal helper agent
 user-invocable: sometimes
 ---
+
 Use this agent for internal helper work.
 ```
 
@@ -36,6 +37,7 @@ description: Internal helper agent
 user-invocable: false
 disable-model-invocation: true
 ---
+
 Use this agent for internal helper work.
 ```
 

@@ -25,6 +25,7 @@ VS Code documents custom-agent `model` as either a single model name string or a
 description: Implement approved changes
 model: []
 ---
+
 Implement the requested changes.
 ```
 
@@ -33,8 +34,9 @@ Implement the requested changes.
 ```md
 ---
 description: Implement approved changes
-model: ['Claude Haiku 4.5 (copilot)', 'GPT-5 (copilot)']
+model: ["Claude Haiku 4.5 (copilot)", "GPT-5 (copilot)"]
 ---
+
 Implement the requested changes.
 ```
 

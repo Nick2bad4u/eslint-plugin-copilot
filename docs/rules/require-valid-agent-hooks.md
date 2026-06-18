@@ -23,10 +23,11 @@ Agent-scoped hooks in VS Code use the same structure as hook configuration files
 ---
 description: Format files after editing
 hooks:
-  PostToolUse:
-    - type: command
-      cwd: scripts
+ PostToolUse:
+  - type: command
+    cwd: scripts
 ---
+
 Format edited files after tool usage.
 ```
 
@@ -36,10 +37,11 @@ Format edited files after tool usage.
 ---
 description: Format files after editing
 hooks:
-  PostToolUse:
-    - type: command
-      command: ./scripts/format.sh
+ PostToolUse:
+  - type: command
+    command: ./scripts/format.sh
 ---
+
 Format edited files after tool usage.
 ```
 

@@ -24,8 +24,9 @@ VS Code documents prompt-file `model` as the language model used when running th
 ---
 description: Review changes
 agent: plan
-model: ['Claude Haiku 4.5 (copilot)', 'GPT-5 (copilot)']
+model: ["Claude Haiku 4.5 (copilot)", "GPT-5 (copilot)"]
 ---
+
 Review the requested changes.
 ```
 
@@ -37,6 +38,7 @@ description: Review changes
 agent: plan
 model: GPT-5 (copilot)
 ---
+
 Review the requested changes.
 ```
 

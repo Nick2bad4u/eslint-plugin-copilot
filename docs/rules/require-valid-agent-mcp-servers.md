@@ -26,6 +26,7 @@ description: Coordinate release automation
 target: github-copilot
 mcp-servers: release-coordinator.json
 ---
+
 Coordinate release tasks through MCP servers.
 ```
 
@@ -35,8 +36,9 @@ Coordinate release tasks through MCP servers.
 ---
 description: Coordinate release automation
 target: github-copilot
-mcp-servers: ['release-coordinator.json', 'observability.json']
+mcp-servers: ["release-coordinator.json", "observability.json"]
 ---
+
 Coordinate release tasks through MCP servers.
 ```
 

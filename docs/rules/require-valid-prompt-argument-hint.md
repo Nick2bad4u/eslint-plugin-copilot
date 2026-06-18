@@ -24,6 +24,7 @@ Require Copilot prompt-file `argument-hint` metadata to be a non-empty scalar wh
 description: Summarize a change
 argument-hint:
 ---
+
 Summarize the supplied change.
 ```
 
@@ -34,6 +35,7 @@ Summarize the supplied change.
 description: Summarize a change
 argument-hint: <pull-request-number>
 ---
+
 Summarize the supplied change.
 ```
 

@@ -26,6 +26,7 @@ Prompt files are reusable requests. Explicit metadata makes them easier to under
 description: Review this repository
 agent: agent
 ---
+
 Audit the repository for stale branding and broken docs links.
 ```
 
@@ -37,6 +38,7 @@ description: Review this repository
 agent: agent
 tools: [search/file_search, search/read_file]
 ---
+
 Audit the repository for stale branding and broken docs links.
 ```
 

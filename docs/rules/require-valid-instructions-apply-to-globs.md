@@ -26,6 +26,7 @@ Path-specific instructions are meant to target files relative to the repository 
 description: Frontend guidance
 applyTo: ./src/**/*.ts
 ---
+
 Use explicit return types.
 ```
 
@@ -36,6 +37,7 @@ Use explicit return types.
 description: Frontend guidance
 applyTo: src/**/*.ts
 ---
+
 Use explicit return types.
 ```
 

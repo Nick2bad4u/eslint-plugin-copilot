@@ -22,11 +22,12 @@ VS Code hook documentation defines `timeout` as a numeric value in seconds. Keep
 ---
 description: Format files after editing
 hooks:
-  PostToolUse:
-    - type: command
-      command: ./scripts/format.sh
-      timeout: soon
+ PostToolUse:
+  - type: command
+    command: ./scripts/format.sh
+    timeout: soon
 ---
+
 Format edited files after tool usage.
 ```
 
@@ -36,11 +37,12 @@ Format edited files after tool usage.
 ---
 description: Format files after editing
 hooks:
-  PostToolUse:
-    - type: command
-      command: ./scripts/format.sh
-      timeout: 15
+ PostToolUse:
+  - type: command
+    command: ./scripts/format.sh
+    timeout: 15
 ---
+
 Format edited files after tool usage.
 ```
 

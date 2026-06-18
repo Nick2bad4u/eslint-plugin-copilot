@@ -21,8 +21,9 @@ Declaring an MCP server file is only useful when the referenced configuration ac
 ```md
 ---
 description: Release coordinator
-mcp-servers: ['mcp/release.json']
+mcp-servers: ["mcp/release.json"]
 ---
+
 Coordinate the release.
 ```
 
@@ -33,8 +34,9 @@ when `mcp/release.json` does not exist in the repository.
 ```md
 ---
 description: Release coordinator
-mcp-servers: ['.vscode/mcp/release.json']
+mcp-servers: [".vscode/mcp/release.json"]
 ---
+
 Coordinate the release.
 ```
 

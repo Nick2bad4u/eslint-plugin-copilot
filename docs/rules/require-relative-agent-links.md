@@ -23,6 +23,7 @@ Relative links make custom-agent instructions portable across forks, local clone
 ---
 description: Release coordinator
 ---
+
 See [runbook](/docs/release-runbook.md).
 ```
 
@@ -32,6 +33,7 @@ See [runbook](/docs/release-runbook.md).
 ---
 description: Release coordinator
 ---
+
 See [runbook](../../docs/release-runbook.md).
 ```
 

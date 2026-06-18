@@ -25,6 +25,7 @@ description: Build features by delegating to specialist agents
 tools: [search/codebase, fetch/fetch]
 agents: [Researcher, Implementer]
 ---
+
 Research first, then delegate implementation.
 ```
 
@@ -36,6 +37,7 @@ description: Build features by delegating to specialist agents
 tools: [agent, search/codebase, fetch/fetch]
 agents: [Researcher, Implementer]
 ---
+
 Research first, then delegate implementation.
 ```
 

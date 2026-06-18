@@ -25,6 +25,7 @@ VS Code documents custom-agent `tools` as a list of tool or tool set names. Keep
 description: Review implementation quality
 tools: search/codebase
 ---
+
 Review the implementation carefully.
 ```
 
@@ -33,8 +34,9 @@ Review the implementation carefully.
 ```md
 ---
 description: Review implementation quality
-tools: ['search/codebase', 'fetch/web']
+tools: ["search/codebase", "fetch/web"]
 ---
+
 Review the implementation carefully.
 ```
 

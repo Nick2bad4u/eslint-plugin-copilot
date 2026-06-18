@@ -25,6 +25,7 @@ VS Code prompt-file documentation says to reference workspace files with Markdow
 description: Review changes with repository guidance
 agent: agent
 ---
+
 Review the proposed changes using [security guidance](/.github/instructions/security.instructions.md).
 ```
 
@@ -35,6 +36,7 @@ Review the proposed changes using [security guidance](/.github/instructions/secu
 description: Review changes with repository guidance
 agent: agent
 ---
+
 Review the proposed changes using [security guidance](../instructions/security.instructions.md).
 ```
 
