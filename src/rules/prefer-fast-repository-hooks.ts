@@ -19,45 +19,41 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `prefer-fast-repository-hooks`. */
 const preferFastRepositoryHooksRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return {
-            Document() {
-                if (!isRepositoryHookFilePath(context.filename)) {
-                    return;
-                }
+    create: (context) => ({
+        Document() {
+            if (!isRepositoryHookFilePath(context.filename)) {
+                return;
+            }
 
-                const root = parseJsonText(context.sourceCode.text);
-                const slowHook = getRepositoryHookObjects(root).find(
-                    ({ hook }) => {
-                        const timeout = hook["timeoutSec"];
+            const root = parseJsonText(context.sourceCode.text);
+            const slowHook = getRepositoryHookObjects(root).find(({ hook }) => {
+                const timeout = hook["timeoutSec"];
 
-                        return (
-                            isJsonNumber(timeout) &&
-                            timeout > DEFAULT_REPOSITORY_HOOK_TIMEOUT_SECONDS
-                        );
-                    }
+                return (
+                    isJsonNumber(timeout) &&
+                    timeout > DEFAULT_REPOSITORY_HOOK_TIMEOUT_SECONDS
                 );
+            });
 
-                if (!isDefined(slowHook)) {
-                    return;
-                }
+            if (!isDefined(slowHook)) {
+                return;
+            }
 
-                const timeout = slowHook.hook["timeoutSec"];
+            const timeout = slowHook.hook["timeoutSec"];
 
-                if (!isJsonNumber(timeout)) {
-                    return;
-                }
+            if (!isJsonNumber(timeout)) {
+                return;
+            }
 
-                reportAtDocumentStart(context, {
-                    data: {
-                        eventName: slowHook.eventName,
-                        timeout: String(timeout),
-                    },
-                    messageId: "slowRepositoryHookTimeout",
-                });
-            },
-        };
-    },
+            reportAtDocumentStart(context, {
+                data: {
+                    eventName: slowHook.eventName,
+                    timeout: String(timeout),
+                },
+                messageId: "slowRepositoryHookTimeout",
+            });
+        },
+    }),
     meta: {
         deprecated: false,
         docs: {

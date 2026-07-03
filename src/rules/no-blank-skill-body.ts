@@ -15,8 +15,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `no-blank-skill-body`. */
 const noBlankSkillBodyRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isSkillFilePath(context.filename)) {
                 return;
             }
@@ -31,8 +31,7 @@ const noBlankSkillBodyRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "blankSkillBody",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

@@ -19,33 +19,31 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-repository-hook-arrays`. */
 const requireRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return {
-            Document() {
-                if (!isRepositoryHookFilePath(context.filename)) {
-                    return;
-                }
+    create: (context) => ({
+        Document() {
+            if (!isRepositoryHookFilePath(context.filename)) {
+                return;
+            }
 
-                const root = parseJsonText(context.sourceCode.text);
-                const invalidEntry =
-                    getRepositoryHookEventEntries(root).find(
-                        ([, eventValue]) => !isJsonArray(eventValue)
-                    ) ?? null;
+            const root = parseJsonText(context.sourceCode.text);
+            const invalidEntry =
+                getRepositoryHookEventEntries(root).find(
+                    ([, eventValue]) => !isJsonArray(eventValue)
+                ) ?? null;
 
-                if (invalidEntry === null) {
-                    return;
-                }
+            if (invalidEntry === null) {
+                return;
+            }
 
-                reportAtDocumentStart(context, {
-                    data: {
-                        eventName: arrayFirst(invalidEntry),
-                        value: formatJsonValue(invalidEntry[1]),
-                    },
-                    messageId: "invalidRepositoryHookArray",
-                });
-            },
-        };
-    },
+            reportAtDocumentStart(context, {
+                data: {
+                    eventName: arrayFirst(invalidEntry),
+                    value: formatJsonValue(invalidEntry[1]),
+                },
+                messageId: "invalidRepositoryHookArray",
+            });
+        },
+    }),
     meta: {
         deprecated: false,
         docs: {

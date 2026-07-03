@@ -32,8 +32,8 @@ const normalizeRelativeFilePath = (
 
 /** Rule module for `no-duplicate-prompt-names`. */
 const noDuplicatePromptNamesRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!context.filename.endsWith(".prompt.md")) {
                 return;
             }
@@ -92,8 +92,7 @@ const noDuplicatePromptNamesRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "duplicatePromptName",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

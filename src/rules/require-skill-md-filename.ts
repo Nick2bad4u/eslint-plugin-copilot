@@ -19,8 +19,8 @@ import {
 
 /** Rule module for `require-skill-md-filename`. */
 const requireSkillMdFilenameRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isSkillMarkdownFilePath(context.filename)) {
                 return;
             }
@@ -43,8 +43,7 @@ const requireSkillMdFilenameRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "invalidSkillDefinitionFilename",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

@@ -39,8 +39,8 @@ const normalizeRelativeFilePath = (
 
 /** Rule module for `no-duplicate-slash-command-names`. */
 const noDuplicateSlashCommandNamesRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isPromptOrSkillCommandFile(context.filename)) {
                 return;
             }
@@ -104,8 +104,7 @@ const noDuplicateSlashCommandNamesRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "duplicateSlashCommandName",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

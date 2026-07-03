@@ -22,41 +22,39 @@ const isValidTimeoutSeconds = (value: unknown): value is number =>
 /** Rule module for `require-valid-repository-hook-timeouts`. */
 const requireValidRepositoryHookTimeoutsRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                Document() {
-                    if (!isRepositoryHookFilePath(context.filename)) {
-                        return;
+        create: (context) => ({
+            Document() {
+                if (!isRepositoryHookFilePath(context.filename)) {
+                    return;
+                }
+
+                const root = parseJsonText(context.sourceCode.text);
+                const invalidHook = getRepositoryHookObjects(root).find(
+                    ({ hook }) => {
+                        const timeout = hook["timeoutSec"];
+
+                        return (
+                            isDefined(timeout) &&
+                            !isValidTimeoutSeconds(timeout)
+                        );
                     }
+                );
 
-                    const root = parseJsonText(context.sourceCode.text);
-                    const invalidHook = getRepositoryHookObjects(root).find(
-                        ({ hook }) => {
-                            const timeout = hook["timeoutSec"];
+                if (!isDefined(invalidHook)) {
+                    return;
+                }
 
-                            return (
-                                isDefined(timeout) &&
-                                !isValidTimeoutSeconds(timeout)
-                            );
-                        }
-                    );
-
-                    if (!isDefined(invalidHook)) {
-                        return;
-                    }
-
-                    reportAtDocumentStart(context, {
-                        data: {
-                            eventName: invalidHook.eventName,
-                            timeout: formatJsonValue(
-                                invalidHook.hook["timeoutSec"]
-                            ),
-                        },
-                        messageId: "invalidRepositoryHookTimeout",
-                    });
-                },
-            };
-        },
+                reportAtDocumentStart(context, {
+                    data: {
+                        eventName: invalidHook.eventName,
+                        timeout: formatJsonValue(
+                            invalidHook.hook["timeoutSec"]
+                        ),
+                    },
+                    messageId: "invalidRepositoryHookTimeout",
+                });
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

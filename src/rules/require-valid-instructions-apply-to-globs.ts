@@ -47,8 +47,8 @@ const isValidApplyToGlob = (value: string): boolean => {
 /** Rule module for `require-valid-instructions-apply-to-globs`. */
 const requireValidInstructionsApplyToGlobsRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 if (getCopilotFileKind(context.filename) !== "instructions") {
                     return;
                 }
@@ -88,8 +88,7 @@ const requireValidInstructionsApplyToGlobsRule: CopilotRuleModule =
                     },
                     messageId: "invalidApplyToGlob",
                 });
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

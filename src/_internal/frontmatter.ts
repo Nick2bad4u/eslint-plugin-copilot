@@ -46,7 +46,7 @@ const isYamlIdentifierCharacter = (character: string): boolean =>
 
 /** Validate the limited frontmatter field names this plugin supports. */
 const isSupportedFrontmatterFieldName = (value: string): boolean => {
-    if (value.length === 0 || !isAsciiLetter(value[0] ?? "")) {
+    if (value.length === 0 || !isAsciiLetter(value.at(0) ?? "")) {
         return false;
     }
 

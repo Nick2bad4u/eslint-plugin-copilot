@@ -85,8 +85,8 @@ const reportAgentToolsRequirement = (
 
 /** Rule module for `require-prompt-file-metadata`. */
 const requirePromptFileMetadataRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (getCopilotFileKind(context.filename) !== "prompt") {
                 return;
             }
@@ -134,8 +134,7 @@ const requirePromptFileMetadataRule: CopilotRuleModule = createCopilotRule({
             const tools = getFrontmatterList(frontmatter, "tools");
 
             reportAgentToolsRequirement(context, frontmatter, agent, tools);
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

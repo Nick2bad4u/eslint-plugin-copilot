@@ -18,55 +18,47 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-existing-relative-prompt-links`. */
 const requireExistingRelativePromptLinksRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                root() {
-                    if (getCopilotFileKind(context.filename) !== "prompt") {
-                        return;
+        create: (context) => ({
+            root() {
+                if (getCopilotFileKind(context.filename) !== "prompt") {
+                    return;
+                }
+
+                const { body, offset } = getCustomizationBodyWithOffset(
+                    context.sourceCode.text
+                );
+
+                for (const link of extractMarkdownLinks(body, offset)) {
+                    if (!isRelativeWorkspaceLinkDestination(link.destination)) {
+                        continue;
                     }
 
-                    const { body, offset } = getCustomizationBodyWithOffset(
-                        context.sourceCode.text
-                    );
-
-                    for (const link of extractMarkdownLinks(body, offset)) {
-                        if (
-                            !isRelativeWorkspaceLinkDestination(
+                    if (
+                        pathExists(
+                            resolveMarkdownWorkspaceLink(
+                                context.filename,
                                 link.destination
                             )
-                        ) {
-                            continue;
-                        }
-
-                        if (
-                            pathExists(
-                                resolveMarkdownWorkspaceLink(
-                                    context.filename,
-                                    link.destination
-                                )
-                            )
-                        ) {
-                            continue;
-                        }
-
-                        context.report({
-                            data: {
-                                destination: link.destination,
-                            },
-                            loc: {
-                                end: context.sourceCode.getLocFromIndex(
-                                    link.end
-                                ),
-                                start: context.sourceCode.getLocFromIndex(
-                                    link.start
-                                ),
-                            },
-                            messageId: "missingPromptLinkTarget",
-                        });
+                        )
+                    ) {
+                        continue;
                     }
-                },
-            };
-        },
+
+                    context.report({
+                        data: {
+                            destination: link.destination,
+                        },
+                        loc: {
+                            end: context.sourceCode.getLocFromIndex(link.end),
+                            start: context.sourceCode.getLocFromIndex(
+                                link.start
+                            ),
+                        },
+                        messageId: "missingPromptLinkTarget",
+                    });
+                }
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

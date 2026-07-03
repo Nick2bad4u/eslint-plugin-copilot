@@ -37,8 +37,8 @@ const formatToolsValue = (
 
 /** Rule module for `require-valid-prompt-tools`. */
 const requireValidPromptToolsRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (getCopilotFileKind(context.filename) !== "prompt") {
                 return;
             }
@@ -67,8 +67,7 @@ const requireValidPromptToolsRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "invalidPromptTools",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

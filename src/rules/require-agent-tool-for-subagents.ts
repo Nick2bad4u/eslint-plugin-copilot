@@ -27,8 +27,8 @@ const hasAgentTool = (tools: readonly string[] | undefined): boolean =>
 
 /** Rule module for `require-agent-tool-for-subagents`. */
 const requireAgentToolForSubagentsRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -64,8 +64,7 @@ const requireAgentToolForSubagentsRule: CopilotRuleModule = createCopilotRule({
                     ? "missingAgentTool"
                     : "missingTools",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

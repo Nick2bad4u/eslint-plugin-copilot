@@ -20,8 +20,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-valid-agent-handoffs`. */
 const requireValidAgentHandoffsRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -72,8 +72,7 @@ const requireValidAgentHandoffsRule: CopilotRuleModule = createCopilotRule({
                     return;
                 }
             }
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

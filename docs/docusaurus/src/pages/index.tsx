@@ -1,5 +1,5 @@
-import Link from "@docusaurus/Link";
 import Head from "@docusaurus/Head";
+import Link from "@docusaurus/Link";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import Layout from "@theme/Layout";
 
@@ -8,97 +8,6 @@ import {
     homePrimaryCards,
     liveBadges,
 } from "../components/siteData";
-
-function OverviewIcon(): React.JSX.Element {
-    return (
-        <svg aria-hidden className="ui-icon" viewBox="0 0 24 24">
-            <path
-                d="M5.25 6.75h13.5m-13.5 5.25h13.5m-13.5 5.25h8.25"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.8"
-            />
-        </svg>
-    );
-}
-
-function PresetsIcon(): React.JSX.Element {
-    return (
-        <svg aria-hidden className="ui-icon" viewBox="0 0 24 24">
-            <path
-                d="M4.5 7.5h15m-15 4.5h15m-15 4.5h15"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.8"
-            />
-            <circle cx="8.25" cy="7.5" fill="currentColor" r="1.1" />
-            <circle cx="12" cy="12" fill="currentColor" r="1.1" />
-            <circle cx="15.75" cy="16.5" fill="currentColor" r="1.1" />
-        </svg>
-    );
-}
-
-function RulesIcon(): React.JSX.Element {
-    return (
-        <svg aria-hidden className="ui-icon" viewBox="0 0 24 24">
-            <path
-                d="M7.5 5.25h7.25l3.75 3.75v9.75a1.5 1.5 0 0 1-1.5 1.5h-9.5a1.5 1.5 0 0 1-1.5-1.5v-12a1.5 1.5 0 0 1 1.5-1.5Z"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.8"
-            />
-            <path
-                d="M14.75 5.25V9h3.75M8.75 12.75h6.5m-6.5 3h4.5"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.8"
-            />
-        </svg>
-    );
-}
-
-function ArrowRightIcon(): React.JSX.Element {
-    return (
-        <svg aria-hidden className="ui-icon ui-icon--sm" viewBox="0 0 24 24">
-            <path
-                d="M5.25 12h13.5m-5.25-5.25 5.25 5.25-5.25 5.25"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.8"
-            />
-        </svg>
-    );
-}
-
-function getHomeIcon(icon: string | undefined): React.JSX.Element {
-    switch (icon) {
-        case "overview": {
-            return <OverviewIcon />;
-        }
-
-        case "presets": {
-            return <PresetsIcon />;
-        }
-
-        case "rules": {
-            return <RulesIcon />;
-        }
-
-        default: {
-            return <ArrowRightIcon />;
-        }
-    }
-}
 
 /** Render the public landing page for eslint-plugin-copilot documentation. */
 export default function Home(): React.JSX.Element {
@@ -162,8 +71,8 @@ export default function Home(): React.JSX.Element {
                             </div>
                         </div>
                         <aside
-                            className="home-hero__visual"
                             aria-label="GitHub Copilot brand mark"
+                            className="home-hero__visual"
                         >
                             <div className="home-hero__art">
                                 <div className="home-hero__artGlow" />
@@ -182,9 +91,9 @@ export default function Home(): React.JSX.Element {
                         <div className="site-badge-strip home-hero__badges home-hero__badges--fullwidth">
                             {liveBadges.map((badge) => (
                                 <Link
-                                    key={badge.alt}
                                     className="site-badge"
                                     href={badge.href}
+                                    key={badge.alt}
                                 >
                                     <img
                                         alt={badge.alt}
@@ -199,9 +108,9 @@ export default function Home(): React.JSX.Element {
 
                 <section className="container home-card-grid">
                     {homePrimaryCards.map((card) => (
-                        <article key={card.title} className="home-card">
+                        <article className="home-card" key={card.title}>
                             <div className="home-card__heading">
-                                <span className="home-card__icon" aria-hidden>
+                                <span aria-hidden className="home-card__icon">
                                     {getHomeIcon(card.icon)}
                                 </span>
                                 {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
@@ -224,5 +133,96 @@ export default function Home(): React.JSX.Element {
                 </section>
             </main>
         </Layout>
+    );
+}
+
+function ArrowRightIcon(): React.JSX.Element {
+    return (
+        <svg aria-hidden className="ui-icon ui-icon--sm" viewBox="0 0 24 24">
+            <path
+                d="M5.25 12h13.5m-5.25-5.25 5.25 5.25-5.25 5.25"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+        </svg>
+    );
+}
+
+function getHomeIcon(icon: string | undefined): React.JSX.Element {
+    switch (icon) {
+        case "overview": {
+            return <OverviewIcon />;
+        }
+
+        case "presets": {
+            return <PresetsIcon />;
+        }
+
+        case "rules": {
+            return <RulesIcon />;
+        }
+
+        default: {
+            return <ArrowRightIcon />;
+        }
+    }
+}
+
+function OverviewIcon(): React.JSX.Element {
+    return (
+        <svg aria-hidden className="ui-icon" viewBox="0 0 24 24">
+            <path
+                d="M5.25 6.75h13.5m-13.5 5.25h13.5m-13.5 5.25h8.25"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+        </svg>
+    );
+}
+
+function PresetsIcon(): React.JSX.Element {
+    return (
+        <svg aria-hidden className="ui-icon" viewBox="0 0 24 24">
+            <path
+                d="M4.5 7.5h15m-15 4.5h15m-15 4.5h15"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+            <circle cx="8.25" cy="7.5" fill="currentColor" r="1.1" />
+            <circle cx="12" cy="12" fill="currentColor" r="1.1" />
+            <circle cx="15.75" cy="16.5" fill="currentColor" r="1.1" />
+        </svg>
+    );
+}
+
+function RulesIcon(): React.JSX.Element {
+    return (
+        <svg aria-hidden className="ui-icon" viewBox="0 0 24 24">
+            <path
+                d="M7.5 5.25h7.25l3.75 3.75v9.75a1.5 1.5 0 0 1-1.5 1.5h-9.5a1.5 1.5 0 0 1-1.5-1.5v-12a1.5 1.5 0 0 1 1.5-1.5Z"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+            <path
+                d="M14.75 5.25V9h3.75M8.75 12.75h6.5m-6.5 3h4.5"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+            />
+        </svg>
     );
 }

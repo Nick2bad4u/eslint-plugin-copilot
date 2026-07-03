@@ -21,8 +21,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-valid-prompt-name`. */
 const requireValidPromptNameRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (getCopilotFileKind(context.filename) !== "prompt") {
                 return;
             }
@@ -43,8 +43,7 @@ const requireValidPromptNameRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "invalidPromptName",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

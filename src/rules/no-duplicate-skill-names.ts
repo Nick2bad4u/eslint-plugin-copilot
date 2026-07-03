@@ -35,8 +35,8 @@ const normalizeRelativeFilePath = (
 
 /** Rule module for `no-duplicate-skill-names`. */
 const noDuplicateSkillNamesRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isSkillFilePath(context.filename)) {
                 return;
             }
@@ -96,8 +96,7 @@ const noDuplicateSkillNamesRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "duplicateSkillName",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

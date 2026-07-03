@@ -43,8 +43,8 @@ const isQualifiedModelName = (value: string): boolean => {
 /** Rule module for `require-qualified-agent-handoff-models`. */
 const requireQualifiedAgentHandoffModelsRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 if (!isCustomAgentFilePath(context.filename)) {
                     return;
                 }
@@ -85,8 +85,7 @@ const requireQualifiedAgentHandoffModelsRule: CopilotRuleModule =
 
                     return;
                 }
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

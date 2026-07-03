@@ -21,8 +21,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-chatmode-file-metadata`. */
 const requireChatmodeFileMetadataRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (getCopilotFileKind(context.filename) !== "chatmode") {
                 return;
             }
@@ -50,8 +50,7 @@ const requireChatmodeFileMetadataRule: CopilotRuleModule = createCopilotRule({
                     ? "emptyDescription"
                     : "missingDescription",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

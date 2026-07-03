@@ -37,8 +37,8 @@ const formatMcpServersValue = (
 
 /** Rule module for `require-valid-agent-mcp-servers`. */
 const requireValidAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -67,8 +67,7 @@ const requireValidAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "invalidMcpServersField",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

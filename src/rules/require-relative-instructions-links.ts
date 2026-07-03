@@ -16,44 +16,36 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-relative-instructions-links`. */
 const requireRelativeInstructionsLinksRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                root() {
-                    if (
-                        getCopilotFileKind(context.filename) !== "instructions"
-                    ) {
-                        return;
+        create: (context) => ({
+            root() {
+                if (getCopilotFileKind(context.filename) !== "instructions") {
+                    return;
+                }
+
+                const { body, offset } = getCustomizationBodyWithOffset(
+                    context.sourceCode.text
+                );
+
+                for (const link of extractMarkdownLinks(body, offset)) {
+                    if (!isInvalidWorkspaceLinkDestination(link.destination)) {
+                        continue;
                     }
 
-                    const { body, offset } = getCustomizationBodyWithOffset(
-                        context.sourceCode.text
-                    );
-
-                    for (const link of extractMarkdownLinks(body, offset)) {
-                        if (
-                            !isInvalidWorkspaceLinkDestination(link.destination)
-                        ) {
-                            continue;
-                        }
-
-                        context.report({
-                            data: {
-                                destination: link.destination,
-                            },
-                            loc: {
-                                end: context.sourceCode.getLocFromIndex(
-                                    link.end
-                                ),
-                                start: context.sourceCode.getLocFromIndex(
-                                    link.start
-                                ),
-                            },
-                            messageId: "nonRelativeInstructionsLink",
-                        });
-                    }
-                },
-            };
-        },
+                    context.report({
+                        data: {
+                            destination: link.destination,
+                        },
+                        loc: {
+                            end: context.sourceCode.getLocFromIndex(link.end),
+                            start: context.sourceCode.getLocFromIndex(
+                                link.start
+                            ),
+                        },
+                        messageId: "nonRelativeInstructionsLink",
+                    });
+                }
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

@@ -15,38 +15,34 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-relative-skill-links`. */
 const requireRelativeSkillLinksRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return {
-            root() {
-                if (!isSkillFilePath(context.filename)) {
-                    return;
+    create: (context) => ({
+        root() {
+            if (!isSkillFilePath(context.filename)) {
+                return;
+            }
+
+            const { body, offset } = getCustomizationBodyWithOffset(
+                context.sourceCode.text
+            );
+
+            for (const link of extractMarkdownLinks(body, offset)) {
+                if (!isInvalidWorkspaceLinkDestination(link.destination)) {
+                    continue;
                 }
 
-                const { body, offset } = getCustomizationBodyWithOffset(
-                    context.sourceCode.text
-                );
-
-                for (const link of extractMarkdownLinks(body, offset)) {
-                    if (!isInvalidWorkspaceLinkDestination(link.destination)) {
-                        continue;
-                    }
-
-                    context.report({
-                        data: {
-                            destination: link.destination,
-                        },
-                        loc: {
-                            end: context.sourceCode.getLocFromIndex(link.end),
-                            start: context.sourceCode.getLocFromIndex(
-                                link.start
-                            ),
-                        },
-                        messageId: "nonRelativeSkillLink",
-                    });
-                }
-            },
-        };
-    },
+                context.report({
+                    data: {
+                        destination: link.destination,
+                    },
+                    loc: {
+                        end: context.sourceCode.getLocFromIndex(link.end),
+                        start: context.sourceCode.getLocFromIndex(link.start),
+                    },
+                    messageId: "nonRelativeSkillLink",
+                });
+            }
+        },
+    }),
     meta: {
         deprecated: false,
         docs: {

@@ -17,8 +17,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-agents-md-for-cross-surface-agent-instructions`. */
 const requireAgentsMdForCrossSurfaceAgentInstructionsRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 const basename = path.basename(context.filename);
 
                 if (basename !== "CLAUDE.md" && basename !== "GEMINI.md") {
@@ -40,8 +40,7 @@ const requireAgentsMdForCrossSurfaceAgentInstructionsRule: CopilotRuleModule =
                     },
                     messageId: "missingAgentsMdSibling",
                 });
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

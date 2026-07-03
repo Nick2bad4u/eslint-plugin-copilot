@@ -47,41 +47,37 @@ const isInvalidPromptWorkspaceLinkDestination = (
 
 /** Rule module for `require-relative-prompt-links`. */
 const requireRelativePromptLinksRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return {
-            root() {
-                if (getCopilotFileKind(context.filename) !== "prompt") {
-                    return;
+    create: (context) => ({
+        root() {
+            if (getCopilotFileKind(context.filename) !== "prompt") {
+                return;
+            }
+
+            const sourceText = context.sourceCode.text;
+            const frontmatter = extractFrontmatter(sourceText);
+            const body = frontmatter?.body ?? sourceText;
+            const bodyOffset = sourceText.length - body.length;
+
+            for (const link of extractMarkdownLinks(body, bodyOffset)) {
+                const { destination } = link;
+
+                if (!isInvalidPromptWorkspaceLinkDestination(destination)) {
+                    continue;
                 }
 
-                const sourceText = context.sourceCode.text;
-                const frontmatter = extractFrontmatter(sourceText);
-                const body = frontmatter?.body ?? sourceText;
-                const bodyOffset = sourceText.length - body.length;
-
-                for (const link of extractMarkdownLinks(body, bodyOffset)) {
-                    const { destination } = link;
-
-                    if (!isInvalidPromptWorkspaceLinkDestination(destination)) {
-                        continue;
-                    }
-
-                    context.report({
-                        data: {
-                            destination,
-                        },
-                        loc: {
-                            end: context.sourceCode.getLocFromIndex(link.end),
-                            start: context.sourceCode.getLocFromIndex(
-                                link.start
-                            ),
-                        },
-                        messageId: "nonRelativePromptLink",
-                    });
-                }
-            },
-        };
-    },
+                context.report({
+                    data: {
+                        destination,
+                    },
+                    loc: {
+                        end: context.sourceCode.getLocFromIndex(link.end),
+                        start: context.sourceCode.getLocFromIndex(link.start),
+                    },
+                    messageId: "nonRelativePromptLink",
+                });
+            }
+        },
+    }),
     meta: {
         deprecated: false,
         docs: {

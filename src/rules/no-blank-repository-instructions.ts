@@ -18,8 +18,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `no-blank-repository-instructions`. */
 const noBlankRepositoryInstructionsRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (
                 getCopilotFileKind(context.filename) !==
                 "repository-instructions"
@@ -39,8 +39,7 @@ const noBlankRepositoryInstructionsRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "blankInstructions",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

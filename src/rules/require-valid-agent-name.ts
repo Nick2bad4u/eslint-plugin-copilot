@@ -21,8 +21,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-valid-agent-name`. */
 const requireValidAgentNameRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -43,8 +43,7 @@ const requireValidAgentNameRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "invalidAgentName",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

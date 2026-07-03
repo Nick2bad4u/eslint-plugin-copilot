@@ -35,8 +35,8 @@ const normalizeRelativeFilePath = (
 
 /** Rule module for `no-duplicate-agent-names`. */
 const noDuplicateAgentNamesRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -95,8 +95,7 @@ const noDuplicateAgentNamesRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "duplicateAgentName",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

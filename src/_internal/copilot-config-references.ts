@@ -3,6 +3,8 @@
  * Shared Copilot preset/config reference constants and type guards.
  */
 
+import type { ArrayValues } from "type-fest";
+
 /** Canonical flat-config preset keys exposed through `plugin.configs`. */
 import { objectHasOwn } from "ts-extras";
 
@@ -23,7 +25,7 @@ export type CopilotConfigMetadata = Readonly<{
 }>;
 
 /** Canonical flat-config preset key type exposed through `plugin.configs`. */
-export type CopilotConfigName = (typeof copilotConfigNames)[number];
+export type CopilotConfigName = ArrayValues<typeof copilotConfigNames>;
 
 /** Fully-qualified preset reference lookup object shape. */
 type CopilotConfigReferenceMap = Readonly<{

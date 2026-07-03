@@ -16,8 +16,8 @@ import { isValidSkillDefinitionLocation } from "../_internal/skill-files.js";
 
 /** Rule module for `require-skill-file-location`. */
 const requireSkillFileLocationRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (path.basename(context.filename) !== "SKILL.md") {
                 return;
             }
@@ -29,8 +29,7 @@ const requireSkillFileLocationRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "invalidSkillLocation",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

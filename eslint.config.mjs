@@ -4,6 +4,15 @@ import plugin from "./plugin.mjs";
 
 /** @type {import("eslint").Linter.Config[]} */
 const config = [
+    {
+        ignores: [
+            "docs/docusaurus/typedoc-plugins/**/*.{js,mjs,cjs,ts,mts,cts}",
+            "knip.config.ts",
+            "stryker.config.mjs",
+            "vitest.stryker.config.ts",
+        ],
+        name: "Local Tooling Files Outside TypeScript Project Service",
+    },
     ...nickTwoBadFourU.configs.withoutCopilot,
 
     // Local Plugin Config
@@ -27,6 +36,38 @@ const config = [
         rules: {
             "@typescript-eslint/no-unsafe-assignment": "off",
             "@typescript-eslint/no-unsafe-member-access": "off",
+        },
+    },
+    {
+        files: ["**/*.{cjs,cts,js,jsx,mjs,mts,ts,tsx}"],
+        name: "TypeScript Separate Type Imports",
+        rules: {
+            "no-duplicate-imports": [
+                "error",
+                { allowSeparateTypeImports: true },
+            ],
+        },
+    },
+    {
+        files: [
+            "docs/docusaurus/**/*.{js,mjs,cjs,ts,mts,cts,tsx,jsx}",
+            "docs/docusaurus/**/*.json",
+            "docs/docusaurus/**/*.md",
+        ],
+        name: "Docusaurus Documentation Tooling",
+        rules: {
+            "@typescript-eslint/no-unsafe-type-assertion": "off",
+            "@typescript-eslint/switch-exhaustiveness-check": "off",
+            "canonical/filename-no-index": "off",
+            "json-schema-validator-2/no-invalid": "off",
+            "markdown/no-multiple-h1": "off",
+            "n/no-process-env": "off",
+            "no-plusplus": "off",
+            "unicorn/filename-case": "off",
+            "unicorn/no-non-function-verb-prefix": "off",
+            "unicorn/no-top-level-assignment-in-function": "off",
+            "unicorn/no-unreadable-new-expression": "off",
+            "unicorn/prefer-temporal": "off",
         },
     },
     {
@@ -67,6 +108,40 @@ const config = [
         name: "Reusable Dependabot Workflow Caller",
         rules: {
             "github-actions/no-external-job": "off",
+        },
+    },
+    {
+        files: ["src/**/*.{ts,mts,cts}"],
+        name: "Copilot Rule Source Migration Guardrails",
+        rules: {
+            "import-x/max-dependencies": "off",
+            "unicorn/consistent-boolean-name": "off",
+            "unicorn/import-style": "off",
+            "unicorn/no-break-in-nested-loop": "off",
+            "unicorn/no-declarations-before-early-exit": "off",
+            "unicorn/prefer-includes-over-repeated-comparisons": "off",
+            "unicorn/prefer-minimal-ternary": "off",
+        },
+    },
+    {
+        files: ["test/**/*.test.ts"],
+        name: "RuleTester Negative Case Suites",
+        rules: {
+            "test-signal/require-negative-path": "off",
+        },
+    },
+    {
+        files: ["test/_internal/vitest-setup.ts"],
+        name: "Vitest Setup Sentinel",
+        rules: {
+            "unicorn/consistent-boolean-name": "off",
+        },
+    },
+    {
+        files: ["vite.config.ts"],
+        name: "Vitest Config Compatibility",
+        rules: {
+            "unicorn/prefer-number-coercion": "off",
         },
     },
     // Add repository-specific config entries below as needed.

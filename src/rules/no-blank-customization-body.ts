@@ -18,8 +18,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `no-blank-customization-body`. */
 const noBlankCustomizationBodyRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             const fileKind = getCopilotFileKind(context.filename);
 
             if (fileKind === null || fileKind === "repository-instructions") {
@@ -36,8 +36,7 @@ const noBlankCustomizationBodyRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "blankBody",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

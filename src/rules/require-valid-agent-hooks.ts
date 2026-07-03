@@ -68,8 +68,8 @@ const getInvalidHookReport = (
 
 /** Rule module for `require-valid-agent-hooks`. */
 const requireValidAgentHooksRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -107,8 +107,7 @@ const requireValidAgentHooksRule: CopilotRuleModule = createCopilotRule({
                     return;
                 }
             }
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

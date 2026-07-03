@@ -50,8 +50,8 @@ const formatAgentsValue = (
 
 /** Rule module for `require-valid-agent-subagents`. */
 const requireValidAgentSubagentsRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -91,8 +91,7 @@ const requireValidAgentSubagentsRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "invalidAgentsField",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

@@ -39,8 +39,8 @@ const formatPromptModelValue = (
 
 /** Rule module for `require-valid-prompt-model`. */
 const requireValidPromptModelRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (getCopilotFileKind(context.filename) !== "prompt") {
                 return;
             }
@@ -85,8 +85,7 @@ const requireValidPromptModelRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "invalidPromptModel",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

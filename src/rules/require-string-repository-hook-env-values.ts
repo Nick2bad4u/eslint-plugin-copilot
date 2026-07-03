@@ -21,43 +21,41 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-string-repository-hook-env-values`. */
 const requireStringRepositoryHookEnvValuesRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                Document() {
-                    if (!isRepositoryHookFilePath(context.filename)) {
-                        return;
+        create: (context) => ({
+            Document() {
+                if (!isRepositoryHookFilePath(context.filename)) {
+                    return;
+                }
+
+                const root = parseJsonText(context.sourceCode.text);
+                const invalidHook = getRepositoryHookObjects(root).find(
+                    ({ hook }) => {
+                        const env = hook["env"];
+
+                        return (
+                            isJsonObject(env) &&
+                            objectValues(env).some(
+                                (value) => !isJsonString(value)
+                            )
+                        );
                     }
+                );
 
-                    const root = parseJsonText(context.sourceCode.text);
-                    const invalidHook = getRepositoryHookObjects(root).find(
-                        ({ hook }) => {
-                            const env = hook["env"];
+                if (!isDefined(invalidHook)) {
+                    return;
+                }
 
-                            return (
-                                isJsonObject(env) &&
-                                objectValues(env).some(
-                                    (value) => !isJsonString(value)
-                                )
-                            );
-                        }
-                    );
+                const env = invalidHook.hook["env"];
 
-                    if (!isDefined(invalidHook)) {
-                        return;
-                    }
-
-                    const env = invalidHook.hook["env"];
-
-                    reportAtDocumentStart(context, {
-                        data: {
-                            env: formatJsonValue(env),
-                            eventName: invalidHook.eventName,
-                        },
-                        messageId: "nonStringRepositoryHookEnvValue",
-                    });
-                },
-            };
-        },
+                reportAtDocumentStart(context, {
+                    data: {
+                        env: formatJsonValue(env),
+                        eventName: invalidHook.eventName,
+                    },
+                    messageId: "nonStringRepositoryHookEnvValue",
+                });
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

@@ -22,8 +22,8 @@ const VALID_BOOLEAN_FIELD_VALUES = new Set(["false", "true"]);
 
 /** Rule module for `require-valid-agent-handoff-send`. */
 const requireValidAgentHandoffSendRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -64,8 +64,7 @@ const requireValidAgentHandoffSendRule: CopilotRuleModule = createCopilotRule({
 
                 return;
             }
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

@@ -27,8 +27,8 @@ const isValidRelativeHookCwd = (cwd: string): boolean => {
 
 /** Rule module for `require-relative-agent-hook-cwd`. */
 const requireRelativeAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -68,8 +68,7 @@ const requireRelativeAgentHookCwdRule: CopilotRuleModule = createCopilotRule({
                     return;
                 }
             }
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

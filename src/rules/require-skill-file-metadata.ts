@@ -20,8 +20,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-skill-file-metadata`. */
 const requireSkillFileMetadataRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isSkillFilePath(context.filename)) {
                 return;
             }
@@ -47,8 +47,7 @@ const requireSkillFileMetadataRule: CopilotRuleModule = createCopilotRule({
                     messageId: "missingSkillDescription",
                 });
             }
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

@@ -25,8 +25,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-skill-name-match-directory`. */
 const requireSkillNameMatchDirectoryRule: CopilotRuleModule = createCopilotRule(
     {
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 if (!isSkillFilePath(context.filename)) {
                     return;
                 }
@@ -55,8 +55,7 @@ const requireSkillNameMatchDirectoryRule: CopilotRuleModule = createCopilotRule(
                     },
                     messageId: "skillNameDoesNotMatchDirectory",
                 });
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

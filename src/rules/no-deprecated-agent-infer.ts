@@ -18,8 +18,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `no-deprecated-agent-infer`. */
 const noDeprecatedAgentInferRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -36,8 +36,7 @@ const noDeprecatedAgentInferRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "deprecatedInfer",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

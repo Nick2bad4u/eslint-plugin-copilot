@@ -24,8 +24,8 @@ const INLINE_LIST_LITERAL_PATTERN = /^\s*\[.*\]\s*$/v;
 
 /** Rule module for `require-valid-agent-model`. */
 const requireValidAgentModelRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -64,8 +64,7 @@ const requireValidAgentModelRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "invalidAgentModel",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

@@ -1,12 +1,5 @@
 import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 
-type SidebarDocConfig = Readonly<{
-    className?: string;
-    id: string;
-    label: string;
-    type: "doc";
-}>;
-
 type SidebarCategoryConfig = Readonly<{
     className?: string;
     collapsed: boolean;
@@ -17,6 +10,13 @@ type SidebarCategoryConfig = Readonly<{
 }>;
 
 type SidebarConfigItem = SidebarCategoryConfig | SidebarDocConfig;
+
+type SidebarDocConfig = Readonly<{
+    className?: string;
+    id: string;
+    label: string;
+    type: "doc";
+}>;
 
 const topDoc = (
     id: string,

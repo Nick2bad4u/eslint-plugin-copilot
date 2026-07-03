@@ -1,3 +1,19 @@
+/** Badge metadata displayed in hero and project badge strips. */
+export type SiteBadge = Readonly<{
+    alt: string;
+    href: string;
+    src: string;
+}>;
+
+/** Feature-card content shown on marketing-style docs pages. */
+export type SiteFeatureCard = Readonly<{
+    description: string;
+    eyebrow: string;
+    icon: string;
+    meta: string;
+    title: string;
+}>;
+
 /** Link-card data rendered by the docs site landing and resource pages. */
 export type SiteLinkCard = Readonly<{
     cta: string;
@@ -6,6 +22,25 @@ export type SiteLinkCard = Readonly<{
     icon?: string;
     title: string;
     to?: string;
+}>;
+
+/** Short explanatory reason shown in project signal lists. */
+export type SiteReason = Readonly<{
+    description: string;
+    title: string;
+}>;
+
+/** Grouped resource links rendered by the resources page. */
+export type SiteResourceGroup = Readonly<{
+    items: readonly SiteLinkCard[];
+    title: string;
+}>;
+
+/** Short numeric or textual stat used by site summary blocks. */
+export type SiteStat = Readonly<{
+    detail: string;
+    label: string;
+    value: string;
 }>;
 
 /**
@@ -28,41 +63,6 @@ export function getSiteLinkProps(
         `Link card "${linkCard.title}" is missing a destination.`
     );
 }
-
-/** Badge metadata displayed in hero and project badge strips. */
-export type SiteBadge = Readonly<{
-    alt: string;
-    href: string;
-    src: string;
-}>;
-
-/** Feature-card content shown on marketing-style docs pages. */
-export type SiteFeatureCard = Readonly<{
-    description: string;
-    eyebrow: string;
-    icon: string;
-    meta: string;
-    title: string;
-}>;
-
-/** Short numeric or textual stat used by site summary blocks. */
-export type SiteStat = Readonly<{
-    detail: string;
-    label: string;
-    value: string;
-}>;
-
-/** Short explanatory reason shown in project signal lists. */
-export type SiteReason = Readonly<{
-    description: string;
-    title: string;
-}>;
-
-/** Grouped resource links rendered by the resources page. */
-export type SiteResourceGroup = Readonly<{
-    items: readonly SiteLinkCard[];
-    title: string;
-}>;
 
 const projectBase = "https://github.com/Nick2bad4u/eslint-plugin-copilot";
 

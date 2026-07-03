@@ -23,8 +23,8 @@ const VALID_AGENT_TARGETS = new Set(["github-copilot", "vscode"]);
 
 /** Rule module for `require-valid-agent-target`. */
 const requireValidAgentTargetRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -57,8 +57,7 @@ const requireValidAgentTargetRule: CopilotRuleModule = createCopilotRule({
                 data: { target },
                 messageId: "invalidTarget",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

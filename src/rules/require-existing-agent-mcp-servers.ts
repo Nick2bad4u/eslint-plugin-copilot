@@ -28,8 +28,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-existing-agent-mcp-servers`. */
 const requireExistingAgentMcpServersRule: CopilotRuleModule = createCopilotRule(
     {
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 if (!isCustomAgentFilePath(context.filename)) {
                     return;
                 }
@@ -65,8 +65,7 @@ const requireExistingAgentMcpServersRule: CopilotRuleModule = createCopilotRule(
                     },
                     messageId: "missingAgentMcpServer",
                 });
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

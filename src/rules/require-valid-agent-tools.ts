@@ -37,8 +37,8 @@ const formatToolsValue = (
 
 /** Rule module for `require-valid-agent-tools`. */
 const requireValidAgentToolsRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -67,8 +67,7 @@ const requireValidAgentToolsRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "invalidAgentTools",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

@@ -22,8 +22,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-valid-prompt-argument-hint`. */
 const requireValidPromptArgumentHintRule: CopilotRuleModule = createCopilotRule(
     {
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 if (getCopilotFileKind(context.filename) !== "prompt") {
                     return;
                 }
@@ -48,8 +48,7 @@ const requireValidPromptArgumentHintRule: CopilotRuleModule = createCopilotRule(
                 reportAtDocumentStart(context, {
                     messageId: "invalidPromptArgumentHint",
                 });
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

@@ -42,8 +42,8 @@ const isNumericTimeoutValue = (value: string): boolean => {
 
 /** Rule module for `require-valid-agent-hook-timeouts`. */
 const requireValidAgentHookTimeoutsRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -87,8 +87,7 @@ const requireValidAgentHookTimeoutsRule: CopilotRuleModule = createCopilotRule({
                     return;
                 }
             }
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

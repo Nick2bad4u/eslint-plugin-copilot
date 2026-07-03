@@ -21,39 +21,37 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-valid-repository-hook-command-type`. */
 const requireValidRepositoryHookCommandTypeRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                Document() {
-                    if (!isRepositoryHookFilePath(context.filename)) {
-                        return;
+        create: (context) => ({
+            Document() {
+                if (!isRepositoryHookFilePath(context.filename)) {
+                    return;
+                }
+
+                const root = parseJsonText(context.sourceCode.text);
+                const invalidHook = getRepositoryHookObjects(root).find(
+                    ({ hook }) => {
+                        const typeValue = hook["type"];
+
+                        return (
+                            !isJsonString(typeValue) ||
+                            !isRepositoryHookType(typeValue)
+                        );
                     }
+                );
 
-                    const root = parseJsonText(context.sourceCode.text);
-                    const invalidHook = getRepositoryHookObjects(root).find(
-                        ({ hook }) => {
-                            const typeValue = hook["type"];
+                if (!isDefined(invalidHook)) {
+                    return;
+                }
 
-                            return (
-                                !isJsonString(typeValue) ||
-                                !isRepositoryHookType(typeValue)
-                            );
-                        }
-                    );
-
-                    if (!isDefined(invalidHook)) {
-                        return;
-                    }
-
-                    reportAtDocumentStart(context, {
-                        data: {
-                            eventName: invalidHook.eventName,
-                            type: formatJsonValue(invalidHook.hook["type"]),
-                        },
-                        messageId: "invalidRepositoryHookType",
-                    });
-                },
-            };
-        },
+                reportAtDocumentStart(context, {
+                    data: {
+                        eventName: invalidHook.eventName,
+                        type: formatJsonValue(invalidHook.hook["type"]),
+                    },
+                    messageId: "invalidRepositoryHookType",
+                });
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

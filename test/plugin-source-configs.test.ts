@@ -39,9 +39,11 @@ describe("source plugin config wiring", () => {
 
         expect(minimalJsonLayer).toBeUndefined();
 
-        for (const configName of sortedConfigNames.filter(
+        const configNamesWithJsonLayer = sortedConfigNames.filter(
             (name) => name !== "minimal"
-        )) {
+        );
+
+        for (const configName of configNamesWithJsonLayer) {
             const configLayers =
                 plugin.configs[configName as keyof typeof plugin.configs];
             const jsonLayer = configLayers.find(

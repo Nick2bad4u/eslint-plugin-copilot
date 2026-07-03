@@ -35,15 +35,15 @@ export const isValidSkillIdentifier = (value: string): boolean => {
         return false;
     }
 
-    let previousCharacterWasHyphen = false;
+    let isPreviousCharacterWasHyphen = false;
 
     for (const character of trimmedValue) {
         if (character === "-") {
-            if (previousCharacterWasHyphen) {
+            if (isPreviousCharacterWasHyphen) {
                 return false;
             }
 
-            previousCharacterWasHyphen = true;
+            isPreviousCharacterWasHyphen = true;
             continue;
         }
 
@@ -51,7 +51,7 @@ export const isValidSkillIdentifier = (value: string): boolean => {
             return false;
         }
 
-        previousCharacterWasHyphen = false;
+        isPreviousCharacterWasHyphen = false;
     }
 
     return !trimmedValue.startsWith("-") && !trimmedValue.endsWith("-");

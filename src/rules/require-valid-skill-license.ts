@@ -21,8 +21,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-valid-skill-license`. */
 const requireValidSkillLicenseRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isSkillFilePath(context.filename)) {
                 return;
             }
@@ -43,8 +43,7 @@ const requireValidSkillLicenseRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "invalidSkillLicense",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

@@ -17,8 +17,8 @@ const CODE_REVIEW_CUSTOM_INSTRUCTIONS_LIMIT = 4000;
 /** Rule module for `prefer-custom-instructions-under-code-review-limit`. */
 const preferCustomInstructionsUnderCodeReviewLimitRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 const fileKind = getCopilotFileKind(context.filename);
 
                 if (
@@ -43,8 +43,7 @@ const preferCustomInstructionsUnderCodeReviewLimitRule: CopilotRuleModule =
                     },
                     messageId: "exceedsCodeReviewLimit",
                 });
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

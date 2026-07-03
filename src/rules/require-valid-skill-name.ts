@@ -25,8 +25,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-valid-skill-name`. */
 const requireValidSkillNameRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isSkillFilePath(context.filename)) {
                 return;
             }
@@ -57,8 +57,7 @@ const requireValidSkillNameRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "invalidSkillName",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

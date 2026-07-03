@@ -22,8 +22,8 @@ const JSON_FILE_EXTENSION_PATTERN = /\.json$/iv;
 
 /** Rule module for `require-json-agent-mcp-servers`. */
 const requireJsonAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -53,8 +53,7 @@ const requireJsonAgentMcpServersRule: CopilotRuleModule = createCopilotRule({
                 },
                 messageId: "nonJsonAgentMcpServer",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

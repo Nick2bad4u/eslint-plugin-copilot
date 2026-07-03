@@ -17,29 +17,27 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-valid-repository-hook-version`. */
 const requireValidRepositoryHookVersionRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                Document() {
-                    if (!isRepositoryHookFilePath(context.filename)) {
-                        return;
-                    }
+        create: (context) => ({
+            Document() {
+                if (!isRepositoryHookFilePath(context.filename)) {
+                    return;
+                }
 
-                    const root = parseJsonText(context.sourceCode.text);
-                    const versionValue = getRepositoryHooksVersionValue(root);
+                const root = parseJsonText(context.sourceCode.text);
+                const versionValue = getRepositoryHooksVersionValue(root);
 
-                    if (versionValue === 1) {
-                        return;
-                    }
+                if (versionValue === 1) {
+                    return;
+                }
 
-                    reportAtDocumentStart(context, {
-                        data: {
-                            version: formatJsonValue(versionValue),
-                        },
-                        messageId: "invalidRepositoryHookVersion",
-                    });
-                },
-            };
-        },
+                reportAtDocumentStart(context, {
+                    data: {
+                        version: formatJsonValue(versionValue),
+                    },
+                    messageId: "invalidRepositoryHookVersion",
+                });
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

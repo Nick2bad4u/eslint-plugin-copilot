@@ -31,8 +31,8 @@ const VALID_HOOK_EVENT_NAMES = new Set([
 
 /** Rule module for `require-valid-agent-hook-events`. */
 const requireValidAgentHookEventsRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -64,8 +64,7 @@ const requireValidAgentHookEventsRule: CopilotRuleModule = createCopilotRule({
 
                 return;
             }
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

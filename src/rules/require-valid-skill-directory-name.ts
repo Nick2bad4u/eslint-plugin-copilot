@@ -19,8 +19,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-valid-skill-directory-name`. */
 const requireValidSkillDirectoryNameRule: CopilotRuleModule = createCopilotRule(
     {
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 if (!isSkillFilePath(context.filename)) {
                     return;
                 }
@@ -37,8 +37,7 @@ const requireValidSkillDirectoryNameRule: CopilotRuleModule = createCopilotRule(
                     },
                     messageId: "invalidSkillDirectoryName",
                 });
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

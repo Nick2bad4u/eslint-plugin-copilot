@@ -14,8 +14,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `no-legacy-chatmode-files`. */
 const noLegacyChatmodeFilesRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isLegacyChatmodeFilePath(context.filename)) {
                 return;
             }
@@ -23,8 +23,7 @@ const noLegacyChatmodeFilesRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "legacyChatmodeFile",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

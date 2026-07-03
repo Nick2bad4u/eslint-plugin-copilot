@@ -27,53 +27,51 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-existing-repository-hook-cwd`. */
 const requireExistingRepositoryHookCwdRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                Document() {
-                    if (!isRepositoryHookFilePath(context.filename)) {
-                        return;
-                    }
+        create: (context) => ({
+            Document() {
+                if (!isRepositoryHookFilePath(context.filename)) {
+                    return;
+                }
 
-                    const repositoryRoot = findRepositoryRoot(context.filename);
-                    const root = parseJsonText(context.sourceCode.text);
-                    const invalidHook = getRepositoryHookObjects(root).find(
-                        ({ hook }) => {
-                            const cwd = hook["cwd"];
+                const repositoryRoot = findRepositoryRoot(context.filename);
+                const root = parseJsonText(context.sourceCode.text);
+                const invalidHook = getRepositoryHookObjects(root).find(
+                    ({ hook }) => {
+                        const cwd = hook["cwd"];
 
-                            return (
-                                isJsonString(cwd) &&
-                                cwd.trim().length > 0 &&
-                                isRelativeWorkspacePath(cwd) &&
-                                !pathExists(
-                                    resolveRepositoryRelativePath(
-                                        repositoryRoot,
-                                        cwd
-                                    )
+                        return (
+                            isJsonString(cwd) &&
+                            cwd.trim().length > 0 &&
+                            isRelativeWorkspacePath(cwd) &&
+                            !pathExists(
+                                resolveRepositoryRelativePath(
+                                    repositoryRoot,
+                                    cwd
                                 )
-                            );
-                        }
-                    );
-
-                    if (!isDefined(invalidHook)) {
-                        return;
+                            )
+                        );
                     }
+                );
 
-                    const cwd = invalidHook.hook["cwd"];
+                if (!isDefined(invalidHook)) {
+                    return;
+                }
 
-                    if (!isJsonString(cwd)) {
-                        return;
-                    }
+                const cwd = invalidHook.hook["cwd"];
 
-                    reportAtDocumentStart(context, {
-                        data: {
-                            cwd,
-                            eventName: invalidHook.eventName,
-                        },
-                        messageId: "missingRepositoryHookCwd",
-                    });
-                },
-            };
-        },
+                if (!isJsonString(cwd)) {
+                    return;
+                }
+
+                reportAtDocumentStart(context, {
+                    data: {
+                        cwd,
+                        eventName: invalidHook.eventName,
+                    },
+                    messageId: "missingRepositoryHookCwd",
+                });
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

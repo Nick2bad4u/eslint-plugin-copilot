@@ -19,8 +19,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-repository-instructions-file`. */
 const requireRepositoryInstructionsFileRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 const fileKind = getCopilotFileKind(context.filename);
 
                 if (
@@ -47,8 +47,7 @@ const requireRepositoryInstructionsFileRule: CopilotRuleModule =
                 reportAtDocumentStart(context, {
                     messageId: "missingRepositoryInstructions",
                 });
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

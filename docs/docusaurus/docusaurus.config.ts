@@ -1,9 +1,9 @@
-import { themes as prismThemes } from "prism-react-renderer";
-import { createRequire } from "node:module";
-
 import type { Options as DocsPluginOptions } from "@docusaurus/plugin-content-docs";
 import type * as Preset from "@docusaurus/preset-classic";
 import type { Config, PluginModule } from "@docusaurus/types";
+
+import { createRequire } from "node:module";
+import { themes as prismThemes } from "prism-react-renderer";
 
 const organizationName = "Nick2bad4u";
 const projectName = "eslint-plugin-copilot";
@@ -13,7 +13,7 @@ const siteUrl = `${siteOrigin}${baseUrl}`;
 const siteDescription =
     "ESLint plugin for linting GitHub Copilot repository customization files.";
 const socialCardImagePath = "img/logo.png";
-const socialCardImageUrl = new URL(socialCardImagePath, siteUrl).toString();
+const socialCardImageUrl = new URL(socialCardImagePath, siteUrl).href;
 const pwaThemeColor = "#312E81";
 const pwaTileColor = "#312E81";
 const pwaMaskIconColor = "#312E81";
@@ -50,48 +50,40 @@ const vscodeLanguageServerTypesEsmEntry = resolveOptionalModule(
  * Alias VS Code language-service packages to their ESM entries when they are
  * present and suppress known third-party webpack warning noise.
  */
-const suppressKnownWebpackWarningsPlugin: PluginModule = () => {
-    return {
-        configureWebpack() {
-            return {
-                ignoreWarnings: [
-                    (warning: unknown) => {
-                        const warningRecord = warning as
-                            | Readonly<Record<string, unknown>>
-                            | undefined;
-                        const warningMessage = warningRecord?.["message"];
+const suppressKnownWebpackWarningsPlugin: PluginModule = () => ({
+    configureWebpack: () => ({
+        ignoreWarnings: [
+            (warning: unknown) => {
+                const warningRecord = warning as
+                    | Readonly<Record<string, unknown>>
+                    | undefined;
+                const warningMessage = warningRecord?.["message"];
 
-                        return (
-                            typeof warningMessage === "string" &&
-                            warningMessage.includes(
-                                "Critical dependency: require function is used in a way in which dependencies cannot be statically extracted"
-                            )
-                        );
-                    },
-                ],
-                resolve: {
-                    alias: {
-                        ...(vscodeCssLanguageServiceEsmEntry === undefined
-                            ? {}
-                            : {
-                                  "vscode-css-languageservice$":
-                                      vscodeCssLanguageServiceEsmEntry,
-                              }),
-                        ...(vscodeLanguageServerTypesEsmEntry === undefined
-                            ? {}
-                            : {
-                                  "vscode-languageserver-types$":
-                                      vscodeLanguageServerTypesEsmEntry,
-                                  "vscode-languageserver-types/lib/umd/main.js$":
-                                      vscodeLanguageServerTypesEsmEntry,
-                              }),
-                    },
-                },
-            };
+                return (
+                    typeof warningMessage === "string" &&
+                    warningMessage.includes(
+                        "Critical dependency: require function is used in a way in which dependencies cannot be statically extracted"
+                    )
+                );
+            },
+        ],
+        resolve: {
+            alias: {
+                ...(vscodeCssLanguageServiceEsmEntry !== undefined && {
+                    "vscode-css-languageservice$":
+                        vscodeCssLanguageServiceEsmEntry,
+                }),
+                ...(vscodeLanguageServerTypesEsmEntry !== undefined && {
+                    "vscode-languageserver-types$":
+                        vscodeLanguageServerTypesEsmEntry,
+                    "vscode-languageserver-types/lib/umd/main.js$":
+                        vscodeLanguageServerTypesEsmEntry,
+                }),
+            },
         },
-        name: "suppress-known-webpack-warnings",
-    };
-};
+    }),
+    name: "suppress-known-webpack-warnings",
+});
 
 /** Obfuscated key for the v4 legacy post-build head attribute removal flag. */
 const removeHeadAttrFlagKey = [
@@ -106,35 +98,29 @@ const enableExperimentalFaster =
 
 /** Docusaurus future flags, including optional experimental fast path. */
 const futureConfig = {
-    ...(enableExperimentalFaster
-        ? {
-              faster: {
-                  mdxCrossCompilerCache: true,
-                  rspackBundler: true,
-                  rspackPersistentCache: true,
-                  ssgWorkerThreads: true,
-              },
-          }
-        : {}),
+    ...(enableExperimentalFaster && {
+        faster: {
+            mdxCrossCompilerCache: true,
+            rspackBundler: true,
+            rspackPersistentCache: true,
+            ssgWorkerThreads: true,
+        },
+    }),
     v4: {
+        fasterByDefault: true,
+        mdx1CompatDisabledByDefault: true,
         [removeHeadAttrFlagKey]: true,
+        removeLegacyPostBuildHeadAttribute: true,
         // NOTE: Enabling cascade layers currently breaks our production CSS output
         // (CssMinimizer parsing errors -> large chunks of CSS dropped), which
         // makes many Infima (--ifm-*) variables undefined across the site.
         // Re-enable only after verifying the build output CSS is valid.
         siteStorageNamespacing: true,
-        fasterByDefault: true,
-        removeLegacyPostBuildHeadAttribute: true,
-        mdx1CompatDisabledByDefault: true,
         useCssCascadeLayers: false,
     },
 } satisfies Config["future"];
 
 const config = {
-    storage: {
-        namespace: true,
-        type: "localStorage",
-    },
     baseUrl,
     baseUrlIssueBanner: true,
     deploymentBranch: "gh-pages",
@@ -315,6 +301,10 @@ const config = {
         ],
     ],
     projectName,
+    storage: {
+        namespace: true,
+        type: "localStorage",
+    },
     tagline:
         "Lint GitHub Copilot repository instructions, prompt files, custom agents, legacy chat modes, and related customization assets.",
     themeConfig: {
@@ -323,6 +313,95 @@ const config = {
             disableSwitch: false,
             respectPrefersColorScheme: true,
         },
+        footer: {
+            copyright:
+                `© ${new Date().getFullYear()} ` +
+                '<a href="https://github.com/Nick2bad4u" target="_blank" rel="noopener noreferrer">Nick2bad4u</a>.',
+            links: [
+                {
+                    items: [
+                        {
+                            className: "footer-link--overview",
+                            label: "\u{EAD3} Getting started",
+                            to: "/docs/rules/getting-started",
+                        },
+                        {
+                            className: "footer-link--rules",
+                            label: "\u{EA96} Rule overview",
+                            to: "/docs/rules/overview",
+                        },
+                        {
+                            className: "footer-link--presets",
+                            label: "\u{E690} Presets",
+                            to: "/docs/rules/presets",
+                        },
+                        {
+                            className: "footer-link--reference",
+                            label: "\u{1F9E9} Customization files",
+                            to: "/docs/rules/guides/copilot-customization-files",
+                        },
+                    ],
+                    title: "Docs",
+                },
+                {
+                    items: [
+                        {
+                            className: "footer-link--github",
+                            href: `https://github.com/${organizationName}/${projectName}`,
+                            label: "\u{F09B} GitHub",
+                        },
+                        {
+                            className: "footer-link--npm",
+                            href: "https://www.npmjs.com/package/eslint-plugin-copilot",
+                            label: "\u{F1FA} npm package",
+                        },
+                        {
+                            className: "footer-link--releases",
+                            href: `https://github.com/${organizationName}/${projectName}/releases`,
+                            label: "\u{F0C5} Releases",
+                        },
+                        {
+                            className: "footer-link--changelog",
+                            href: `https://github.com/${organizationName}/${projectName}/blob/main/CHANGELOG.md`,
+                            label: "\u{F0F6} Changelog",
+                        },
+                    ],
+                    title: "Project",
+                },
+                {
+                    items: [
+                        {
+                            className: "footer-link--developer",
+                            label: "\u{F121} Developer guide",
+                            to: "/developer",
+                        },
+                        {
+                            className: "footer-link--adrs",
+                            label: "\u{F02D} ADRs",
+                            to: "/developer/adrs",
+                        },
+                        {
+                            className: "footer-link--contributing",
+                            href: `https://github.com/${organizationName}/${projectName}/blob/main/CONTRIBUTING.md`,
+                            label: "\u{F0C0} Contributing",
+                        },
+                        {
+                            className: "footer-link--support",
+                            href: `https://github.com/${organizationName}/${projectName}/blob/main/SUPPORT.md`,
+                            label: "\u{F1CD} Support",
+                        },
+                    ],
+                    title: "Developer",
+                },
+            ],
+            logo: {
+                alt: "GitHub Copilot footer logo",
+                href: baseUrl,
+                src: "img/github-copilot-footer-light.png",
+            },
+            style: "dark",
+        },
+        image: "img/logo.png",
         liveCodeBlock: {
             playgroundPosition: "bottom",
         },
@@ -341,98 +420,8 @@ const config = {
                 property: "og:site_name",
             },
         ],
-        footer: {
-            copyright:
-                `© ${new Date().getFullYear()} ` +
-                '<a href="https://github.com/Nick2bad4u" target="_blank" rel="noopener noreferrer">Nick2bad4u</a>.',
-            links: [
-                {
-                    items: [
-                        {
-                            className: "footer-link--overview",
-                            label: "\uead3 Getting started",
-                            to: "/docs/rules/getting-started",
-                        },
-                        {
-                            className: "footer-link--rules",
-                            label: "\uea96 Rule overview",
-                            to: "/docs/rules/overview",
-                        },
-                        {
-                            className: "footer-link--presets",
-                            label: "\ue690 Presets",
-                            to: "/docs/rules/presets",
-                        },
-                        {
-                            className: "footer-link--reference",
-                            label: "\ud83e\udde9 Customization files",
-                            to: "/docs/rules/guides/copilot-customization-files",
-                        },
-                    ],
-                    title: "Docs",
-                },
-                {
-                    items: [
-                        {
-                            className: "footer-link--github",
-                            href: `https://github.com/${organizationName}/${projectName}`,
-                            label: "\uf09b GitHub",
-                        },
-                        {
-                            className: "footer-link--npm",
-                            href: "https://www.npmjs.com/package/eslint-plugin-copilot",
-                            label: "\uf1fa npm package",
-                        },
-                        {
-                            className: "footer-link--releases",
-                            href: `https://github.com/${organizationName}/${projectName}/releases`,
-                            label: "\uf0c5 Releases",
-                        },
-                        {
-                            className: "footer-link--changelog",
-                            href: `https://github.com/${organizationName}/${projectName}/blob/main/CHANGELOG.md`,
-                            label: "\uf0f6 Changelog",
-                        },
-                    ],
-                    title: "Project",
-                },
-                {
-                    items: [
-                        {
-                            className: "footer-link--developer",
-                            label: "\uf121 Developer guide",
-                            to: "/developer",
-                        },
-                        {
-                            className: "footer-link--adrs",
-                            label: "\uf02d ADRs",
-                            to: "/developer/adrs",
-                        },
-                        {
-                            className: "footer-link--contributing",
-                            href: `https://github.com/${organizationName}/${projectName}/blob/main/CONTRIBUTING.md`,
-                            label: "\uf0c0 Contributing",
-                        },
-                        {
-                            className: "footer-link--support",
-                            href: `https://github.com/${organizationName}/${projectName}/blob/main/SUPPORT.md`,
-                            label: "\uf1cd Support",
-                        },
-                    ],
-                    title: "Developer",
-                },
-            ],
-            logo: {
-                alt: "GitHub Copilot footer logo",
-                href: baseUrl,
-                src: "img/github-copilot-footer-light.png",
-            },
-            style: "dark",
-        },
-        image: "img/logo.png",
         navbar: {
             hideOnScroll: true,
-            style: "dark",
             items: [
                 {
                     className: "navbar-link--overview",
@@ -474,6 +463,7 @@ const config = {
                 src: "img/logo.svg",
                 width: 32,
             },
+            style: "dark",
             title: "eslint-plugin-copilot",
         },
         prism: {
@@ -483,8 +473,8 @@ const config = {
                 "yaml",
                 "typescript",
             ],
-            defaultLanguage: "typescript",
             darkTheme: prismThemes.vsDark,
+            defaultLanguage: "typescript",
             theme: prismThemes.github,
         },
         tableOfContents: {
@@ -500,7 +490,6 @@ const config = {
             selector: ".markdown > img",
         },
     } satisfies Preset.ThemeConfig,
-    title: "eslint-plugin-copilot",
     themes: [
         "@docusaurus/theme-mermaid",
         [
@@ -530,6 +519,7 @@ const config = {
             },
         ],
     ],
+    title: "eslint-plugin-copilot",
     trailingSlash: true,
     url: siteOrigin,
 } satisfies Config;

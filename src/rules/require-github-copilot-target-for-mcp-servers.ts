@@ -22,8 +22,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-github-copilot-target-for-mcp-servers`. */
 const requireGithubCopilotTargetForMcpServersRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 if (!isCustomAgentFilePath(context.filename)) {
                     return;
                 }
@@ -57,8 +57,7 @@ const requireGithubCopilotTargetForMcpServersRule: CopilotRuleModule =
                     data: { target },
                     messageId: "invalidTarget",
                 });
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

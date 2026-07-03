@@ -1,8 +1,7 @@
-import clsx from "clsx";
-
-import Link from "@docusaurus/Link";
 import Head from "@docusaurus/Head";
+import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
+import clsx from "clsx";
 
 import {
     getSiteLinkProps,
@@ -76,9 +75,9 @@ export default function ProjectPage(): React.JSX.Element {
                             <div className="site-badge-strip">
                                 {liveBadges.map((badge) => (
                                     <Link
-                                        key={badge.alt}
                                         className="site-badge"
                                         href={badge.href}
+                                        key={badge.alt}
                                     >
                                         <img
                                             alt={badge.alt}
@@ -129,12 +128,12 @@ export default function ProjectPage(): React.JSX.Element {
                     <div className="site-grid site-grid--3">
                         {projectHighlights.map((highlight) => (
                             <article
-                                key={highlight.title}
                                 className="site-link-tile"
+                                key={highlight.title}
                             >
                                 <span
-                                    className="site-link-tile__icon"
                                     aria-hidden
+                                    className="site-link-tile__icon"
                                 >
                                     {highlight.icon}
                                 </span>
@@ -173,8 +172,8 @@ export default function ProjectPage(): React.JSX.Element {
                     <div className="site-grid site-grid--3">
                         {relatedPages.map((page) => (
                             <article
-                                key={page.title}
                                 className="site-link-tile"
+                                key={page.title}
                             >
                                 {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                                 <h3 className="site-link-tile__title">

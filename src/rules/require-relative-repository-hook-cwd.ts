@@ -20,45 +20,42 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-relative-repository-hook-cwd`. */
 const requireRelativeRepositoryHookCwdRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                Document() {
-                    if (!isRepositoryHookFilePath(context.filename)) {
-                        return;
+        create: (context) => ({
+            Document() {
+                if (!isRepositoryHookFilePath(context.filename)) {
+                    return;
+                }
+
+                const root = parseJsonText(context.sourceCode.text);
+                const invalidHook = getRepositoryHookObjects(root).find(
+                    ({ hook }) => {
+                        const cwd = hook["cwd"];
+
+                        return (
+                            isJsonString(cwd) && isNonRelativeWorkspacePath(cwd)
+                        );
                     }
+                );
 
-                    const root = parseJsonText(context.sourceCode.text);
-                    const invalidHook = getRepositoryHookObjects(root).find(
-                        ({ hook }) => {
-                            const cwd = hook["cwd"];
+                if (!isDefined(invalidHook)) {
+                    return;
+                }
 
-                            return (
-                                isJsonString(cwd) &&
-                                isNonRelativeWorkspacePath(cwd)
-                            );
-                        }
-                    );
+                const cwd = invalidHook.hook["cwd"];
 
-                    if (!isDefined(invalidHook)) {
-                        return;
-                    }
+                if (!isJsonString(cwd)) {
+                    return;
+                }
 
-                    const cwd = invalidHook.hook["cwd"];
-
-                    if (!isJsonString(cwd)) {
-                        return;
-                    }
-
-                    reportAtDocumentStart(context, {
-                        data: {
-                            cwd,
-                            eventName: invalidHook.eventName,
-                        },
-                        messageId: "nonRelativeRepositoryHookCwd",
-                    });
-                },
-            };
-        },
+                reportAtDocumentStart(context, {
+                    data: {
+                        cwd,
+                        eventName: invalidHook.eventName,
+                    },
+                    messageId: "nonRelativeRepositoryHookCwd",
+                });
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

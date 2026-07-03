@@ -29,8 +29,8 @@ const INVOCATION_CONTROL_FIELDS = [
 /** Rule module for `require-valid-agent-invocation-controls`. */
 const requireValidAgentInvocationControlsRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return createMarkdownDocumentListener(() => {
+        create: (context) =>
+            createMarkdownDocumentListener(() => {
                 if (!isCustomAgentFilePath(context.filename)) {
                     return;
                 }
@@ -73,8 +73,7 @@ const requireValidAgentInvocationControlsRule: CopilotRuleModule =
 
                     return;
                 }
-            });
-        },
+            }),
         meta: {
             deprecated: false,
             docs: {

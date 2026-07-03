@@ -22,8 +22,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-instructions-apply-to`. */
 const requireInstructionsApplyToRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (getCopilotFileKind(context.filename) !== "instructions") {
                 return;
             }
@@ -49,8 +49,7 @@ const requireInstructionsApplyToRule: CopilotRuleModule = createCopilotRule({
                     ? "emptyApplyTo"
                     : "missingApplyTo",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

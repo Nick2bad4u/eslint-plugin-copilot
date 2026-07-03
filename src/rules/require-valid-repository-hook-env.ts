@@ -19,36 +19,34 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-valid-repository-hook-env`. */
 const requireValidRepositoryHookEnvRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return {
-            Document() {
-                if (!isRepositoryHookFilePath(context.filename)) {
-                    return;
+    create: (context) => ({
+        Document() {
+            if (!isRepositoryHookFilePath(context.filename)) {
+                return;
+            }
+
+            const root = parseJsonText(context.sourceCode.text);
+            const invalidHook = getRepositoryHookObjects(root).find(
+                ({ hook }) => {
+                    const env = hook["env"];
+
+                    return isDefined(env) && !isJsonObject(env);
                 }
+            );
 
-                const root = parseJsonText(context.sourceCode.text);
-                const invalidHook = getRepositoryHookObjects(root).find(
-                    ({ hook }) => {
-                        const env = hook["env"];
+            if (!isDefined(invalidHook)) {
+                return;
+            }
 
-                        return isDefined(env) && !isJsonObject(env);
-                    }
-                );
-
-                if (!isDefined(invalidHook)) {
-                    return;
-                }
-
-                reportAtDocumentStart(context, {
-                    data: {
-                        env: formatJsonValue(invalidHook.hook["env"]),
-                        eventName: invalidHook.eventName,
-                    },
-                    messageId: "invalidRepositoryHookEnv",
-                });
-            },
-        };
-    },
+            reportAtDocumentStart(context, {
+                data: {
+                    env: formatJsonValue(invalidHook.hook["env"]),
+                    eventName: invalidHook.eventName,
+                },
+                messageId: "invalidRepositoryHookEnv",
+            });
+        },
+    }),
     meta: {
         deprecated: false,
         docs: {

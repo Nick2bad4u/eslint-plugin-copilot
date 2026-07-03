@@ -28,8 +28,8 @@ const isAllowedUnqualifiedToolName = (toolName: string): boolean =>
 
 /** Rule module for `prefer-qualified-tools`. */
 const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             const fileKind = getCopilotFileKind(context.filename);
 
             if (fileKind !== "chatmode" && fileKind !== "prompt") {
@@ -63,8 +63,7 @@ const preferQualifiedToolsRule: CopilotRuleModule = createCopilotRule({
                 data: { toolName: firstUnqualifiedTool },
                 messageId: "preferQualifiedTool",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

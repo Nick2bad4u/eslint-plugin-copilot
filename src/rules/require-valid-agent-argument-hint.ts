@@ -21,8 +21,8 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-valid-agent-argument-hint`. */
 const requireValidAgentArgumentHintRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return createMarkdownDocumentListener(() => {
+    create: (context) =>
+        createMarkdownDocumentListener(() => {
             if (!isCustomAgentFilePath(context.filename)) {
                 return;
             }
@@ -43,8 +43,7 @@ const requireValidAgentArgumentHintRule: CopilotRuleModule = createCopilotRule({
             reportAtDocumentStart(context, {
                 messageId: "invalidAgentArgumentHint",
             });
-        });
-    },
+        }),
     meta: {
         deprecated: false,
         docs: {

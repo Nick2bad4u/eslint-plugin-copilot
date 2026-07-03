@@ -16,26 +16,24 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-repository-hooks-object`. */
 const requireRepositoryHooksObjectRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return {
-            Document() {
-                if (!isRepositoryHookFilePath(context.filename)) {
-                    return;
-                }
+    create: (context) => ({
+        Document() {
+            if (!isRepositoryHookFilePath(context.filename)) {
+                return;
+            }
 
-                const root = parseJsonText(context.sourceCode.text);
-                const hooksValue = getRepositoryHooksValue(root);
+            const root = parseJsonText(context.sourceCode.text);
+            const hooksValue = getRepositoryHooksValue(root);
 
-                if (isJsonObject(hooksValue)) {
-                    return;
-                }
+            if (isJsonObject(hooksValue)) {
+                return;
+            }
 
-                reportAtDocumentStart(context, {
-                    messageId: "invalidRepositoryHooksObject",
-                });
-            },
-        };
-    },
+            reportAtDocumentStart(context, {
+                messageId: "invalidRepositoryHooksObject",
+            });
+        },
+    }),
     meta: {
         deprecated: false,
         docs: {

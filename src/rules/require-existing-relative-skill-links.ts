@@ -18,55 +18,47 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-existing-relative-skill-links`. */
 const requireExistingRelativeSkillLinksRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                root() {
-                    if (!isSkillFilePath(context.filename)) {
-                        return;
+        create: (context) => ({
+            root() {
+                if (!isSkillFilePath(context.filename)) {
+                    return;
+                }
+
+                const { body, offset } = getCustomizationBodyWithOffset(
+                    context.sourceCode.text
+                );
+
+                for (const link of extractMarkdownLinks(body, offset)) {
+                    if (!isRelativeWorkspaceLinkDestination(link.destination)) {
+                        continue;
                     }
 
-                    const { body, offset } = getCustomizationBodyWithOffset(
-                        context.sourceCode.text
-                    );
-
-                    for (const link of extractMarkdownLinks(body, offset)) {
-                        if (
-                            !isRelativeWorkspaceLinkDestination(
+                    if (
+                        pathExists(
+                            resolveMarkdownWorkspaceLink(
+                                context.filename,
                                 link.destination
                             )
-                        ) {
-                            continue;
-                        }
-
-                        if (
-                            pathExists(
-                                resolveMarkdownWorkspaceLink(
-                                    context.filename,
-                                    link.destination
-                                )
-                            )
-                        ) {
-                            continue;
-                        }
-
-                        context.report({
-                            data: {
-                                destination: link.destination,
-                            },
-                            loc: {
-                                end: context.sourceCode.getLocFromIndex(
-                                    link.end
-                                ),
-                                start: context.sourceCode.getLocFromIndex(
-                                    link.start
-                                ),
-                            },
-                            messageId: "missingSkillLinkTarget",
-                        });
+                        )
+                    ) {
+                        continue;
                     }
-                },
-            };
-        },
+
+                    context.report({
+                        data: {
+                            destination: link.destination,
+                        },
+                        loc: {
+                            end: context.sourceCode.getLocFromIndex(link.end),
+                            start: context.sourceCode.getLocFromIndex(
+                                link.start
+                            ),
+                        },
+                        messageId: "missingSkillLinkTarget",
+                    });
+                }
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

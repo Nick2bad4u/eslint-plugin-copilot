@@ -18,32 +18,30 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `no-empty-repository-hook-arrays`. */
 const noEmptyRepositoryHookArraysRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return {
-            Document() {
-                if (!isRepositoryHookFilePath(context.filename)) {
-                    return;
-                }
+    create: (context) => ({
+        Document() {
+            if (!isRepositoryHookFilePath(context.filename)) {
+                return;
+            }
 
-                const root = parseJsonText(context.sourceCode.text);
-                const emptyEntry = getRepositoryHookEventEntries(root).find(
-                    ([, eventValue]) =>
-                        isJsonArray(eventValue) && isEmpty(eventValue)
-                );
+            const root = parseJsonText(context.sourceCode.text);
+            const emptyEntry = getRepositoryHookEventEntries(root).find(
+                ([, eventValue]) =>
+                    isJsonArray(eventValue) && isEmpty(eventValue)
+            );
 
-                if (!isDefined(emptyEntry)) {
-                    return;
-                }
+            if (!isDefined(emptyEntry)) {
+                return;
+            }
 
-                reportAtDocumentStart(context, {
-                    data: {
-                        eventName: arrayFirst(emptyEntry),
-                    },
-                    messageId: "emptyRepositoryHookArray",
-                });
-            },
-        };
-    },
+            reportAtDocumentStart(context, {
+                data: {
+                    eventName: arrayFirst(emptyEntry),
+                },
+                messageId: "emptyRepositoryHookArray",
+            });
+        },
+    }),
     meta: {
         deprecated: false,
         docs: {

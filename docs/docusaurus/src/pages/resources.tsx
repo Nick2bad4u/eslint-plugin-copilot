@@ -1,14 +1,19 @@
-import clsx from "clsx";
-
-import Link from "@docusaurus/Link";
 import Head from "@docusaurus/Head";
+import Link from "@docusaurus/Link";
 import Layout from "@theme/Layout";
+import clsx from "clsx";
 
 import { getSiteLinkProps, resourceGroups } from "../components/siteData";
 
 /** Render the contributor-facing resources index for the docs site. */
 export default function ResourcesPage(): React.JSX.Element {
     const relatedPages = [
+        {
+            description:
+                "Go back to the rule overview and grouped sidebar when you need the public reference tree.",
+            title: "Rule docs",
+            to: "/docs/rules/overview",
+        },
         {
             description:
                 "Open the maintainer-facing guide for docs architecture, sync workflows, charts, and TypeDoc status.",
@@ -20,12 +25,6 @@ export default function ResourcesPage(): React.JSX.Element {
                 "Review live releases, package links, issues, and other project health surfaces.",
             title: "Project",
             to: "/project",
-        },
-        {
-            description:
-                "Go back to the rule overview and grouped sidebar when you need the public reference tree.",
-            title: "Rule docs",
-            to: "/docs/rules/overview",
         },
     ] as const;
 
@@ -108,8 +107,8 @@ export default function ResourcesPage(): React.JSX.Element {
 
                 {resourceGroups.map((group) => (
                     <section
-                        key={group.title}
                         className="container site-section"
+                        key={group.title}
                     >
                         <div className="site-section__header">
                             <div>
@@ -125,12 +124,12 @@ export default function ResourcesPage(): React.JSX.Element {
                         <div className="site-grid site-grid--3">
                             {group.items.map((item) => (
                                 <article
-                                    key={item.title}
                                     className="site-link-tile"
+                                    key={item.title}
                                 >
                                     <span
-                                        className="site-link-tile__icon"
                                         aria-hidden
+                                        className="site-link-tile__icon"
                                     >
                                         {item.icon}
                                     </span>
@@ -170,8 +169,8 @@ export default function ResourcesPage(): React.JSX.Element {
                     <div className="site-grid site-grid--3">
                         {relatedPages.map((page) => (
                             <article
-                                key={page.title}
                                 className="site-link-tile"
+                                key={page.title}
                             >
                                 {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                                 <h3 className="site-link-tile__title">

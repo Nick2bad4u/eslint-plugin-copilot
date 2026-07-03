@@ -22,35 +22,33 @@ const hasHookShellCommand = (value: unknown): boolean =>
 /** Rule module for `require-repository-hook-command-shell`. */
 const requireRepositoryHookCommandShellRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                Document() {
-                    if (!isRepositoryHookFilePath(context.filename)) {
-                        return;
-                    }
+        create: (context) => ({
+            Document() {
+                if (!isRepositoryHookFilePath(context.filename)) {
+                    return;
+                }
 
-                    const root = parseJsonText(context.sourceCode.text);
-                    const invalidHook = getRepositoryHookObjects(root).find(
-                        ({ hook }) =>
-                            isJsonString(hook["type"]) &&
-                            hook["type"] === "command" &&
-                            !hasHookShellCommand(hook["bash"]) &&
-                            !hasHookShellCommand(hook["powershell"])
-                    );
+                const root = parseJsonText(context.sourceCode.text);
+                const invalidHook = getRepositoryHookObjects(root).find(
+                    ({ hook }) =>
+                        isJsonString(hook["type"]) &&
+                        hook["type"] === "command" &&
+                        !hasHookShellCommand(hook["bash"]) &&
+                        !hasHookShellCommand(hook["powershell"])
+                );
 
-                    if (!isDefined(invalidHook)) {
-                        return;
-                    }
+                if (!isDefined(invalidHook)) {
+                    return;
+                }
 
-                    reportAtDocumentStart(context, {
-                        data: {
-                            eventName: invalidHook.eventName,
-                        },
-                        messageId: "missingRepositoryHookShellCommand",
-                    });
-                },
-            };
-        },
+                reportAtDocumentStart(context, {
+                    data: {
+                        eventName: invalidHook.eventName,
+                    },
+                    messageId: "missingRepositoryHookShellCommand",
+                });
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {

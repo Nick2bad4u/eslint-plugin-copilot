@@ -15,38 +15,34 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 
 /** Rule module for `require-relative-agent-links`. */
 const requireRelativeAgentLinksRule: CopilotRuleModule = createCopilotRule({
-    create(context) {
-        return {
-            root() {
-                if (!isCustomAgentFilePath(context.filename)) {
-                    return;
+    create: (context) => ({
+        root() {
+            if (!isCustomAgentFilePath(context.filename)) {
+                return;
+            }
+
+            const { body, offset } = getCustomizationBodyWithOffset(
+                context.sourceCode.text
+            );
+
+            for (const link of extractMarkdownLinks(body, offset)) {
+                if (!isInvalidWorkspaceLinkDestination(link.destination)) {
+                    continue;
                 }
 
-                const { body, offset } = getCustomizationBodyWithOffset(
-                    context.sourceCode.text
-                );
-
-                for (const link of extractMarkdownLinks(body, offset)) {
-                    if (!isInvalidWorkspaceLinkDestination(link.destination)) {
-                        continue;
-                    }
-
-                    context.report({
-                        data: {
-                            destination: link.destination,
-                        },
-                        loc: {
-                            end: context.sourceCode.getLocFromIndex(link.end),
-                            start: context.sourceCode.getLocFromIndex(
-                                link.start
-                            ),
-                        },
-                        messageId: "nonRelativeAgentLink",
-                    });
-                }
-            },
-        };
-    },
+                context.report({
+                    data: {
+                        destination: link.destination,
+                    },
+                    loc: {
+                        end: context.sourceCode.getLocFromIndex(link.end),
+                        start: context.sourceCode.getLocFromIndex(link.start),
+                    },
+                    messageId: "nonRelativeAgentLink",
+                });
+            }
+        },
+    }),
     meta: {
         deprecated: false,
         docs: {

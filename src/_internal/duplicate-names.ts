@@ -29,7 +29,7 @@ export const collectDuplicateNameGroups = (
     }
 
     return new Map(
-        [...groups.entries()]
+        [...groups]
             .filter(([, group]) => group.length > 1)
             .map(([name, group]) => [
                 name,

@@ -18,55 +18,47 @@ import { createRuleDocsUrl } from "../_internal/rule-docs-url.js";
 /** Rule module for `require-existing-relative-agent-links`. */
 const requireExistingRelativeAgentLinksRule: CopilotRuleModule =
     createCopilotRule({
-        create(context) {
-            return {
-                root() {
-                    if (!isCustomAgentFilePath(context.filename)) {
-                        return;
+        create: (context) => ({
+            root() {
+                if (!isCustomAgentFilePath(context.filename)) {
+                    return;
+                }
+
+                const { body, offset } = getCustomizationBodyWithOffset(
+                    context.sourceCode.text
+                );
+
+                for (const link of extractMarkdownLinks(body, offset)) {
+                    if (!isRelativeWorkspaceLinkDestination(link.destination)) {
+                        continue;
                     }
 
-                    const { body, offset } = getCustomizationBodyWithOffset(
-                        context.sourceCode.text
-                    );
-
-                    for (const link of extractMarkdownLinks(body, offset)) {
-                        if (
-                            !isRelativeWorkspaceLinkDestination(
+                    if (
+                        pathExists(
+                            resolveMarkdownWorkspaceLink(
+                                context.filename,
                                 link.destination
                             )
-                        ) {
-                            continue;
-                        }
-
-                        if (
-                            pathExists(
-                                resolveMarkdownWorkspaceLink(
-                                    context.filename,
-                                    link.destination
-                                )
-                            )
-                        ) {
-                            continue;
-                        }
-
-                        context.report({
-                            data: {
-                                destination: link.destination,
-                            },
-                            loc: {
-                                end: context.sourceCode.getLocFromIndex(
-                                    link.end
-                                ),
-                                start: context.sourceCode.getLocFromIndex(
-                                    link.start
-                                ),
-                            },
-                            messageId: "missingAgentLinkTarget",
-                        });
+                        )
+                    ) {
+                        continue;
                     }
-                },
-            };
-        },
+
+                    context.report({
+                        data: {
+                            destination: link.destination,
+                        },
+                        loc: {
+                            end: context.sourceCode.getLocFromIndex(link.end),
+                            start: context.sourceCode.getLocFromIndex(
+                                link.start
+                            ),
+                        },
+                        messageId: "missingAgentLinkTarget",
+                    });
+                }
+            },
+        }),
         meta: {
             deprecated: false,
             docs: {
