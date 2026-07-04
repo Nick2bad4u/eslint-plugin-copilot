@@ -8,7 +8,7 @@ import type { UnknownArray } from "type-fest";
 import { ESLintUtils } from "@typescript-eslint/utils";
 
 import type {
-    CopilotConfigName,
+    CopilotBaseConfigName,
     CopilotConfigReference,
 } from "./copilot-config-references.js";
 
@@ -17,7 +17,7 @@ import { createRuleDocsUrl } from "./rule-docs-url.js";
 
 /** Copilot-specific metadata extensions stored in `meta.docs`. */
 export type CopilotRuleDocs = Readonly<{
-    copilotConfigNames: readonly CopilotConfigName[];
+    copilotConfigNames: readonly CopilotBaseConfigName[];
     copilotConfigs: CopilotConfigReference | readonly CopilotConfigReference[];
     description: string;
     frozen: boolean;
@@ -61,7 +61,7 @@ const assertNever = (value: never): never => {
 
 const getCopilotConfigNameFromReference = (
     reference: CopilotConfigReference
-): CopilotConfigName => {
+): CopilotBaseConfigName => {
     switch (reference) {
         case "copilot.configs.all": {
             return "all";
@@ -88,13 +88,13 @@ const getCopilotConfigNameFromReference = (
 /** Normalize preset references into stable preset-name keys. */
 const normalizeCopilotConfigNames: (
     value: CopilotConfigReference | readonly CopilotConfigReference[]
-) => readonly CopilotConfigName[] = (
+) => readonly CopilotBaseConfigName[] = (
     value: CopilotConfigReference | readonly CopilotConfigReference[]
 ) => {
     const references: readonly CopilotConfigReference[] = Array.isArray(value)
         ? value
         : [value];
-    const normalizedNames = new Set<CopilotConfigName>();
+    const normalizedNames = new Set<CopilotBaseConfigName>();
 
     for (const reference of references) {
         normalizedNames.add(getCopilotConfigNameFromReference(reference));

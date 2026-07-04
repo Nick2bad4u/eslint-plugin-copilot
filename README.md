@@ -26,7 +26,7 @@ The plugin focuses on repository setup quality, metadata correctness, and modern
 ## Installation
 
 ```sh
-npm install --save-dev eslint-plugin-copilot eslint
+npm install --save-dev eslint-plugin-copilot eslint @eslint/markdown @eslint/json
 ```
 
 ### Compatibility
@@ -36,6 +36,8 @@ npm install --save-dev eslint-plugin-copilot eslint
 - **Node.js runtime:** `>=22.0.0`
 
 ## Quick start
+
+For direct use in an application or repository, use the self-contained presets:
 
 ```js
 import copilot from "eslint-plugin-copilot";
@@ -50,6 +52,25 @@ The shipped presets already configure:
 - `language: "markdown/gfm"`
 - `language: "json/json"` for `.github/hooks/*.json`
 - Copilot customization file globs for repository instructions, path-specific instructions, prompt files, custom agents, legacy chat modes, skills, agent-instructions files, and repository hooks
+
+Shareable configs that already register `@eslint/markdown` and `@eslint/json`
+should use the no-language-plugin variants after that registration instead:
+
+```js
+import copilot from "eslint-plugin-copilot";
+import sharedConfig from "your-shared-eslint-config";
+
+export default [
+ ...sharedConfig,
+ ...copilot.configs["recommended-without-language-plugins"],
+];
+```
+
+Those variants keep the same `files`, `language`, and `copilot` rule layers, but
+they do not register `plugins.markdown` or `plugins.json`. Use them only when an
+earlier matching flat config entry already registers `markdown` from
+`@eslint/markdown` and `json` from `@eslint/json`; otherwise ESLint cannot
+resolve `language: "markdown/gfm"` or `language: "json/json"`.
 
 ## What the presets lint
 
@@ -76,12 +97,12 @@ They also target these JSON file patterns:
 
 This plugin intentionally exports four presets:
 
-| Preset                                                                                                                                                                                                     |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [🟢](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/minimal) [`copilot.configs.minimal`](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/minimal)             |
-| [🟡](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/recommended) [`copilot.configs.recommended`](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/recommended) |
-| [🔴](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/strict) [`copilot.configs.strict`](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/strict)                |
-| [🟣](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/all) [`copilot.configs.all`](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/all)                         |
+| Self-contained preset                                                                                                                                                                                      | No-language-plugin variant                                |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| [🟢](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/minimal) [`copilot.configs.minimal`](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/minimal)             | `copilot.configs["minimal-without-language-plugins"]`     |
+| [🟡](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/recommended) [`copilot.configs.recommended`](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/recommended) | `copilot.configs["recommended-without-language-plugins"]` |
+| [🔴](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/strict) [`copilot.configs.strict`](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/strict)                | `copilot.configs["strict-without-language-plugins"]`      |
+| [🟣](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/all) [`copilot.configs.all`](https://nick2bad4u.github.io/eslint-plugin-copilot/docs/rules/presets/all)                         | `copilot.configs["all-without-language-plugins"]`         |
 
 ### Configuration examples by preset
 

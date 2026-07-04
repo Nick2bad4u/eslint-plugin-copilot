@@ -13,6 +13,7 @@ import type { CopilotRuleDocs } from "./_internal/create-copilot-rule.js";
 
 import packageJson from "../package.json" with { type: "json" };
 import {
+    type CopilotBaseConfigName,
     copilotConfigMetadataByName,
     type CopilotConfigName,
 } from "./_internal/copilot-config-references.js";
@@ -86,6 +87,9 @@ type CopilotPluginContract = Except<ESLint.Plugin, "configs" | "rules"> & {
     rules: NonNullable<ESLint.Plugin["rules"]>;
 };
 
+/** Whether a preset layer should self-register ESLint language plugins. */
+type LanguagePluginRegistrationMode = "external" | "self-contained";
+
 /** Resolve the package version from package.json data. */
 const getPackageVersion = (pkg: unknown): string => {
     if (typeof pkg !== "object" || pkg === null) {
@@ -117,7 +121,7 @@ const copilotRuleEntries = safeCastTo<
 
 /** Create an empty mutable preset-rule bucket map. */
 const createEmptyPresetRuleMap = (): Record<
-    CopilotConfigName,
+    CopilotBaseConfigName,
     CopilotRuleName[]
 > => ({
     all: [],
@@ -133,7 +137,7 @@ const dedupeRuleNames = (
 
 /** Derive preset membership directly from static rule docs metadata. */
 const derivePresetRuleNamesByConfig = (): Readonly<
-    Record<CopilotConfigName, readonly CopilotRuleName[]>
+    Record<CopilotBaseConfigName, readonly CopilotRuleName[]>
 > => {
     const presetRuleMap = createEmptyPresetRuleMap();
 
@@ -184,12 +188,44 @@ const partitionRuleNamesByPresetLayer = (
     ),
 });
 
+/** Build a preset plugin map for Markdown-backed layers. */
+const createMarkdownPluginMap = (
+    plugin: Readonly<CopilotPluginContract>,
+    registrationMode: LanguagePluginRegistrationMode
+): NonNullable<CopilotPresetLayer["plugins"]> =>
+    registrationMode === "self-contained"
+        ? {
+              copilot: plugin,
+              markdown: markdownPlugin,
+          }
+        : {
+              copilot: plugin,
+          };
+
+/** Build a preset plugin map for JSON-backed layers. */
+const createJsonPluginMap = (
+    plugin: Readonly<CopilotPluginContract>,
+    registrationMode: LanguagePluginRegistrationMode
+): NonNullable<CopilotPresetLayer["plugins"]> =>
+    registrationMode === "self-contained"
+        ? {
+              copilot: plugin,
+              json: jsonPlugin,
+          }
+        : {
+              copilot: plugin,
+          };
+
 /** Build one public preset config as layered flat-config entries. */
 const createPresetConfig = (
-    configName: CopilotConfigName,
-    plugin: Readonly<CopilotPluginContract>
+    configName: CopilotBaseConfigName,
+    plugin: Readonly<CopilotPluginContract>,
+    registrationMode: LanguagePluginRegistrationMode
 ): CopilotPresetConfig => {
-    const presetName = copilotConfigMetadataByName[configName].presetName;
+    const presetName =
+        registrationMode === "self-contained"
+            ? copilotConfigMetadataByName[configName].presetName
+            : `${copilotConfigMetadataByName[configName].presetName}-without-language-plugins`;
     const { jsonRuleNames, markdownRuleNames } =
         partitionRuleNamesByPresetLayer(presetRuleNamesByConfig[configName]);
     const configLayers: CopilotPresetLayer[] = [
@@ -197,10 +233,7 @@ const createPresetConfig = (
             files: [...COPILOT_MARKDOWN_FILES],
             language: "markdown/gfm",
             name: `${presetName}:markdown`,
-            plugins: {
-                copilot: plugin,
-                markdown: markdownPlugin,
-            },
+            plugins: createMarkdownPluginMap(plugin, registrationMode),
             rules: errorRulesFor(markdownRuleNames),
         },
     ];
@@ -210,10 +243,7 @@ const createPresetConfig = (
             files: [...COPILOT_JSON_FILES],
             language: "json/json",
             name: `${presetName}:json`,
-            plugins: {
-                copilot: plugin,
-                json: jsonPlugin,
-            },
+            plugins: createJsonPluginMap(plugin, registrationMode),
             rules: errorRulesFor(jsonRuleNames),
         });
     }
@@ -234,10 +264,30 @@ const plugin: CopilotPluginContract = {
 };
 
 plugin.configs = {
-    all: createPresetConfig("all", plugin),
-    minimal: createPresetConfig("minimal", plugin),
-    recommended: createPresetConfig("recommended", plugin),
-    strict: createPresetConfig("strict", plugin),
+    all: createPresetConfig("all", plugin, "self-contained"),
+    "all-without-language-plugins": createPresetConfig(
+        "all",
+        plugin,
+        "external"
+    ),
+    minimal: createPresetConfig("minimal", plugin, "self-contained"),
+    "minimal-without-language-plugins": createPresetConfig(
+        "minimal",
+        plugin,
+        "external"
+    ),
+    recommended: createPresetConfig("recommended", plugin, "self-contained"),
+    "recommended-without-language-plugins": createPresetConfig(
+        "recommended",
+        plugin,
+        "external"
+    ),
+    strict: createPresetConfig("strict", plugin, "self-contained"),
+    "strict-without-language-plugins": createPresetConfig(
+        "strict",
+        plugin,
+        "external"
+    ),
 };
 
 export default plugin;

@@ -8,18 +8,35 @@ import type { ArrayValues } from "type-fest";
 /** Canonical flat-config preset keys exposed through `plugin.configs`. */
 import { objectHasOwn } from "ts-extras";
 
-/** Stable preset names used across docs, README tables, and runtime configs. */
-export const copilotConfigNames = [
+/** Stable base preset names used across docs, README tables, and rule metadata. */
+export const copilotBaseConfigNames = [
     "all",
     "minimal",
     "recommended",
     "strict",
 ] as const;
 
+/** Preset variants for shareable configs that already register language plugins. */
+export const copilotNoLanguagePluginConfigNames = [
+    "all-without-language-plugins",
+    "minimal-without-language-plugins",
+    "recommended-without-language-plugins",
+    "strict-without-language-plugins",
+] as const;
+
+/** Canonical flat-config preset keys exposed through `plugin.configs`. */
+export const copilotConfigNames: readonly [
+    ...typeof copilotBaseConfigNames,
+    ...typeof copilotNoLanguagePluginConfigNames,
+] = [...copilotBaseConfigNames, ...copilotNoLanguagePluginConfigNames];
+
+/** Canonical base preset key type used by rule metadata and docs matrices. */
+export type CopilotBaseConfigName = ArrayValues<typeof copilotBaseConfigNames>;
+
 /** Metadata contract shared across preset wiring, docs, and README rendering. */
 export type CopilotConfigMetadata = Readonly<{
     icon: string;
-    presetName: `copilot:${CopilotConfigName}`;
+    presetName: `copilot:${CopilotBaseConfigName}`;
     readmeOrder: number;
     requiresTypeChecking: boolean;
 }>;
@@ -37,7 +54,7 @@ type CopilotConfigReferenceMap = Readonly<{
 
 /** Canonical metadata for every exported `copilot` preset key. */
 export const copilotConfigMetadataByName: Readonly<
-    Record<CopilotConfigName, CopilotConfigMetadata>
+    Record<CopilotBaseConfigName, CopilotConfigMetadata>
 > = {
     all: {
         icon: "🟣",
@@ -66,12 +83,13 @@ export const copilotConfigMetadataByName: Readonly<
 };
 
 /** Stable README legend/rendering order for preset icons. */
-export const copilotConfigNamesByReadmeOrder: readonly CopilotConfigName[] = [
-    "minimal",
-    "recommended",
-    "strict",
-    "all",
-];
+export const copilotConfigNamesByReadmeOrder: readonly CopilotBaseConfigName[] =
+    [
+        "minimal",
+        "recommended",
+        "strict",
+        "all",
+    ];
 
 /** Fully-qualified preset reference lookup used by rule docs metadata. */
 export const copilotConfigReferenceToName: CopilotConfigReferenceMap = {

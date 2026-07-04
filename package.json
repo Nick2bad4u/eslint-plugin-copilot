@@ -202,8 +202,6 @@
         "jsonc-eslint-parser": "$jsonc-eslint-parser"
     },
     "dependencies": {
-        "@eslint/json": "^1.2.0",
-        "@eslint/markdown": "^8.0.1",
         "@typescript-eslint/type-utils": "^8.59.3",
         "@typescript-eslint/utils": "^8.59.3",
         "ts-extras": "^1.0.0",
@@ -215,6 +213,8 @@
         "@double-great/remark-lint-alt-text": "^1.1.1",
         "@eslint/compat": "^2.1.0",
         "@eslint/config-inspector": "^3.0.2",
+        "@eslint/json": "^2.0.0",
+        "@eslint/markdown": "^8.0.0",
         "@microsoft/tsdoc-config": "^0.18.1",
         "@stryker-ignorer/console-all": "^0.3.2",
         "@stryker-mutator/core": "^9.6.1",
@@ -281,7 +281,9 @@
         "yamllint-js": "^0.2.4"
     },
     "peerDependencies": {
-        "eslint": "^9.0.0 || ^10.5.0",
+        "@eslint/json": "^2.0.0",
+        "@eslint/markdown": "^8.0.0",
+        "eslint": "^9.0.0 || ^10.0.0",
         "typescript": ">=5.0.0"
     },
     "packageManager": "npm@11.18.0",

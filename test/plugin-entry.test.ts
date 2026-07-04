@@ -28,9 +28,13 @@ describe("plugin entry module", () => {
             )
         ).toStrictEqual([
             "all",
+            "all-without-language-plugins",
             "minimal",
+            "minimal-without-language-plugins",
             "recommended",
+            "recommended-without-language-plugins",
             "strict",
+            "strict-without-language-plugins",
         ]);
 
         expect(exportedRuleNames).toHaveLength(69);

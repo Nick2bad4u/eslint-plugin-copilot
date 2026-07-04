@@ -1,6 +1,21 @@
+import * as jsonPluginModule from "@eslint/json";
+import * as markdownPluginModule from "@eslint/markdown";
+import { ESLint, type Linter } from "eslint";
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import plugin from "../src/plugin";
+
+const jsonPlugin = jsonPluginModule.default as ESLint.Plugin;
+const markdownPlugin = markdownPluginModule.default as ESLint.Plugin;
+
+const copilotFixtureFiles = {
+    ".github/hooks/hooks.json": '{"version":1}',
+    ".github/prompts/review.prompt.md":
+        "---\ndescription: Review the repository\nagent: agent\n---\nReview this repository.\n",
+} as const satisfies Readonly<Record<string, string>>;
 
 describe("source plugin config wiring", () => {
     const collectRuleKeys = (configName: keyof typeof plugin.configs) =>
@@ -9,16 +24,62 @@ describe("source plugin config wiring", () => {
     const compareStrings = (left: string, right: string) =>
         left.localeCompare(right);
 
+    const writeFixtureFiles = async (
+        rootDirectoryPath: string,
+        files: Readonly<Record<string, string>>
+    ): Promise<void> => {
+        for (const [relativeFilePath, content] of Object.entries(files)) {
+            const absoluteFilePath = path.join(
+                rootDirectoryPath,
+                relativeFilePath
+            );
+
+            await fs.mkdir(path.dirname(absoluteFilePath), {
+                recursive: true,
+            });
+            await fs.writeFile(absoluteFilePath, content, "utf8");
+        }
+    };
+
+    const lintFixtureFiles = async (
+        overrideConfig: Linter.Config[]
+    ): Promise<readonly Linter.LintMessage[]> => {
+        const temporaryRoot = await fs.mkdtemp(
+            path.join(os.tmpdir(), "eslint-plugin-copilot-configs-")
+        );
+
+        try {
+            await writeFixtureFiles(temporaryRoot, copilotFixtureFiles);
+
+            const eslint = new ESLint({
+                cwd: temporaryRoot,
+                overrideConfig,
+                overrideConfigFile: true,
+            });
+            const results = await eslint.lintFiles(
+                Object.keys(copilotFixtureFiles).map((relativeFilePath) =>
+                    path.join(temporaryRoot, relativeFilePath)
+                )
+            );
+
+            return results.flatMap((result) => result.messages);
+        } finally {
+            await fs.rm(temporaryRoot, { force: true, recursive: true });
+        }
+    };
+
     it("registers layered markdown and JSON-aware Copilot presets", () => {
         expect.hasAssertions();
 
-        const sortedConfigNames = Object.keys(plugin.configs).toSorted(
-            compareStrings
-        );
+        const sortedConfigNames = [
+            "all",
+            "minimal",
+            "recommended",
+            "strict",
+        ] as const;
 
         for (const configName of sortedConfigNames) {
-            const configLayers =
-                plugin.configs[configName as keyof typeof plugin.configs];
+            const configLayers = plugin.configs[configName];
             const markdownLayer = configLayers[0];
 
             expect(markdownLayer?.files).toContain(
@@ -44,8 +105,7 @@ describe("source plugin config wiring", () => {
         );
 
         for (const configName of configNamesWithJsonLayer) {
-            const configLayers =
-                plugin.configs[configName as keyof typeof plugin.configs];
+            const configLayers = plugin.configs[configName];
             const jsonLayer = configLayers.find(
                 (layer) => layer.language === "json/json"
             );
@@ -54,6 +114,63 @@ describe("source plugin config wiring", () => {
             expect(jsonLayer?.plugins).toHaveProperty("copilot");
             expect(jsonLayer?.plugins).toHaveProperty("json");
         }
+    });
+
+    it("keeps self-contained presets linting Copilot markdown and hook JSON fixtures", async () => {
+        expect.hasAssertions();
+
+        const messages = await lintFixtureFiles(plugin.configs.recommended);
+        const messageIds = messages.map((message) => message.messageId);
+
+        expect(messageIds).toStrictEqual(
+            expect.arrayContaining([
+                "invalidRepositoryHooksObject",
+                "missingTools",
+            ])
+        );
+    });
+
+    it("omits JSON and Markdown plugin registrations from no-language-plugin variants", () => {
+        expect.hasAssertions();
+
+        const configNames = [
+            "all-without-language-plugins",
+            "minimal-without-language-plugins",
+            "recommended-without-language-plugins",
+            "strict-without-language-plugins",
+        ] as const;
+
+        for (const configName of configNames) {
+            const configLayers = plugin.configs[configName];
+
+            for (const layer of configLayers) {
+                expect(layer.plugins).toHaveProperty("copilot");
+                expect(layer.plugins).not.toHaveProperty("json");
+                expect(layer.plugins).not.toHaveProperty("markdown");
+            }
+        }
+    });
+
+    it("composes no-language-plugin variants after external language plugin registration", async () => {
+        expect.hasAssertions();
+
+        const messages = await lintFixtureFiles([
+            {
+                plugins: {
+                    json: jsonPlugin,
+                    markdown: markdownPlugin,
+                },
+            },
+            ...plugin.configs["recommended-without-language-plugins"],
+        ]);
+        const messageIds = messages.map((message) => message.messageId);
+
+        expect(messageIds).toStrictEqual(
+            expect.arrayContaining([
+                "invalidRepositoryHooksObject",
+                "missingTools",
+            ])
+        );
     });
 
     it("layers rule membership across presets", () => {

@@ -8,7 +8,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 import builtPlugin from "../dist/plugin.js";
-import { copilotConfigNames } from "../dist/_internal/copilot-config-references.js";
+import { copilotBaseConfigNames } from "../dist/_internal/copilot-config-references.js";
 
 const matrixSectionHeading = "## Rule matrix";
 const presetRulesSectionHeading = "## Rules in this preset";
@@ -48,7 +48,7 @@ const toPluginRuleName = (configRuleKey) => {
     return configRuleKey.slice("copilot/".length);
 };
 
-/** @param {import("../dist/_internal/copilot-config-references.js").CopilotConfigName} presetConfigName */
+/** @param {import("../dist/_internal/copilot-config-references.js").CopilotBaseConfigName} presetConfigName */
 const collectPresetRuleNames = (presetConfigName) => {
     const presetConfig = builtPlugin.configs[presetConfigName];
     const presetLayers = toConfigArray(presetConfig);
@@ -157,7 +157,7 @@ const createFixLegendLines = () => [
     "  - `—` = report only",
 ];
 
-/** @param {import("../dist/_internal/copilot-config-references.js").CopilotConfigName} presetConfigName */
+/** @param {import("../dist/_internal/copilot-config-references.js").CopilotBaseConfigName} presetConfigName */
 const generatePresetRulesSection = (presetConfigName) => {
     const presetRuleNames = collectPresetRuleNames(presetConfigName);
 
@@ -248,10 +248,11 @@ export const generatePresetsRulesMatrixSectionFromRules = (
     const orderedRuleNames = Object.keys(rules).toSorted((left, right) =>
         left.localeCompare(right)
     );
-    const headerRow = ["Rule", ...copilotConfigNames].join(" | ");
-    const separatorRow = ["---", ...copilotConfigNames.map(() => ":-:")].join(
-        " | "
-    );
+    const headerRow = ["Rule", ...copilotBaseConfigNames].join(" | ");
+    const separatorRow = [
+        "---",
+        ...copilotBaseConfigNames.map(() => ":-:"),
+    ].join(" | ");
 
     const matrixRows = orderedRuleNames.map((ruleName) => {
         const ruleModule = rules[ruleName];
@@ -270,7 +271,7 @@ export const generatePresetsRulesMatrixSectionFromRules = (
             typeof docsUrl === "string"
                 ? `[\`${ruleName}\`](${docsUrl})`
                 : `\`${ruleName}\``,
-            ...copilotConfigNames.map((configName) =>
+            ...copilotBaseConfigNames.map((configName) =>
                 configNameSet.has(configName) ? "✅" : "—"
             ),
         ];
@@ -320,7 +321,7 @@ export const syncPresetsRulesMatrix = async (options = {}) => {
         );
     }
 
-    for (const presetConfigName of copilotConfigNames) {
+    for (const presetConfigName of copilotBaseConfigNames) {
         const presetDocPath = resolve(
             process.cwd(),
             presetsDocsDirectoryPath,
