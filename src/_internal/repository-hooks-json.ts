@@ -21,7 +21,10 @@ export interface JsonObject {
     readonly [key: string]: JsonValue;
 }
 /** Any supported JSON value. */
-export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+export type JsonValue =
+    | JsonArray
+    | JsonObject
+    | JsonPrimitive;
 /** Repository hook entry paired with its source event name and array index. */
 export type RepositoryHookEntry = Readonly<{
     eventName: string;

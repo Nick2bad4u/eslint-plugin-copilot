@@ -51,6 +51,7 @@ const config = [
     {
         files: [
             "docs/docusaurus/**/*.{js,mjs,cjs,ts,mts,cts,tsx,jsx}",
+            "docs/docusaurus/**/*.css",
             "docs/docusaurus/**/*.json",
             "docs/docusaurus/**/*.md",
         ],
@@ -63,6 +64,8 @@ const config = [
             "markdown/no-multiple-h1": "off",
             "n/no-process-env": "off",
             "no-plusplus": "off",
+            // CSS is validated by the dedicated Stylelint scripts, which retain warning severities.
+            "stylelint-2/stylelint": "off",
             "unicorn/filename-case": "off",
             "unicorn/no-non-function-verb-prefix": "off",
             "unicorn/no-top-level-assignment-in-function": "off",
