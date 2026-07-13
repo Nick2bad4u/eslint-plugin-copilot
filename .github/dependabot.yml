@@ -48,6 +48,10 @@ updates:
           # transitive lockfile package exceeds Dependabot's updater budget.
           - dependency-type: "direct"
       ignore:
+          # TypeScript 7 is outside the peer ranges supported by the current
+          # TypeScript-ESLint and TypeDoc toolchain. Keep 6.x updates enabled.
+          - dependency-name: "typescript"
+            update-types: ["version-update:semver-major"]
           - dependency-name: "electron-builder"
             versions: ["< 26.0.18"]
           - dependency-name: "electron-builder-squirrel-windows"
