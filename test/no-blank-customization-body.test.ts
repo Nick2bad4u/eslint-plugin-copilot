@@ -3,67 +3,48 @@ import { describe, expect, it } from "vitest";
 import { lintMarkdownRule } from "./_internal/lint-markdown-file";
 
 describe("no-blank-customization-body", () => {
-    it("accepts prompt files with meaningful body content", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
+    it.each([
+        {
+            expectedMessageIds: [],
             filePath: ".github/prompts/review.prompt.md",
-            ruleId: "no-blank-customization-body",
+            name: "accepts prompt files with meaningful body content",
             text: "---\ndescription: Review the repository\nagent: ask\n---\nReview the repository for configuration drift and summarize the top risks.\n",
-        });
-
-        expect(messages).toHaveLength(0);
-    });
-
-    it("reports prompt files that only contain frontmatter and comments", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
+        },
+        {
+            expectedMessageIds: ["blankBody"],
             filePath: ".github/prompts/review.prompt.md",
-            ruleId: "no-blank-customization-body",
+            name: "reports prompt files that only contain frontmatter and comments",
             text: "---\ndescription: Review the repository\nagent: ask\n---\n<!-- intentionally blank -->\n",
-        });
-
-        expect(messages.map((message) => message.messageId)).toStrictEqual([
-            "blankBody",
-        ]);
-    });
-
-    it("reports blank path-specific instructions files", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
+        },
+        {
+            expectedMessageIds: ["blankBody"],
             filePath: ".github/instructions/typescript.instructions.md",
-            ruleId: "no-blank-customization-body",
+            name: "reports blank path-specific instructions files",
             text: "---\ndescription: TypeScript guidance\napplyTo: **/*.ts\n---\n",
-        });
-
-        expect(messages.map((message) => message.messageId)).toStrictEqual([
-            "blankBody",
-        ]);
-    });
-
-    it("ignores repository instructions because they are covered by a dedicated rule", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
+        },
+        {
+            expectedMessageIds: [],
             filePath: ".github/copilot-instructions.md",
-            ruleId: "no-blank-customization-body",
+            name: "ignores repository instructions because they are covered by a dedicated rule",
             text: "",
-        });
-
-        expect(messages).toHaveLength(0);
-    });
-
-    it("ignores .github/instructions/copilot-instructions.md because it is treated as repository instructions", async () => {
+        },
+        {
+            expectedMessageIds: [],
+            filePath: ".github/instructions/copilot-instructions.md",
+            name: "ignores .github/instructions/copilot-instructions.md because it is treated as repository instructions",
+            text: "",
+        },
+    ])("$name", async ({ expectedMessageIds, filePath, text }) => {
         expect.hasAssertions();
 
         const messages = await lintMarkdownRule({
-            filePath: ".github/instructions/copilot-instructions.md",
+            filePath,
             ruleId: "no-blank-customization-body",
-            text: "",
+            text,
         });
 
-        expect(messages).toHaveLength(0);
+        expect(messages.map((message) => message.messageId)).toStrictEqual(
+            expectedMessageIds
+        );
     });
 });

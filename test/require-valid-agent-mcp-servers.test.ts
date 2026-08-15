@@ -15,41 +15,26 @@ describe("require-valid-agent-mcp-servers", () => {
         expect(messages).toHaveLength(0);
     });
 
-    it("reports empty mcp-servers values", async () => {
+    it.each([
+        {
+            name: "reports empty mcp-servers values",
+            value: "",
+        },
+        {
+            name: "reports scalar mcp-servers values",
+            value: " release-coordinator.json",
+        },
+        {
+            name: "reports empty mcp-servers lists",
+            value: " []",
+        },
+    ])("$name", async ({ value }) => {
         expect.hasAssertions();
 
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/release.agent.md",
             ruleId: "require-valid-agent-mcp-servers",
-            text: "---\ndescription: Coordinate release automation\nmcp-servers:\n---\nCoordinate release tasks through MCP servers.\n",
-        });
-
-        expect(messages.map((message) => message.messageId)).toStrictEqual([
-            "invalidMcpServersField",
-        ]);
-    });
-
-    it("reports scalar mcp-servers values", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
-            filePath: ".github/agents/release.agent.md",
-            ruleId: "require-valid-agent-mcp-servers",
-            text: "---\ndescription: Coordinate release automation\nmcp-servers: release-coordinator.json\n---\nCoordinate release tasks through MCP servers.\n",
-        });
-
-        expect(messages.map((message) => message.messageId)).toStrictEqual([
-            "invalidMcpServersField",
-        ]);
-    });
-
-    it("reports empty mcp-servers lists", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
-            filePath: ".github/agents/release.agent.md",
-            ruleId: "require-valid-agent-mcp-servers",
-            text: "---\ndescription: Coordinate release automation\nmcp-servers: []\n---\nCoordinate release tasks through MCP servers.\n",
+            text: `---\ndescription: Coordinate release automation\nmcp-servers:${value}\n---\nCoordinate release tasks through MCP servers.\n`,
         });
 
         expect(messages.map((message) => message.messageId)).toStrictEqual([

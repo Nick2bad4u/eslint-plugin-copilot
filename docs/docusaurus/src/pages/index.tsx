@@ -40,7 +40,7 @@ export default function Home(): React.JSX.Element {
                                     GitHub Copilot repository linting
                                 </p>
                             </div>
-                            {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                            {/* eslint-disable-next-line docusaurus-2/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                             <h1 className="home-hero__title">
                                 eslint-plugin-copilot
                             </h1>
@@ -113,7 +113,7 @@ export default function Home(): React.JSX.Element {
                                 <span aria-hidden className="home-card__icon">
                                     {getHomeIcon(card.icon)}
                                 </span>
-                                {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                                {/* eslint-disable-next-line docusaurus-2/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                                 <h2 className="home-card__title">
                                     {card.title}
                                 </h2>

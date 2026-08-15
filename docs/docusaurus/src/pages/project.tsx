@@ -47,7 +47,7 @@ export default function ProjectPage(): React.JSX.Element {
                     <div className="container site-hero__grid">
                         <div className="site-hero__copy">
                             <p className="site-kicker">Project</p>
-                            {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                            {/* eslint-disable-next-line docusaurus-2/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                             <h1 className="site-hero__title">
                                 Live package, release, and repository signals in
                                 one place.
@@ -92,7 +92,7 @@ export default function ProjectPage(): React.JSX.Element {
                             <p className="site-panel__label">
                                 What this surfaces
                             </p>
-                            {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                            {/* eslint-disable-next-line docusaurus-2/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                             <h2 className="site-panel__title">
                                 Repository trust signals for adopters and
                                 maintainers
@@ -113,7 +113,7 @@ export default function ProjectPage(): React.JSX.Element {
                     <div className="site-section__header">
                         <div>
                             <p className="site-section__eyebrow">Signals</p>
-                            {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                            {/* eslint-disable-next-line docusaurus-2/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                             <h2 className="site-section__title">
                                 Open the surfaces that answer real evaluation
                                 questions
@@ -137,7 +137,7 @@ export default function ProjectPage(): React.JSX.Element {
                                 >
                                     {highlight.icon}
                                 </span>
-                                {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                                {/* eslint-disable-next-line docusaurus-2/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                                 <h3 className="site-link-tile__title">
                                     {highlight.title}
                                 </h3>
@@ -163,7 +163,7 @@ export default function ProjectPage(): React.JSX.Element {
                     <div className="site-section__header">
                         <div>
                             <p className="site-section__eyebrow">Next</p>
-                            {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                            {/* eslint-disable-next-line docusaurus-2/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                             <h2 className="site-section__title">
                                 Keep moving through the docs surfaces
                             </h2>
@@ -175,7 +175,7 @@ export default function ProjectPage(): React.JSX.Element {
                                 className="site-link-tile"
                                 key={page.title}
                             >
-                                {/* eslint-disable-next-line @docusaurus/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
+                                {/* eslint-disable-next-line docusaurus-2/prefer-docusaurus-heading -- The docs workspace does not expose @theme/Heading types to TypeScript in this repo setup. */}
                                 <h3 className="site-link-tile__title">
                                     {page.title}
                                 </h3>
