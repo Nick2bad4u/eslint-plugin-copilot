@@ -92,8 +92,7 @@ jobs:
               with:
                   node-version-file: ".node-version"
                   registry-url: "${{ env.NPM_REGISTRY_URL }}"
-                  cache: "npm"
-                  cache-dependency-path: "package-lock.json"
+                  package-manager-cache: false
 
             - name: "Install repository npm version"
               run: |
