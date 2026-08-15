@@ -206,4 +206,5 @@ jobs:
                   echo "ESLINT_COMPAT_DIR=${compat_dir}" >> "${GITHUB_ENV}"
 
             - name: "Run ESLint 9 compatibility smoke checks"
-              run: 'node "${ESLINT_COMPAT_DIR}/eslint9-compat-smoke.mjs" --expect-eslint-major=9'
+              run: >-
+                  node "${ESLINT_COMPAT_DIR}/eslint9-compat-smoke.mjs" --expect-eslint-major=9
