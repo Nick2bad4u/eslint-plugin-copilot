@@ -1,9 +1,8 @@
 import process from "node:process";
 
 import { ESLint } from "eslint";
+import plugin from "eslint-plugin-copilot";
 import pc from "picocolors";
-
-import plugin from "../plugin.mjs";
 
 /**
  * @typedef {Readonly<{

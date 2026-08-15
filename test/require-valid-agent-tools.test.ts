@@ -15,41 +15,26 @@ describe("require-valid-agent-tools", () => {
         expect(messages).toHaveLength(0);
     });
 
-    it("reports empty custom-agent tools values", async () => {
+    it.each([
+        {
+            name: "reports empty custom-agent tools values",
+            value: "",
+        },
+        {
+            name: "reports scalar custom-agent tools values",
+            value: " search/codebase",
+        },
+        {
+            name: "reports empty custom-agent tools lists",
+            value: " []",
+        },
+    ])("$name", async ({ value }) => {
         expect.hasAssertions();
 
         const messages = await lintMarkdownRule({
             filePath: ".github/agents/reviewer.agent.md",
             ruleId: "require-valid-agent-tools",
-            text: "---\ndescription: Review implementation quality\ntools:\n---\nReview the implementation carefully.\n",
-        });
-
-        expect(messages.map((message) => message.messageId)).toStrictEqual([
-            "invalidAgentTools",
-        ]);
-    });
-
-    it("reports scalar custom-agent tools values", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
-            filePath: ".github/agents/reviewer.agent.md",
-            ruleId: "require-valid-agent-tools",
-            text: "---\ndescription: Review implementation quality\ntools: search/codebase\n---\nReview the implementation carefully.\n",
-        });
-
-        expect(messages.map((message) => message.messageId)).toStrictEqual([
-            "invalidAgentTools",
-        ]);
-    });
-
-    it("reports empty custom-agent tools lists", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
-            filePath: ".github/agents/reviewer.agent.md",
-            ruleId: "require-valid-agent-tools",
-            text: "---\ndescription: Review implementation quality\ntools: []\n---\nReview the implementation carefully.\n",
+            text: `---\ndescription: Review implementation quality\ntools:${value}\n---\nReview the implementation carefully.\n`,
         });
 
         expect(messages.map((message) => message.messageId)).toStrictEqual([

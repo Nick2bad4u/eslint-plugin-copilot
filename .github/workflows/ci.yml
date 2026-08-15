@@ -46,7 +46,7 @@ jobs:
         steps:
             - name: "Harden the runner (Audit all outbound calls)"
               if: "${{ matrix.os == 'ubuntu-latest' }}"
-              uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
+              uses: "step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40" # v2.20.1
               with:
                   egress-policy: "audit"
 
@@ -57,11 +57,21 @@ jobs:
               uses: "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020" # v7.0.0
               with:
                   node-version-file: ".node-version"
-                  cache: "npm"
-                  cache-dependency-path: "package-lock.json"
+                  package-manager-cache: false
+
+            - name: "Install repository npm version"
+              run: |
+                  npm install --global --ignore-scripts "$(node --print "require('./package.json').packageManager")"
 
             - name: "Install dependencies"
-              run: "npm ci --force"
+              run: "npm ci --ignore-scripts"
+
+            - name: "Rebuild approved native dependencies"
+              run: "npm rebuild @swc/core esbuild unrs-resolver"
+
+            - name: "Rebuild approved macOS dependency"
+              if: "${{ matrix.os == 'macos-latest' }}"
+              run: "npm rebuild fsevents"
 
             - name: "Build package"
               run: "npm run build"
@@ -70,7 +80,7 @@ jobs:
               if: "${{ matrix.os == 'ubuntu-latest' && !cancelled() && env.CODECOV_TOKEN != '' }}"
               continue-on-error: true
               run: >-
-                  npx @codecov/bundle-analyzer ./dist --bundle-name=eslint-plugin-copilot --upload-token="${CODECOV_TOKEN}"
+                  npx --yes --ignore-scripts @codecov/bundle-analyzer@2.0.1 ./dist --bundle-name=eslint-plugin-copilot --upload-token="${CODECOV_TOKEN}"
               env:
                   GITHUB_SHA: "${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}"
                   GITHUB_REF: "${{ github.event_name == 'pull_request' && format('refs/heads/{0}', github.head_ref) || github.ref }}"
@@ -82,7 +92,7 @@ jobs:
               run: "npm run typecheck"
 
             - name: "Run tests with coverage and JUnit report"
-              run: "npx vitest run --coverage --reporter=github-actions --reporter=dot --reporter=junit --outputFile=test-report.junit.xml --silent"
+              run: "npm exec --ignore-scripts -- vitest run --coverage --reporter=github-actions --reporter=dot --reporter=junit --outputFile=test-report.junit.xml --silent"
               env:
                   CI: "true"
                   MAX_THREADS: "1"
@@ -147,7 +157,7 @@ jobs:
 
         steps:
             - name: "Harden the runner (Audit all outbound calls)"
-              uses: "step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920" # v2.20.0
+              uses: "step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40" # v2.20.1
               with:
                   egress-policy: "audit"
 
@@ -157,18 +167,42 @@ jobs:
             - name: "Setup Node.js"
               uses: "actions/setup-node@820762786026740c76f36085b0efc47a31fe5020" # v7.0.0
               with:
-                  cache: "npm"
-                  cache-dependency-path: "package-lock.json"
                   node-version-file: ".node-version"
+                  package-manager-cache: false
+
+            - name: "Install repository npm version"
+              run: |
+                  npm install --global --ignore-scripts "$(node --print "require('./package.json').packageManager")"
 
             - name: "Install dependencies"
-              run: "npm ci --force"
+              run: "npm ci --ignore-scripts"
+
+            - name: "Rebuild approved native dependencies"
+              run: "npm rebuild @swc/core esbuild unrs-resolver"
 
             - name: "Build package"
               run: "npm run build"
 
-            - name: "Install ESLint 9 runtime for compatibility smoke checks"
-              run: "npm install --no-save --force eslint@${{ matrix.eslint-version }} @eslint/js@${{ matrix.eslint-js-version }}"
+            - name: "Create isolated ESLint 9 consumer"
+              shell: "bash"
+              run: |
+                  set -euo pipefail
+                  compat_dir="${RUNNER_TEMP}/eslint-compat-${{ matrix.label }}"
+                  mkdir -p "${compat_dir}"
+                  package_archive="$(npm pack --pack-destination "${compat_dir}")"
+                  picocolors_spec="picocolors@$(node --print "require('./package.json').devDependencies.picocolors")"
+                  typescript_spec="typescript@$(node --print "require('./package.json').devDependencies.typescript")"
+                  cp scripts/eslint9-compat-smoke.mjs "${compat_dir}/"
+                  cd "${compat_dir}"
+                  npm init --yes
+                  npm install --ignore-scripts --no-save --package-lock=false \
+                      "./${package_archive}" \
+                      "eslint@${{ matrix.eslint-version }}" \
+                      "@eslint/js@${{ matrix.eslint-js-version }}" \
+                      "${picocolors_spec}" \
+                      "${typescript_spec}"
+                  echo "ESLINT_COMPAT_DIR=${compat_dir}" >> "${GITHUB_ENV}"
 
             - name: "Run ESLint 9 compatibility smoke checks"
-              run: "npm run lint:compat:eslint9 -- --expect-eslint-major=9"
+              run: >-
+                  node "${ESLINT_COMPAT_DIR}/eslint9-compat-smoke.mjs" --expect-eslint-major=9

@@ -15,41 +15,26 @@ describe("require-valid-prompt-model", () => {
         expect(messages).toHaveLength(0);
     });
 
-    it("reports empty prompt model values", async () => {
+    it.each([
+        {
+            name: "reports empty prompt model values",
+            value: "",
+        },
+        {
+            name: "reports prompt model lists",
+            value: " ['Claude Haiku 4.5 (copilot)', 'GPT-5 (copilot)']",
+        },
+        {
+            name: "reports empty prompt model list literals",
+            value: " []",
+        },
+    ])("$name", async ({ value }) => {
         expect.hasAssertions();
 
         const messages = await lintMarkdownRule({
             filePath: ".github/prompts/review.prompt.md",
             ruleId: "require-valid-prompt-model",
-            text: "---\ndescription: Review changes\nagent: plan\nmodel:\n---\nReview the requested changes.\n",
-        });
-
-        expect(messages.map((message) => message.messageId)).toStrictEqual([
-            "invalidPromptModel",
-        ]);
-    });
-
-    it("reports prompt model lists", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
-            filePath: ".github/prompts/review.prompt.md",
-            ruleId: "require-valid-prompt-model",
-            text: "---\ndescription: Review changes\nagent: plan\nmodel: ['Claude Haiku 4.5 (copilot)', 'GPT-5 (copilot)']\n---\nReview the requested changes.\n",
-        });
-
-        expect(messages.map((message) => message.messageId)).toStrictEqual([
-            "invalidPromptModel",
-        ]);
-    });
-
-    it("reports empty prompt model list literals", async () => {
-        expect.hasAssertions();
-
-        const messages = await lintMarkdownRule({
-            filePath: ".github/prompts/review.prompt.md",
-            ruleId: "require-valid-prompt-model",
-            text: "---\ndescription: Review changes\nagent: plan\nmodel: []\n---\nReview the requested changes.\n",
+            text: `---\ndescription: Review changes\nagent: plan\nmodel:${value}\n---\nReview the requested changes.\n`,
         });
 
         expect(messages.map((message) => message.messageId)).toStrictEqual([
