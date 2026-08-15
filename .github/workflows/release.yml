@@ -28,7 +28,7 @@ on:
 
 concurrency:
     group: "${{ github.workflow }}-${{ github.repository }}"
-    cancel-in-progress: "${{ github.ref != 'refs/heads/master' }}"
+    cancel-in-progress: "${{ github.ref != 'refs/heads/main' }}"
 
 defaults:
     run:
@@ -50,7 +50,7 @@ jobs:
             version: "${{ steps.version.outputs.version }}"
         env:
             CI: "true"
-            DEFAULT_RELEASE_BRANCH: "master"
+            DEFAULT_RELEASE_BRANCH: "main"
             NPM_REGISTRY_URL: "https://registry.npmjs.org"
             RELEASE_NOTES_PATH: "temp/release-notes.md"
 
