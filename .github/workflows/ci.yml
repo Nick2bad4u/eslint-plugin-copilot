@@ -185,8 +185,25 @@ jobs:
             - name: "Build package"
               run: "npm run build"
 
-            - name: "Install ESLint 9 runtime for compatibility smoke checks"
-              run: "npm install --ignore-scripts --no-save --package-lock=false eslint@${{ matrix.eslint-version }} @eslint/js@${{ matrix.eslint-js-version }}"
+            - name: "Create isolated ESLint 9 consumer"
+              shell: "bash"
+              run: |
+                  set -euo pipefail
+                  compat_dir="${RUNNER_TEMP}/eslint-compat-${{ matrix.label }}"
+                  mkdir -p "${compat_dir}"
+                  package_archive="$(npm pack --pack-destination "${compat_dir}")"
+                  picocolors_spec="picocolors@$(node --print "require('./package.json').devDependencies.picocolors")"
+                  typescript_spec="typescript@$(node --print "require('./package.json').devDependencies.typescript")"
+                  cp scripts/eslint9-compat-smoke.mjs "${compat_dir}/"
+                  cd "${compat_dir}"
+                  npm init --yes
+                  npm install --ignore-scripts --no-save --package-lock=false \
+                      "./${package_archive}" \
+                      "eslint@${{ matrix.eslint-version }}" \
+                      "@eslint/js@${{ matrix.eslint-js-version }}" \
+                      "${picocolors_spec}" \
+                      "${typescript_spec}"
+                  echo "ESLINT_COMPAT_DIR=${compat_dir}" >> "${GITHUB_ENV}"
 
             - name: "Run ESLint 9 compatibility smoke checks"
-              run: "npm run lint:compat:eslint9 -- --expect-eslint-major=9"
+              run: 'node "${ESLINT_COMPAT_DIR}/eslint9-compat-smoke.mjs" --expect-eslint-major=9'
