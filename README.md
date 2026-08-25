@@ -14,6 +14,8 @@ ESLint plugin for linting GitHub Copilot repository customization files such as:
 
 The plugin focuses on repository setup quality, metadata correctness, and modern GitHub Copilot customization conventions.
 
+> **Oxlint:** Not compatible (verified with Oxlint 1.80.0); all 69 rules and eight presets target Markdown or JSON through the `@eslint/markdown` and `@eslint/json` language plugins, while [Oxlint JavaScript plugins do not support custom formats](https://oxc.rs/docs/guide/usage/linter/js-plugins.html#api-support). Use ESLint for these Copilot customization files.
+
 ## Table of contents
 
 1. [Installation](#installation)
